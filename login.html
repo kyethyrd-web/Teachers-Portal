@@ -1,19 +1,40 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Teacher Login</title>
-</head>
-<body>
+<script type="module">
 
-  <h2>Teacher Login</h2>
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <input type="email" placeholder="Email"><br><br>
-  <input type="password" placeholder="Password"><br><br>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+    authDomain: "teachers-portal-98254.firebaseapp.com",
+    projectId: "teachers-portal-98254",
+    storageBucket: "teachers-portal-98254.firebasestorage.app",
+    messagingSenderId: "479254583768",
+    appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  };
 
-  <button>Login</button>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-  <br><br>
-  <a href="index.html">Back Home</a>
+  window.login = function() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-</body>
-</html>
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        alert("Login Successful!");
+        window.location.href = "profile.html";
+      })
+      .catch(error => alert(error.message));
+  }
+
+  window.register = function() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => alert("Account Created!"))
+      .catch(error => alert(error.message));
+  }
+
+</script>
