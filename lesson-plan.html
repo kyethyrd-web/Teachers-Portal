@@ -9,14 +9,13 @@
     }
     td {
       border: 1px solid black;
-      padding: 8px;
+      padding: 6px;
     }
-    .label {
-      width: 25%;
-      font-weight: bold;
+    select, input {
+      width: 100%;
     }
     .editable {
-      width: 75%;
+      min-height: 40px;
     }
   </style>
 </head>
@@ -24,67 +23,196 @@
 
 <h2>Daily Lesson Log</h2>
 
-<label>Select Date:</label>
+<label>Select Date</label>
 <input type="date" id="lessonDate">
-<button onclick="loadLesson()">Load Lesson</button>
+<button onclick="loadLesson()">Load</button>
 
 <br><br>
 
-<table>
+<!-- TABLE 1 -->
+<table id="headerTable">
   <tr>
-    <td class="label">School</td>
-    <td class="editable" contenteditable="true" id="school"></td>
+    <td>School</td>
+    <td id="school" class="editable"></td>
+    <td>Grade Level</td>
+    <td>
+      <select id="gradeLevel">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+    </td>
   </tr>
   <tr>
-    <td class="label">Teacher</td>
-    <td class="editable" contenteditable="true" id="teacher"></td>
+    <td>Teacher</td>
+    <td id="teacher" class="editable"></td>
+    <td>Learning Area</td>
+    <td>
+      <select id="learningArea">
+        <option>English</option>
+        <option>Math</option>
+        <option>ESP</option>
+        <option>Araling Panlipunan</option>
+        <option>MAPEH</option>
+        <option>Science</option>
+        <option>TLE</option>
+        <option>Filipino</option>
+        <option>Others</option>
+      </select>
+    </td>
   </tr>
   <tr>
-    <td class="label">Grade Level</td>
-    <td class="editable" contenteditable="true" id="gradeLevel"></td>
-  </tr>
-  <tr>
-    <td class="label">Learning Area</td>
-    <td class="editable" contenteditable="true" id="learningArea"></td>
-  </tr>
-  <tr>
-    <td class="label">Quarter</td>
-    <td class="editable" contenteditable="true" id="quarter"></td>
-  </tr>
-</table>
-
-<br>
-
-<table>
-  <tr>
-    <td class="label">Objectives</td>
-    <td class="editable" contenteditable="true" id="objectives"></td>
-  </tr>
-  <tr>
-    <td class="label">Content</td>
-    <td class="editable" contenteditable="true" id="content"></td>
-  </tr>
-  <tr>
-    <td class="label">Procedures</td>
-    <td class="editable" contenteditable="true" id="procedures"></td>
-  </tr>
-  <tr>
-    <td class="label">Assessment</td>
-    <td class="editable" contenteditable="true" id="assessment"></td>
-  </tr>
-  <tr>
-    <td class="label">Assignment</td>
-    <td class="editable" contenteditable="true" id="assignment"></td>
-  </tr>
-  <tr>
-    <td class="label">Remarks</td>
-    <td class="editable" contenteditable="true" id="remarks"></td>
+    <td>Teaching Dates and Time</td>
+    <td id="teachingTime" class="editable"></td>
+    <td>Quarter</td>
+    <td>
+      <select id="quarter">
+        <option>1st</option>
+        <option>2nd</option>
+        <option>3rd</option>
+        <option>4th</option>
+      </select>
+    </td>
   </tr>
 </table>
 
 <br>
 
-<button onclick="saveLesson()">Save Lesson Plan</button>
+<!-- TABLE 2 -->
+<table id="proceduresTable">
+  <tr>
+    <td></td>
+    <td>MONDAY</td>
+    <td>TUESDAY</td>
+    <td>WEDNESDAY</td>
+    <td>THURSDAY</td>
+    <td>FRIDAY</td>
+  </tr>
+  <tr>
+    <td>Date</td>
+    <td class="editable"></td>
+    <td class="editable"></td>
+    <td class="editable"></td>
+    <td class="editable"></td>
+    <td class="editable"></td>
+  </tr>
+  <tr>
+    <td>I. OBJECTIVES</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>A. GRADE LEVEL STANDARDS</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>B. Learning Competency</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>II. CONTENT</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>III. LEARNING RESOURCES</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>A. References</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>1. Additional Materials from Learning Resources (LR) Portal</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>B. Other Learning Resources</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>IV. PROCEDURES</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>A. Reviewing previous lesson or presenting the new lesson</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>B. Establish a purpose for the lesson</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>C. Presenting Examples/Instances of new lesson</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>D. Discussing new concepts and practicing skills #1</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>E. Discussing new concepts and practicing skills #2</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>F. Developing Mastery</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>G. Applications in daily living</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>H. Generalization</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>I. Evaluating Learning</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>J. Additional activities</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>V. Remarks</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>VI. Reflections</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>A. No. of learners who earned 80%</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>B. No. of learners needing remediation</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>C. Did remedial lessons work?</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>D. Learners continuing remediation</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>E. Teaching strategies that worked</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>F. Difficulties encountered</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+  <tr>
+    <td>G. Innovations used</td>
+    <td class="editable" colspan="5"></td>
+  </tr>
+</table>
+
+<br>
+
+<button onclick="saveLesson()">Save Lesson</button>
 <p id="status"></p>
 
 <script type="module">
@@ -111,39 +239,48 @@
   onAuthStateChanged(auth, (user) => {
     if (user) {
       currentUser = user;
+      loadProfile();
     } else {
       window.location.href = "login.html";
     }
   });
 
-  // Save lesson based on date
+  // Load profile data for school and teacher
+  async function loadProfile() {
+    const docRef = doc(db, "users", currentUser.uid);
+    const snap = await getDoc(docRef);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      document.getElementById("school").innerText = data.school || "";
+      document.getElementById("teacher").innerText = data.name || "";
+    }
+  }
+
+  // Save lesson by date
   window.saveLesson = async function() {
     const date = document.getElementById("lessonDate").value;
 
     if (!date) {
-      document.getElementById("status").innerText = "Please select a date.";
+      document.getElementById("status").innerText = "Select a date.";
       return;
     }
 
     const lesson = {
       school: document.getElementById("school").innerText,
       teacher: document.getElementById("teacher").innerText,
-      gradeLevel: document.getElementById("gradeLevel").innerText,
-      learningArea: document.getElementById("learningArea").innerText,
-      quarter: document.getElementById("quarter").innerText,
-      objectives: document.getElementById("objectives").innerText,
-      content: document.getElementById("content").innerText,
-      procedures: document.getElementById("procedures").innerText,
-      assessment: document.getElementById("assessment").innerText,
-      assignment: document.getElementById("assignment").innerText,
-      remarks: document.getElementById("remarks").innerText,
-      userId: currentUser.uid,
-      date: date
+      gradeLevel: document.getElementById("gradeLevel").value,
+      learningArea: document.getElementById("learningArea").value,
+      quarter: document.getElementById("quarter").value,
+      teachingTime: document.getElementById("teachingTime").innerText,
+      tableHTML: document.getElementById("proceduresTable").innerHTML,
+      date: date,
+      userId: currentUser.uid
     };
 
     try {
       await setDoc(doc(db, "lessonPlans", currentUser.uid + "_" + date), lesson);
-      document.getElementById("status").innerText = "Lesson plan saved!";
+      document.getElementById("status").innerText = "Lesson saved!";
     } catch (error) {
       document.getElementById("status").innerText = error.message;
     }
@@ -154,34 +291,25 @@
     const date = document.getElementById("lessonDate").value;
 
     if (!date) {
-      document.getElementById("status").innerText = "Select a date to load.";
+      document.getElementById("status").innerText = "Select a date.";
       return;
     }
 
     const docRef = doc(db, "lessonPlans", currentUser.uid + "_" + date);
-    const docSnap = await getDoc(docRef);
+    const snap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
+    if (snap.exists()) {
+      const data = snap.data();
 
-      document.getElementById("school").innerText = data.school || "";
-      document.getElementById("teacher").innerText = data.teacher || "";
-      document.getElementById("gradeLevel").innerText = data.gradeLevel || "";
-      document.getElementById("learningArea").innerText = data.learningArea || "";
-      document.getElementById("quarter").innerText = data.quarter || "";
-      document.getElementById("objectives").innerText = data.objectives || "";
-      document.getElementById("content").innerText = data.content || "";
-      document.getElementById("procedures").innerText = data.procedures || "";
-      document.getElementById("assessment").innerText = data.assessment || "";
-      document.getElementById("assignment").innerText = data.assignment || "";
-      document.getElementById("remarks").innerText = data.remarks || "";
+      document.getElementById("gradeLevel").value = data.gradeLevel || "1";
+      document.getElementById("learningArea").value = data.learningArea || "English";
+      document.getElementById("quarter").value = data.quarter || "1st";
+      document.getElementById("teachingTime").innerText = data.teachingTime || "";
+      document.getElementById("proceduresTable").innerHTML = data.tableHTML || document.getElementById("proceduresTable").innerHTML;
 
       document.getElementById("status").innerText = "Lesson loaded!";
     } else {
       document.getElementById("status").innerText = "No lesson for this date.";
-      
-      // Clear fields
-      document.querySelectorAll(".editable").forEach(el => el.innerText = "");
     }
   }
 
