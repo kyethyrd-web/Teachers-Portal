@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Portal</title>
+  <title>Teacher Portal - Profile</title>
   <style>
     body { margin: 0; font-family: Arial; }
     .container { display: flex; }
+
     .sidebar {
       width: 220px;
       background: #f4f4f4;
       padding: 15px;
       height: 100vh;
     }
+
     .sidebar button {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
       cursor: pointer;
     }
+
     .content {
       padding: 20px;
       flex: 1;
     }
+
     .section { display: none; }
-    input { width: 100%; padding: 6px; margin-bottom: 10px; }
+
+    input {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 10px;
+    }
+
     h3 { margin-top: 30px; }
   </style>
 </head>
@@ -33,7 +43,6 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Menu</h3>
-    <button onclick="showSection('dashboard')">Dashboard</button>
     <button onclick="showSection('profile')">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
     <button onclick="logout()">Logout</button>
@@ -42,14 +51,7 @@
   <!-- MAIN CONTENT -->
   <div class="content">
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="section">
-      <h2>Dashboard</h2>
-      <p id="welcomeMessage"></p>
-      <p>Total Lesson Plans: <span id="lessonCount">Loading...</span></p>
-    </div>
-
-    <!-- PROFILE -->
+    <!-- PROFILE SECTION -->
     <div id="profile" class="section">
       <h2>Profile Information</h2>
 
@@ -81,17 +83,17 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-      authDomain: "teachers-portal-98254.firebaseapp.com",
-      projectId: "teachers-portal-98254",
-      storageBucket: "teachers-portal-98254.firebasestorage.app",
-      messagingSenderId: "479254583768",
-      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-    };
-  
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -103,17 +105,14 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     document.getElementById("email").value = user.email;
     loadProfile();
-    countLessons();
-    showSection('dashboard');
+    showSection('profile');
   } else {
     window.location.href = "login.html";
   }
 });
 
 function showSection(section) {
-  document.getElementById("dashboard").style.display = "none";
   document.getElementById("profile").style.display = "none";
-
   document.getElementById(section).style.display = "block";
 }
 
@@ -137,9 +136,6 @@ async function loadProfile() {
     document.getElementById("gsis").value = data.gsis || "";
     document.getElementById("pagibig").value = data.pagibig || "";
   }
-
-  document.getElementById("welcomeMessage").innerText =
-    "Welcome, " + (snap.data()?.name || currentUser.email);
 }
 
 async function saveProfile() {
@@ -159,12 +155,6 @@ async function saveProfile() {
   }, { merge: true });
 
   document.getElementById("saveStatus").innerText = "Profile Saved Successfully!";
-}
-
-async function countLessons() {
-  const q = query(collection(db, "lessonPlans"), where("userId", "==", currentUser.uid));
-  const snapshot = await getDocs(q);
-  document.getElementById("lessonCount").innerText = snapshot.size;
 }
 
 window.logout = function() {
