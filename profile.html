@@ -33,6 +33,7 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Menu</h3>
+    <button onclick="showSection('dashboard')">Dashboard</button>
     <button onclick="showSection('profile')">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
     <button onclick="logout()">Logout</button>
@@ -41,6 +42,12 @@
   <!-- MAIN CONTENT -->
   <div class="content">
 
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="section">
+      <h2>Dashboard</h2>
+      <p id="welcomeMessage"></p>
+      <p>Total Lesson Plans: <span id="lessonCount">Loading...</span></p>
+    </div>
 
     <!-- PROFILE -->
     <div id="profile" class="section">
@@ -77,12 +84,12 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-  authDomain: "teachers-portal-98254.firebaseapp.com",
-  projectId: "teachers-portal-98254",
-  storageBucket: "teachers-portal-98254.firebasestorage.app",
-  messagingSenderId: "479254583768",
-  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
