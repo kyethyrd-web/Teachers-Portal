@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lesson Plan</title>
+</head>
+<body>
 
+  <h2>Create Lesson Plan</h2>
+
+  <textarea id="lessonContent" placeholder="Write lesson plan..." rows="10" cols="40"></textarea><br><br>
+
+  <button onclick="saveLesson()">Save Lesson Plan</button>
+
+  <p id="status"></p>
+
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      authDomain: "teachers-portal-98254.firebaseapp.com",
+      projectId: "teachers-portal-98254",
+      storageBucket: "teachers-portal-98254.firebasestorage.app",
+      messagingSenderId: "479254583768",
+      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    window.saveLesson = async function() {
+      const content = document.getElementById("lessonContent").value;
+
+      if (!content) {
+        document.getElementById("status").innerText = "Please write something.";
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "lessons"), {
+          userId: currentUser.uid,
+          content: content,
+          timestamp: new Date()
+        });
+
+        document.getElementById("status").innerText = "Lesson saved!";
+        document.getElementById("lessonContent").value = "";
+
+      } catch (error) {
+        document.getElementById("status").innerText = error.message;
+      }
+    }
+
+  </script>
+
+</body>
+</html>
