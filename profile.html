@@ -25,8 +25,6 @@
       flex: 1;
     }
 
-    .section { display: none; }
-
     input {
       width: 100%;
       padding: 6px;
@@ -34,6 +32,18 @@
     }
 
     h3 { margin-top: 30px; }
+
+    #profilePic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ccc;
+    }
+
+    .disabled input {
+      background: #f0f0f0;
+    }
   </style>
 </head>
 <body>
@@ -43,7 +53,7 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Menu</h3>
-    <button onclick="showSection('profile')">Profile</button>
+    <button onclick="showProfile()">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
     <button onclick="logout()">Logout</button>
   </div>
@@ -51,28 +61,34 @@
   <!-- MAIN CONTENT -->
   <div class="content">
 
-    <!-- PROFILE SECTION -->
-    <div id="profile" class="section">
+    <div id="profileSection">
+
       <h2>Profile Information</h2>
 
+      <img id="profilePic" src="https://via.placeholder.com/120" alt="Profile Picture"><br><br>
+      <input type="file" id="photoInput" accept="image/*">
+      <button onclick="uploadPhoto()">Upload Photo</button>
+
       <h3>Personal Information</h3>
-      <input id="name" placeholder="Full Name">
+      <input id="name" placeholder="Full Name" disabled>
       <input id="email" placeholder="Email" disabled>
-      <input id="school" placeholder="School">
-      <input id="position" placeholder="Position">
+      <input id="school" placeholder="School" disabled>
+      <input id="position" placeholder="Position" disabled>
 
       <h3>Government Information</h3>
-      <input id="employeeId" placeholder="Employee ID">
-      <input id="prcLicense" placeholder="PRC License No.">
-      <input id="depedEmail" placeholder="DepEd Email">
-      <input id="district" placeholder="District">
-      <input id="division" placeholder="Division">
-      <input id="philhealth" placeholder="PhilHealth No.">
-      <input id="tin" placeholder="TIN No.">
-      <input id="gsis" placeholder="GSIS BP No.">
-      <input id="pagibig" placeholder="Pag-IBIG No.">
+      <input id="employeeId" placeholder="Employee ID" disabled>
+      <input id="prcLicense" placeholder="PRC License No." disabled>
+      <input id="depedEmail" placeholder="DepEd Email" disabled>
+      <input id="district" placeholder="District" disabled>
+      <input id="division" placeholder="Division" disabled>
+      <input id="philhealth" placeholder="PhilHealth No." disabled>
+      <input id="tin" placeholder="TIN No." disabled>
+      <input id="gsis" placeholder="GSIS BP No." disabled>
+      <input id="pagibig" placeholder="Pag-IBIG No." disabled>
 
-      <button onclick="saveProfile()">Save Profile</button>
+      <button id="editBtn" onclick="enableEdit()">Edit</button>
+      <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Profile</button>
+
       <p id="saveStatus"></p>
     </div>
 
@@ -84,6 +100,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
@@ -92,11 +109,12 @@ const firebaseConfig = {
   storageBucket: "teachers-portal-98254.firebasestorage.app",
   messagingSenderId: "479254583768",
   appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-};;
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 let currentUser = null;
 
@@ -105,16 +123,10 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     document.getElementById("email").value = user.email;
     loadProfile();
-    showSection('profile');
   } else {
     window.location.href = "login.html";
   }
 });
-
-function showSection(section) {
-  document.getElementById("profile").style.display = "none";
-  document.getElementById(section).style.display = "block";
-}
 
 async function loadProfile() {
   const docRef = doc(db, "users", currentUser.uid);
@@ -135,10 +147,19 @@ async function loadProfile() {
     document.getElementById("tin").value = data.tin || "";
     document.getElementById("gsis").value = data.gsis || "";
     document.getElementById("pagibig").value = data.pagibig || "";
+    document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
   }
 }
 
-async function saveProfile() {
+window.enableEdit = function() {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach(input => input.disabled = false);
+
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "block";
+}
+
+window.saveProfile = async function() {
   await setDoc(doc(db, "users", currentUser.uid), {
     name: document.getElementById("name").value,
     school: document.getElementById("school").value,
@@ -155,6 +176,33 @@ async function saveProfile() {
   }, { merge: true });
 
   document.getElementById("saveStatus").innerText = "Profile Saved Successfully!";
+
+  // Gray out fields after save
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach(input => input.disabled = true);
+
+  document.getElementById("editBtn").style.display = "block";
+  document.getElementById("saveBtn").style.display = "none";
+}
+
+window.uploadPhoto = async function() {
+  const file = document.getElementById("photoInput").files[0];
+  if (!file) return;
+
+  const storageRef = ref(storage, `profilePics/${currentUser.uid}`);
+  await uploadBytes(storageRef, file);
+
+  const url = await getDownloadURL(storageRef);
+
+  await setDoc(doc(db, "users", currentUser.uid), {
+    photoURL: url
+  }, { merge: true });
+
+  document.getElementById("profilePic").src = url;
+}
+
+window.showProfile = function() {
+  document.getElementById("profileSection").style.display = "block";
 }
 
 window.logout = function() {
