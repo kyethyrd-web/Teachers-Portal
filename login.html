@@ -18,28 +18,24 @@
   <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      setPersistence,
-      browserLocalPersistence,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-  authDomain: "teachers-portal-98254.firebaseapp.com",
-  projectId: "teachers-portal-98254",
-  storageBucket: "teachers-portal-98254.firebasestorage.app",
-  messagingSenderId: "479254583768",
-  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-};
+    const auth = getAuth(app);
+
+    await setPersistence(auth, browserLocalPersistence);
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      authDomain: "teachers-portal-98254.firebaseapp.com",
+      projectId: "teachers-portal-98254",
+      storageBucket: "teachers-portal-98254.firebasestorage.app",
+      messagingSenderId: "479254583768",
+      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
-    // Enable session persistence
-    setPersistence(auth, browserLocalPersistence);
 
     window.login = function() {
       const email = document.getElementById("email").value;
