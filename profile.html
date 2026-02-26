@@ -1,34 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Profile</title>
+  <title>Teacher Portal</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-    }
-
-    .container {
-      display: flex;
-    }
-
+    body { margin: 0; font-family: Arial; }
+    .container { display: flex; }
     .sidebar {
-      width: 200px;
+      width: 220px;
       background: #f4f4f4;
       padding: 15px;
       height: 100vh;
     }
-
     .sidebar button {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
+      cursor: pointer;
     }
-
     .content {
       padding: 20px;
       flex: 1;
     }
+    .section { display: none; }
+    input { width: 100%; padding: 6px; margin-bottom: 10px; }
+    h3 { margin-top: 30px; }
   </style>
 </head>
 <body>
@@ -38,61 +33,144 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Menu</h3>
-    <button onclick="location.href='profile.html'">Profile</button>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('profile')">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
-    <!-- Add more buttons later -->
     <button onclick="logout()">Logout</button>
   </div>
 
   <!-- MAIN CONTENT -->
   <div class="content">
-    <h2>Teacher Profile</h2>
-    <p id="userEmail">Loading...</p>
-  </div>
 
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="section">
+      <h2>Dashboard</h2>
+      <p id="welcomeMessage"></p>
+      <p>Total Lesson Plans: <span id="lessonCount">Loading...</span></p>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="profile" class="section">
+      <h2>Profile Information</h2>
+
+      <h3>Personal Information</h3>
+      <input id="name" placeholder="Full Name">
+      <input id="email" placeholder="Email" disabled>
+      <input id="school" placeholder="School">
+      <input id="position" placeholder="Position">
+
+      <h3>Government Information</h3>
+      <input id="employeeId" placeholder="Employee ID">
+      <input id="prcLicense" placeholder="PRC License No.">
+      <input id="depedEmail" placeholder="DepEd Email">
+      <input id="district" placeholder="District">
+      <input id="division" placeholder="Division">
+      <input id="philhealth" placeholder="PhilHealth No.">
+      <input id="tin" placeholder="TIN No.">
+      <input id="gsis" placeholder="GSIS BP No.">
+      <input id="pagibig" placeholder="Pag-IBIG No.">
+
+      <button onclick="saveProfile()">Save Profile</button>
+      <p id="saveStatus"></p>
+    </div>
+
+  </div>
 </div>
 
 <script type="module">
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-  authDomain: "teachers-portal-98254.firebaseapp.com",
-  projectId: "teachers-portal-98254",
-  storageBucket: "teachers-portal-98254.firebasestorage.app",
-  messagingSenderId: "479254583768",
-  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      document.getElementById("userEmail").innerText = "Logged in as: " + user.email;
+let currentUser = null;
 
-      const docRef = doc(db, "users", user.uid);
-      const snap = await getDoc(docRef);
-
-      if (snap.exists()) {
-        const data = snap.data();
-        document.getElementById("userEmail").innerText += "\nName: " + (data.name || "");
-      }
-
-    } else {
-      window.location.href = "login.html";
-    }
-  });
-
-  window.logout = function() {
-    signOut(auth).then(() => {
-      window.location.href = "login.html";
-    });
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById("email").value = user.email;
+    loadProfile();
+    countLessons();
+    showSection('dashboard');
+  } else {
+    window.location.href = "login.html";
   }
+});
+
+function showSection(section) {
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("profile").style.display = "none";
+  document.getElementById(section).style.display = "block";
+}
+
+async function loadProfile() {
+  const docRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(docRef);
+
+  if (snap.exists()) {
+    const data = snap.data();
+
+    document.getElementById("name").value = data.name || "";
+    document.getElementById("school").value = data.school || "";
+    document.getElementById("position").value = data.position || "";
+    document.getElementById("employeeId").value = data.employeeId || "";
+    document.getElementById("prcLicense").value = data.prcLicense || "";
+    document.getElementById("depedEmail").value = data.depedEmail || "";
+    document.getElementById("district").value = data.district || "";
+    document.getElementById("division").value = data.division || "";
+    document.getElementById("philhealth").value = data.philhealth || "";
+    document.getElementById("tin").value = data.tin || "";
+    document.getElementById("gsis").value = data.gsis || "";
+    document.getElementById("pagibig").value = data.pagibig || "";
+  }
+
+  document.getElementById("welcomeMessage").innerText =
+    "Welcome, " + (snap.data()?.name || currentUser.email);
+}
+
+async function saveProfile() {
+  await setDoc(doc(db, "users", currentUser.uid), {
+    name: document.getElementById("name").value,
+    school: document.getElementById("school").value,
+    position: document.getElementById("position").value,
+    employeeId: document.getElementById("employeeId").value,
+    prcLicense: document.getElementById("prcLicense").value,
+    depedEmail: document.getElementById("depedEmail").value,
+    district: document.getElementById("district").value,
+    division: document.getElementById("division").value,
+    philhealth: document.getElementById("philhealth").value,
+    tin: document.getElementById("tin").value,
+    gsis: document.getElementById("gsis").value,
+    pagibig: document.getElementById("pagibig").value,
+  }, { merge: true });
+
+  document.getElementById("saveStatus").innerText = "Profile Saved Successfully!";
+}
+
+async function countLessons() {
+  const q = query(collection(db, "lessonPlans"), where("userId", "==", currentUser.uid));
+  const snapshot = await getDocs(q);
+  document.getElementById("lessonCount").innerText = snapshot.size;
+}
+
+window.logout = function() {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+}
 
 </script>
 
