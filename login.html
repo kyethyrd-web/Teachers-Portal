@@ -18,8 +18,12 @@
   <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const auth = getAuth(app);
+
+    await setPersistence(auth, browserLocalPersistence);
 
     const firebaseConfig = {
       apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
