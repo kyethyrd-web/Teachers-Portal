@@ -1,40 +1,66 @@
-<script type="module">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Login</title>
+</head>
+<body>
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <h2>Teacher Login</h2>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-    authDomain: "teachers-portal-98254.firebaseapp.com",
-    projectId: "teachers-portal-98254",
-    storageBucket: "teachers-portal-98254.firebasestorage.app",
-    messagingSenderId: "479254583768",
-    appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-  };
+  <input type="email" id="email" placeholder="Email"><br><br>
+  <input type="password" id="password" placeholder="Password"><br><br>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
 
-  window.login = function() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+  <p id="message"></p>
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        alert("Login Successful!");
-        window.location.href = "profile.html";
-      })
-      .catch(error => alert(error.message));
-  }
+  <script type="module">
 
-  window.register = function() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => alert("Account Created!"))
-      .catch(error => alert(error.message));
-  }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      authDomain: "teachers-portal-98254.firebaseapp.com",
+      projectId: "teachers-portal-98254",
+      storageBucket: "teachers-portal-98254.firebasestorage.app",
+      messagingSenderId: "479254583768",
+      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+    };
 
-</script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("message").innerText = "Login Successful!";
+          window.location.href = "profile.html";
+        })
+        .catch(error => {
+          document.getElementById("message").innerText = error.message;
+        });
+    }
+
+    window.register = function() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("message").innerText = "Account Created!";
+        })
+        .catch(error => {
+          document.getElementById("message").innerText = error.message;
+        });
+    }
+
+  </script>
+
+</body>
+</html>
