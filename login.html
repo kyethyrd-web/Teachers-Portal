@@ -18,15 +18,16 @@
   <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const auth = getAuth(app);
-
-    await setPersistence(auth, browserLocalPersistence);
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmwWump0b0R09xs",
       authDomain: "teachers-portal-98254.firebaseapp.com",
       projectId: "teachers-portal-98254",
       storageBucket: "teachers-portal-98254.firebasestorage.app",
@@ -37,13 +38,12 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    // Enable session persistence
+    setPersistence(auth, browserLocalPersistence);
 
-  await signInWithEmailAndPassword(auth, email, password);
-  window.location.href = "profile.html";
-}
+    window.login = function() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
