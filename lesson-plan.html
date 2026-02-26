@@ -1,71 +1,288 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lesson Plan</title>
+  <title>Daily Lesson Log</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    td, th {
+      border: 1px solid black;
+      padding: 8px;
+      vertical-align: top;
+    }
+    .editable {
+      min-height: 40px;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Create Lesson Plan</h2>
+<h2>GRADES 1 to 12 DAILY LESSON LOG</h2>
 
-  <textarea id="lessonContent" placeholder="Write lesson plan..." rows="10" cols="40"></textarea><br><br>
+<table>
+  <tr>
+    <td>School:</td>
+    <td contenteditable="true">:contentReference[oaicite:0]{index=0}</td>
+    <td>Grade Level:</td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td>Teacher:</td>
+    <td contenteditable="true">:contentReference[oaicite:1]{index=1}</td>
+    <td>Learning Area:</td>
+    <td contenteditable="true">ENGLISH</td>
+  </tr>
+  <tr>
+    <td>Teaching Dates and Time:</td>
+    <td contenteditable="true"></td>
+    <td>Quarter:</td>
+    <td contenteditable="true"></td>
+  </tr>
+</table>
 
-  <button onclick="saveLesson()">Save Lesson Plan</button>
+<br>
 
-  <p id="status"></p>
+<table>
+  <tr>
+    <th>MONDAY</th>
+    <th>TUESDAY</th>
+    <th>WEDNESDAY</th>
+    <th>THURSDAY</th>
+    <th>FRIDAY</th>
+  </tr>
+  <tr>
+    <td contenteditable="true">DATE:</td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+</table>
 
-  <script type="module">
+<br>
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<table>
+  <tr>
+    <th>I. OBJECTIVES</th>
+  </tr>
+  <tr>
+    <td>
+      <strong>A. GRADE LEVEL STANDARDS:</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>B. Learning Competencies / Objectives</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+</table>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-      authDomain: "teachers-portal-98254.firebaseapp.com",
-      projectId: "teachers-portal-98254",
-      storageBucket: "teachers-portal-98254.firebasestorage.app",
-      messagingSenderId: "479254583768",
-      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+<br>
+
+<table>
+  <tr>
+    <th>II. CONTENT</th>
+  </tr>
+  <tr>
+    <td contenteditable="true" class="editable"></td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>III. LEARNING RESOURCES</th>
+  </tr>
+  <tr>
+    <td>
+      <strong>A. References</strong>
+      <div contenteditable="true" class="editable"></div>
+
+      <strong>1. Additional Materials from LR Portal</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>B. Other Learning Resources</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>IV. PROCEDURES</th>
+  </tr>
+  <tr>
+    <td>
+      <strong>A. Reviewing previous lesson or presenting the new lesson</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>B. Establishing a purpose for the lesson</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>C. Presenting Examples/Instances of new lesson</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>D. Discussing new concepts and practicing skills #1</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>E. Discussing new concepts and practicing skills #2</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>F. Developing mastery</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>G. Applications in daily living</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>H. Generalizations</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>I. Evaluating Learning</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>J. Additional activities</strong>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>V. REMARKS</th>
+  </tr>
+  <tr>
+    <td contenteditable="true" class="editable"></td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>VI. REFLECTIONS</th>
+  </tr>
+  <tr>
+    <td>
+      A. Learners who earned 80%<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      B. Learners needing remediation<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      C. Did remedial lessons work?<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      D. Learners needing remediation<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      E. Teaching strategies that worked<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      F. Difficulties encountered<br>
+      <div contenteditable="true" class="editable"></div><br>
+
+      G. Innovations used<br>
+      <div contenteditable="true" class="editable"></div>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<button onclick="saveLesson()">Save Lesson Plan</button>
+<p id="status"></p>
+
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+    authDomain: "teachers-portal-98254.firebaseapp.com",
+    projectId: "teachers-portal-98254",
+    storageBucket: "teachers-portal-98254.firebasestorage.app",
+    messagingSenderId: "479254583768",
+    appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null;
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  window.saveLesson = async function() {
+
+    const lesson = {
+      school: document.querySelectorAll("td")[1].innerText,
+      teacher: document.querySelectorAll("td")[3].innerText,
+      gradeLevel: document.querySelectorAll("td")[5].innerText,
+      learningArea: document.querySelectorAll("td")[7].innerText,
+      quarter: document.querySelectorAll("td")[9].innerText,
+      objectives: document.querySelector("strong").nextElementSibling.innerText,
+      content: document.querySelectorAll("td")[10].innerText,
+      userId: currentUser.uid,
+      timestamp: new Date()
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-      } else {
-        window.location.href = "login.html";
-      }
-    });
-
-    window.saveLesson = async function() {
-      const content = document.getElementById("lessonContent").value;
-
-      if (!content) {
-        document.getElementById("status").innerText = "Please write something.";
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "lessons"), {
-          userId: currentUser.uid,
-          content: content,
-          timestamp: new Date()
-        });
-
-        document.getElementById("status").innerText = "Lesson saved!";
-        document.getElementById("lessonContent").value = "";
-
-      } catch (error) {
-        document.getElementById("status").innerText = error.message;
-      }
+    try {
+      await addDoc(collection(db, "lessonPlans"), lesson);
+      document.getElementById("status").innerText = "Lesson plan saved!";
+    } catch (error) {
+      document.getElementById("status").innerText = error.message;
     }
+  }
 
-  </script>
+</script>
 
 </body>
 </html>
