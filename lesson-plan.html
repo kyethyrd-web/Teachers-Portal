@@ -1,277 +1,295 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Lesson Plan</title>
+  <title>Daily Lesson Log</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  display: flex;
-}
+  <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+    }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-  width: 220px;
-  background: #1e3a8a;
-  color: white;
-  height: 100vh;
-  padding-top: 20px;
-  transition: 0.3s;
-}
+    h2 {
+      margin-bottom: 10px;
+    }
 
-.sidebar.collapsed {
-  width: 70px;
-}
+    .top-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-.sidebar button {
-  background: none;
-  border: none;
-  color: white;
-  padding: 15px;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  font-size: 16px;
-}
+    input[type="date"] {
+      width: 160px; /* shorter date box */
+      padding: 5px;
+    }
 
-.sidebar button:hover {
-  background: #3749a6;
-}
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
 
-.toggle-btn {
-  font-size: 20px;
-  text-align: center;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
 
-/* ===== MAIN ===== */
-.main {
-  flex: 1;
-  padding: 20px;
-}
+    td {
+      border: 1px solid black;
+      padding: 6px;
+      vertical-align: top;
+    }
 
-.week-picker {
-  width: 220px;
-  padding: 5px;
-  margin-bottom: 10px;
-}
+    select, input[type="text"] {
+      width: 100%;
+      padding: 4px;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
+    .editable {
+      min-height: 50px;
+    }
 
-td {
-  border: 1px solid black;
-  padding: 6px;
-  vertical-align: top;
-}
+    .indent-1 { padding-left: 20px; }
+    .indent-2 { padding-left: 40px; }
 
-.label {
-  width: 200px;
-  font-weight: bold;
-}
-
-.indent1 { padding-left: 20px; }
-.indent2 { padding-left: 40px; }
-
-input, textarea {
-  width: 100%;
-  border: none;
-  outline: none;
-  font-family: Arial;
-}
-
-textarea {
-  resize: vertical;
-}
-
-.header-center {
-  text-align: center;
-}
-
-.export-btn, .save-btn {
-  margin-top: 15px;
-  padding: 8px 15px;
-  background: #1e3a8a;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.export-btn:hover, .save-btn:hover {
-  background: #3749a6;
-}
-</style>
+  </style>
 </head>
-
 <body>
 
-<div class="sidebar" id="sidebar">
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-  <button onclick="window.location='profile.html'">Profile</button>
-  <button onclick="window.location='dashboard.html'">Home</button>
+<h2>Daily Lesson Log</h2>
+
+<div class="top-bar">
+  <button onclick="location.href='profile.html'">Home</button>
+  <input type="date" id="lessonDate">
+  <button onclick="loadLesson()">Load</button>
 </div>
 
-<div class="main">
-
-<h3>Select Any Date (Auto Generates Week)</h3>
-<input type="date" class="week-picker" onchange="generateWeek(this.value)">
-
-<div id="documentArea">
-
-<div class="header-center">
-  <h3>DETAILED LESSON PLAN</h3>
-  <p>School: <input id="school"></p>
-  <p>Teacher: <input id="teacher"></p>
-  <p>Grade Level: <input id="grade"></p>
-  <p>Subject: <input id="subject"></p>
-  <p>Week: <span id="weekRange"></span></p>
-  <p>Time: <input id="time"></p>
-</div>
-
+<!-- HEADER TABLE -->
 <table>
-<tr>
-  <td class="label">I. OBJECTIVES</td>
-  <td></td>
-</tr>
-<tr>
-  <td class="label indent1">A. Content Standard</td>
-  <td><textarea id="contentStandard"></textarea></td>
-</tr>
-<tr>
-  <td class="label indent1">B. Performance Standard</td>
-  <td><textarea id="performanceStandard"></textarea></td>
-</tr>
-<tr>
-  <td class="label indent1">C. Learning Competencies</td>
-  <td><textarea id="competencies"></textarea></td>
-</tr>
+  <tr>
+    <td>School</td>
+    <td id="school"></td>
+    <td>Grade Level</td>
+    <td>
+      <select id="gradeLevel">
+        ${[...Array(12)].map((_,i)=>`<option>${i+1}</option>`).join("")}
+      </select>
+    </td>
+  </tr>
 
-<tr>
-  <td class="label">II. CONTENT</td>
-  <td><textarea id="content"></textarea></td>
-</tr>
+  <tr>
+    <td>Teacher</td>
+    <td id="teacher"></td>
+    <td>Learning Area</td>
+    <td>
+      <select id="learningArea">
+        <option>English</option>
+        <option>Math</option>
+        <option>ESP</option>
+        <option>Araling Panlipunan</option>
+        <option>MAPEH</option>
+        <option>Science</option>
+        <option>TLE</option>
+        <option>Filipino</option>
+      </select>
+    </td>
+  </tr>
 
-<tr>
-  <td class="label">III. LEARNING RESOURCES</td>
-  <td></td>
-</tr>
-<tr>
-  <td class="label indent1">A. References</td>
-  <td><textarea id="references"></textarea></td>
-</tr>
-<tr>
-  <td class="label indent1">B. Other Resources</td>
-  <td><textarea id="otherResources"></textarea></td>
-</tr>
+  <tr>
+    <td>Teaching Dates and Time</td>
+    <td id="dateRange"></td>
+    <td>Quarter</td>
+    <td>
+      <select id="quarter">
+        <option>1st</option>
+        <option>2nd</option>
+        <option>3rd</option>
+        <option>4th</option>
+      </select>
+    </td>
+  </tr>
 
-<tr>
-  <td class="label">IV. PROCEDURE</td>
-  <td><textarea id="procedure"></textarea></td>
-</tr>
-
-<tr>
-  <td class="label">V. REMARKS</td>
-  <td><textarea id="remarks"></textarea></td>
-</tr>
-
-<tr>
-  <td class="label">VI. REFLECTION</td>
-  <td><textarea id="reflection"></textarea></td>
-</tr>
-
+  <tr>
+    <td>Time</td>
+    <td contenteditable="true" id="timeCell"></td>
+    <td></td>
+    <td></td>
+  </tr>
 </table>
 
-</div>
+<!-- PROCEDURES TABLE -->
+<table id="proceduresTable">
+  <tr>
+    <td></td>
+    <td>MONDAY</td>
+    <td>TUESDAY</td>
+    <td>WEDNESDAY</td>
+    <td>THURSDAY</td>
+    <td>FRIDAY</td>
+  </tr>
 
-<button class="save-btn" onclick="saveData()">Save</button>
-<button class="export-btn" onclick="exportToWord()">Export to Word</button>
+  <tr>
+    <td>Date</td>
+    <td id="dateMon"></td>
+    <td id="dateTue"></td>
+    <td id="dateWed"></td>
+    <td id="dateThu"></td>
+    <td id="dateFri"></td>
+  </tr>
 
-</div>
+  <!-- Roman (No indent) -->
+  <tr>
+    <td>I. OBJECTIVES</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
 
-<script>
+  <!-- Alphabet (Indent 1) -->
+  <tr>
+    <td class="indent-1">A. GRADE LEVEL STANDARDS</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
 
-/* ===== SIDEBAR ===== */
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("collapsed");
+  <tr>
+    <td class="indent-1">B. Learning Competency</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <!-- Roman -->
+  <tr>
+    <td>II. CONTENT</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <!-- Roman -->
+  <tr>
+    <td>III. LEARNING RESOURCES</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <!-- Alphabet -->
+  <tr>
+    <td class="indent-1">A. References</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <!-- Number (Indent 2) -->
+  <tr>
+    <td class="indent-2">1. Additional Materials from LR Portal</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <tr>
+    <td class="indent-1">B. Other Learning Resources</td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+</table>
+
+<button onclick="saveLesson()">Save Lesson</button>
+<p id="status"></p>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+  authDomain: "teachers-portal-98254.firebaseapp.com",
+  projectId: "teachers-portal-98254",
+  storageBucket: "teachers-portal-98254.firebasestorage.app",
+  messagingSenderId: "479254583768",
+  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) window.location.href = "login.html";
+  currentUser = user;
+
+  const snap = await getDoc(doc(db,"users",user.uid));
+  if (snap.exists()) {
+    document.getElementById("school").innerText = snap.data().school || "";
+    document.getElementById("teacher").innerText = snap.data().name || "";
+  }
+});
+
+function getMonday(date){
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
 }
 
-/* ===== WEEK GENERATOR ===== */
-function generateWeek(dateStr) {
-  let date = new Date(dateStr);
-  let day = date.getDay();
-  let monday = new Date(date);
-  monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
-  let friday = new Date(monday);
-  friday.setDate(monday.getDate() + 4);
+function formatRange(monday){
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate()+4);
 
-  const options = { month: 'long', day: '2-digit', year: 'numeric' };
+  const options = { month: "long" };
 
-  let formatted =
-    monday.toLocaleDateString('en-US', options) +
-    " – " +
-    friday.toLocaleDateString('en-US', options);
+  const month1 = monday.toLocaleString("default", options);
+  const month2 = friday.toLocaleString("default", options);
 
-  document.getElementById("weekRange").innerText = formatted;
+  if (month1 === month2) {
+    return `${month1} ${monday.getDate()}-${friday.getDate()}, ${monday.getFullYear()}`;
+  } else {
+    return `${month1} ${monday.getDate()} - ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
+  }
 }
 
-/* ===== SAVE SAFELY ===== */
-function saveData() {
-  const data = {
-    school: school.value,
-    teacher: teacher.value,
-    grade: grade.value,
-    subject: subject.value,
-    week: weekRange.innerText,
-    time: time.value,
-    contentStandard: contentStandard.value,
-    performanceStandard: performanceStandard.value,
-    competencies: competencies.value,
-    content: content.value,
-    references: references.value,
-    otherResources: otherResources.value,
-    procedure: procedure.value,
-    remarks: remarks.value,
-    reflection: reflection.value
-  };
+window.loadLesson = function(){
+  const selected = document.getElementById("lessonDate").value;
+  if (!selected) return;
 
-  localStorage.setItem("lessonPlan", JSON.stringify(data));
-  alert("Saved successfully!");
-}
+  const monday = getMonday(selected);
 
-/* ===== EXPORT TO WORD ===== */
-function exportToWord() {
+  for(let i=0;i<5;i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    document.getElementById(["dateMon","dateTue","dateWed","dateThu","dateFri"][i])
+      .innerText = d.toISOString().split("T")[0];
+  }
 
-  let content = document.getElementById("documentArea").innerHTML;
+  document.getElementById("dateRange").innerText = formatRange(monday);
+};
 
-  let header = `
-  <html xmlns:o='urn:schemas-microsoft-com:office:office'
-  xmlns:w='urn:schemas-microsoft-com:office:word'
-  xmlns='http://www.w3.org/TR/REC-html40'>
-  <head><meta charset='utf-8'></head><body>`;
+window.saveLesson = async function(){
+  const selected = document.getElementById("lessonDate").value;
+  if (!selected) return;
 
-  let footer = "</body></html>";
-
-  let sourceHTML = header + content + footer;
-
-  let blob = new Blob(['\ufeff', sourceHTML], {
-    type: 'application/msword'
+  await setDoc(doc(db,"lessonPlans",currentUser.uid+"_"+selected),{
+    date:selected,
+    dateRange:document.getElementById("dateRange").innerText,
+    time:document.getElementById("timeCell").innerText,
+    tableHTML:document.getElementById("proceduresTable").innerHTML,
+    userId:currentUser.uid
   });
 
-  let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-
-  let downloadLink = document.createElement("a");
-  document.body.appendChild(downloadLink);
-
-  downloadLink.href = url;
-  downloadLink.download = "Detailed_Lesson_Plan.doc";
-  downloadLink.click();
-
-  document.body.removeChild(downloadLink);
-}
+  document.getElementById("status").innerText="Lesson Saved!";
+};
 
 </script>
 
