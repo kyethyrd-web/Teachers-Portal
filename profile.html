@@ -3,7 +3,7 @@
 <head>
   <title>Teacher Portal - Profile</title>
   <style>
-    body { margin: 0; font-family: Arial; }
+    body { margin: 0; font-family: Arial, sans-serif; }
     .container { display: flex; }
 
     .sidebar {
@@ -18,32 +18,76 @@
       margin-bottom: 10px;
       padding: 10px;
       cursor: pointer;
+      border: none;
+      background: #ddd;
     }
 
     .content {
-      padding: 20px;
+      padding: 30px;
       flex: 1;
+    }
+
+    h2 { margin-bottom: 20px; }
+
+    /* PROFILE PICTURE */
+    .profile-pic-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #profilePic {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ccc;
+      cursor: pointer;
+    }
+
+    #profilePic:hover {
+      opacity: 0.8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    td:first-child {
+      width: 30%;
+      font-weight: bold;
+      background: #f9f9f9;
     }
 
     input {
       width: 100%;
       padding: 6px;
-      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
-    h3 { margin-top: 30px; }
-
-    #profilePic {
-      width: 120px;
-      height: 160px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-    }
-
-    .disabled input {
+    input:disabled {
       background: #f0f0f0;
     }
+
+    .buttons {
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #saveBtn { display: none; }
   </style>
 </head>
 <body>
@@ -53,44 +97,49 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Menu</h3>
-    <button onclick="showProfile()">Profile</button>
+    <button onclick="location.href='profile.html'">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
     <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- CONTENT -->
   <div class="content">
 
-    <div id="profileSection">
+    <h2>Profile Information</h2>
 
-      <h2>Profile Information</h2>
-
-      <img id="profilePic" src="https://via.placeholder.com/120" alt="Profile Picture"><br><br>
-      <input type="file" id="photoInput" accept="image/*">
-      <button onclick="uploadPhoto()">Upload Photo</button>
-
-      <h3>Personal Information</h3>
-      <input id="name" placeholder="Full Name" disabled>
-      <input id="email" placeholder="Email" disabled>
-      <input id="school" placeholder="School" disabled>
-      <input id="position" placeholder="Position" disabled>
-
-      <h3>Government Information</h3>
-      <input id="employeeId" placeholder="Employee ID" disabled>
-      <input id="prcLicense" placeholder="PRC License No." disabled>
-      <input id="depedEmail" placeholder="DepEd Email" disabled>
-      <input id="district" placeholder="District" disabled>
-      <input id="division" placeholder="Division" disabled>
-      <input id="philhealth" placeholder="PhilHealth No." disabled>
-      <input id="tin" placeholder="TIN No." disabled>
-      <input id="gsis" placeholder="GSIS BP No." disabled>
-      <input id="pagibig" placeholder="Pag-IBIG No." disabled>
-
-      <button id="editBtn" onclick="enableEdit()">Edit</button>
-      <button id="saveBtn" onclick="saveProfile()" style="display:none;">Save Profile</button>
-
-      <p id="saveStatus"></p>
+    <div class="profile-pic-container">
+      <img id="profilePic" src="https://via.placeholder.com/150">
+      <input type="file" id="photoInput" accept="image/*" style="display:none;">
+      <p style="font-size:13px;">Click photo to change</p>
     </div>
+
+    <h3>Personal Information</h3>
+    <table>
+      <tr><td>Full Name</td><td><input id="name" disabled></td></tr>
+      <tr><td>Email</td><td><input id="email" disabled></td></tr>
+      <tr><td>School</td><td><input id="school" disabled></td></tr>
+      <tr><td>Position</td><td><input id="position" disabled></td></tr>
+    </table>
+
+    <h3>Government Information</h3>
+    <table>
+      <tr><td>Employee ID</td><td><input id="employeeId" disabled></td></tr>
+      <tr><td>PRC License</td><td><input id="prcLicense" disabled></td></tr>
+      <tr><td>DepEd Email</td><td><input id="depedEmail" disabled></td></tr>
+      <tr><td>District</td><td><input id="district" disabled></td></tr>
+      <tr><td>Division</td><td><input id="division" disabled></td></tr>
+      <tr><td>PhilHealth No.</td><td><input id="philhealth" disabled></td></tr>
+      <tr><td>TIN No.</td><td><input id="tin" disabled></td></tr>
+      <tr><td>GSIS BP No.</td><td><input id="gsis" disabled></td></tr>
+      <tr><td>Pag-IBIG No.</td><td><input id="pagibig" disabled></td></tr>
+    </table>
+
+    <div class="buttons">
+      <button id="editBtn" onclick="enableEdit()">Edit</button>
+      <button id="saveBtn" onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <p id="saveStatus"></p>
 
   </div>
 </div>
@@ -110,105 +159,87 @@ const firebaseConfig = {
   messagingSenderId: "479254583768",
   appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
 };
-  
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-let currentUser = null;
+let currentUser;
 
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    document.getElementById("email").value = user.email;
-    loadProfile();
-  } else {
+  if (!user) {
     window.location.href = "login.html";
+    return;
   }
+
+  currentUser = user;
+  document.getElementById("email").value = user.email;
+  loadProfile();
 });
 
 async function loadProfile() {
-  const docRef = doc(db, "users", currentUser.uid);
-  const snap = await getDoc(docRef);
+  const snap = await getDoc(doc(db, "users", currentUser.uid));
 
   if (snap.exists()) {
     const data = snap.data();
+    Object.keys(data).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = data[id];
+    });
 
-    document.getElementById("name").value = data.name || "";
-    document.getElementById("school").value = data.school || "";
-    document.getElementById("position").value = data.position || "";
-    document.getElementById("employeeId").value = data.employeeId || "";
-    document.getElementById("prcLicense").value = data.prcLicense || "";
-    document.getElementById("depedEmail").value = data.depedEmail || "";
-    document.getElementById("district").value = data.district || "";
-    document.getElementById("division").value = data.division || "";
-    document.getElementById("philhealth").value = data.philhealth || "";
-    document.getElementById("tin").value = data.tin || "";
-    document.getElementById("gsis").value = data.gsis || "";
-    document.getElementById("pagibig").value = data.pagibig || "";
-    document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
+    if (data.photoURL) {
+      document.getElementById("profilePic").src = data.photoURL;
+    }
   }
 }
 
 window.enableEdit = function() {
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach(input => input.disabled = false);
+  document.querySelectorAll("input").forEach(input => {
+    if (input.id !== "email") input.disabled = false;
+  });
 
   document.getElementById("editBtn").style.display = "none";
-  document.getElementById("saveBtn").style.display = "block";
+  document.getElementById("saveBtn").style.display = "inline-block";
 }
 
 window.saveProfile = async function() {
-  await setDoc(doc(db, "users", currentUser.uid), {
-    name: document.getElementById("name").value,
-    school: document.getElementById("school").value,
-    position: document.getElementById("position").value,
-    employeeId: document.getElementById("employeeId").value,
-    prcLicense: document.getElementById("prcLicense").value,
-    depedEmail: document.getElementById("depedEmail").value,
-    district: document.getElementById("district").value,
-    division: document.getElementById("division").value,
-    philhealth: document.getElementById("philhealth").value,
-    tin: document.getElementById("tin").value,
-    gsis: document.getElementById("gsis").value,
-    pagibig: document.getElementById("pagibig").value,
-  }, { merge: true });
+  const data = {};
+  document.querySelectorAll("input").forEach(input => {
+    if (input.id !== "photoInput")
+      data[input.id] = input.value;
+  });
 
-  document.getElementById("saveStatus").innerText = "Profile Saved Successfully!";
+  await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
 
-  // Gray out fields after save
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach(input => input.disabled = true);
+  document.querySelectorAll("input").forEach(input => input.disabled = true);
 
-  document.getElementById("editBtn").style.display = "block";
+  document.getElementById("editBtn").style.display = "inline-block";
   document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("saveStatus").innerText = "Profile saved successfully!";
 }
 
-window.uploadPhoto = async function() {
-  const file = document.getElementById("photoInput").files[0];
+/* CLICK PHOTO TO CHANGE */
+document.getElementById("profilePic").addEventListener("click", () => {
+  document.getElementById("photoInput").click();
+});
+
+/* AUTO UPLOAD WHEN SELECTED */
+document.getElementById("photoInput").addEventListener("change", async function() {
+  const file = this.files[0];
   if (!file) return;
 
   const storageRef = ref(storage, `profilePics/${currentUser.uid}`);
   await uploadBytes(storageRef, file);
-
   const url = await getDownloadURL(storageRef);
 
-  await setDoc(doc(db, "users", currentUser.uid), {
-    photoURL: url
-  }, { merge: true });
+  await setDoc(doc(db, "users", currentUser.uid), { photoURL: url }, { merge: true });
 
   document.getElementById("profilePic").src = url;
-}
-
-window.showProfile = function() {
-  document.getElementById("profileSection").style.display = "block";
-}
+});
 
 window.logout = function() {
-  signOut(auth).then(() => {
-    window.location.href = "login.html";
-  });
+  signOut(auth).then(() => window.location.href = "login.html");
 }
 
 </script>
