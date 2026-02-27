@@ -53,6 +53,26 @@
 
     .indent-1 { padding-left: 20px; }
     .indent-2 { padding-left: 40px; }
+.infoTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.infoTable td {
+  border: 1px solid black;
+  padding: 6px;
+}
+.infoTable td:nth-child(1),
+.infoTable td:nth-child(3){
+  width: 20%;
+  white-space: nowrap;
+}
+
+.infoTable td:nth-child(2),
+.infoTable td:nth-child(4){
+  width: 30%;
+}
 
   </style>
 </head>
@@ -66,7 +86,6 @@
   <button onclick="loadLesson()">Load</button>
 </div>
 
-<!-- HEADER TABLE -->
 <table class="infoTable" border="1">
   <tr>
     <td class="label">School</td>
@@ -391,11 +410,11 @@ onAuthStateChanged(auth, async (user) => {
 
   const snap = await getDoc(doc(db,"users",user.uid));
   if (snap.exists()) {
-    const data = snap.data();
-    document.getElementById("school").innerText = data.school || "";
-    document.getElementById("teacher").innerText = data.name || "";
+    document.getElementById("school").innerText = snap.data().school || "";
+    document.getElementById("teacher").innerText = snap.data().name || "";
   }
 });
+
 
 function getMonday(date){
   const d = new Date(date);
