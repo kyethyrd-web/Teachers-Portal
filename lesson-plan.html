@@ -70,7 +70,7 @@
 <table class="infoTable" border="1">
   <tr>
     <td class="label">School</td>
-    <td class="inputCell"><id="school"></td>
+    <td id="school"></td>
     <td>Grade Level</td>
     <td>
       <select id="gradeLevel">
@@ -391,8 +391,9 @@ onAuthStateChanged(auth, async (user) => {
 
   const snap = await getDoc(doc(db,"users",user.uid));
   if (snap.exists()) {
-    document.getElementById("school").innerText = snap.data().school || "";
-    document.getElementById("teacher").innerText = snap.data().name || "";
+    const data = snap.data();
+    document.getElementById("school").innerText = data.school || "";
+    document.getElementById("teacher").innerText = data.name || "";
   }
 });
 
