@@ -88,7 +88,7 @@
 
 <table class="infoTable" border="1">
   <tr>
-    <td class="label">School</td>
+    <td>School</td>
     <td id="school"></td>
     <td>Grade Level</td>
     <td>
@@ -409,6 +409,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const snap = await getDoc(doc(db,"users",user.uid));
+  console.log("Firestore Data:", snap.data());
   if (snap.exists()) {
     document.getElementById("school").innerText = snap.data().school || "";
     document.getElementById("teacher").innerText = snap.data().name || "";
