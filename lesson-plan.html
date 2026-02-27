@@ -1,381 +1,277 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Daily Lesson Log</title>
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    td {
-      border: 1px solid black;
-      padding: 6px;
-    }
-    select, input {
-      width: 100%;
-    }
-    .editable {
-      min-height: 40px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Lesson Plan</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px;
+  background: #1e3a8a;
+  color: white;
+  height: 100vh;
+  padding-top: 20px;
+  transition: 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 15px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sidebar button:hover {
+  background: #3749a6;
+}
+
+.toggle-btn {
+  font-size: 20px;
+  text-align: center;
+}
+
+/* ===== MAIN ===== */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+.week-picker {
+  width: 220px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+td {
+  border: 1px solid black;
+  padding: 6px;
+  vertical-align: top;
+}
+
+.label {
+  width: 200px;
+  font-weight: bold;
+}
+
+.indent1 { padding-left: 20px; }
+.indent2 { padding-left: 40px; }
+
+input, textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-family: Arial;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.header-center {
+  text-align: center;
+}
+
+.export-btn, .save-btn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.export-btn:hover, .save-btn:hover {
+  background: #3749a6;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Daily Lesson Log</h2>
+<div class="sidebar" id="sidebar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <button onclick="window.location='profile.html'">Profile</button>
+  <button onclick="window.location='dashboard.html'">Home</button>
+</div>
 
-<label>Select Date</label>
-<input type="date" id="lessonDate">
-<button onclick="loadLesson()">Load</button>
+<div class="main">
 
-<br><br>
+<h3>Select Any Date (Auto Generates Week)</h3>
+<input type="date" class="week-picker" onchange="generateWeek(this.value)">
 
-<!-- TABLE 1 -->
-<table id="headerTable">
-  <tr>
-    <td>School</td>
-    <td id="school" class="editable"></td>
-    <td>Grade Level</td>
-    <td>
-      <select id="gradeLevel">
-        <option>1</option><option>2</option><option>3</option><option>4</option>
-        <option>5</option><option>6</option><option>7</option><option>8</option>
-        <option>9</option><option>10</option><option>11</option><option>12</option>
-      </select>
-    </td>
-  </tr>
-  <tr>
-    <td>Teacher</td>
-    <td id="teacher" class="editable"></td>
-    <td>Learning Area</td>
-    <td>
-      <select id="learningArea">
-        <option>English</option>
-        <option>Math</option>
-        <option>ESP</option>
-        <option>Araling Panlipunan</option>
-        <option>MAPEH</option>
-        <option>Science</option>
-        <option>TLE</option>
-        <option>Filipino</option>
-        <option>Others</option>
-      </select>
-    </td>
-  </tr>
-  <tr>
-    <td>Teaching Dates and Time</td>
-    <td id="teachingTime" class="editable"></td>
-    <td>Quarter</td>
-    <td>
-      <select id="quarter">
-        <option>1st</option>
-        <option>2nd</option>
-        <option>3rd</option>
-        <option>4th</option>
-      </select>
-    </td>
-  </tr>
+<div id="documentArea">
+
+<div class="header-center">
+  <h3>DETAILED LESSON PLAN</h3>
+  <p>School: <input id="school"></p>
+  <p>Teacher: <input id="teacher"></p>
+  <p>Grade Level: <input id="grade"></p>
+  <p>Subject: <input id="subject"></p>
+  <p>Week: <span id="weekRange"></span></p>
+  <p>Time: <input id="time"></p>
+</div>
+
+<table>
+<tr>
+  <td class="label">I. OBJECTIVES</td>
+  <td></td>
+</tr>
+<tr>
+  <td class="label indent1">A. Content Standard</td>
+  <td><textarea id="contentStandard"></textarea></td>
+</tr>
+<tr>
+  <td class="label indent1">B. Performance Standard</td>
+  <td><textarea id="performanceStandard"></textarea></td>
+</tr>
+<tr>
+  <td class="label indent1">C. Learning Competencies</td>
+  <td><textarea id="competencies"></textarea></td>
+</tr>
+
+<tr>
+  <td class="label">II. CONTENT</td>
+  <td><textarea id="content"></textarea></td>
+</tr>
+
+<tr>
+  <td class="label">III. LEARNING RESOURCES</td>
+  <td></td>
+</tr>
+<tr>
+  <td class="label indent1">A. References</td>
+  <td><textarea id="references"></textarea></td>
+</tr>
+<tr>
+  <td class="label indent1">B. Other Resources</td>
+  <td><textarea id="otherResources"></textarea></td>
+</tr>
+
+<tr>
+  <td class="label">IV. PROCEDURE</td>
+  <td><textarea id="procedure"></textarea></td>
+</tr>
+
+<tr>
+  <td class="label">V. REMARKS</td>
+  <td><textarea id="remarks"></textarea></td>
+</tr>
+
+<tr>
+  <td class="label">VI. REFLECTION</td>
+  <td><textarea id="reflection"></textarea></td>
+</tr>
+
 </table>
 
-<br>
+</div>
 
-<!-- TABLE 2 -->
-<table id="proceduresTable">
-  <tr>
-    <td></td>
-    <td>MONDAY</td>
-    <td>TUESDAY</td>
-    <td>WEDNESDAY</td>
-    <td>THURSDAY</td>
-    <td>FRIDAY</td>
-  </tr>
-  <tr>
-    <td>Date</td>
-    <td id="dateMon"></td>
-    <td id="dateTue"></td>
-    <td id="dateWed"></td>
-    <td id="dateThu"></td>
-    <td id="dateFri"></td>
-  </tr>
-  <tr>
-    <td>I. OBJECTIVES</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>A. GRADE LEVEL STANDARDS</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>B. Learning Competency</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>II. CONTENT</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>III. LEARNING RESOURCES</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>A. References</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>1. Additional Materials from LR Portal</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>B. Other Learning Resources</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>IV. PROCEDURES</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>A. Reviewing previous lesson</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>B. Establish a purpose</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>C. Examples/Instances</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>D. Discussing skills #1</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>E. Discussing skills #2</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>F. Developing Mastery</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>G. Applications</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>H. Generalization</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>I. Evaluating Learning</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>J. Additional activities</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>V. Remarks</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-  <tr>
-    <td>VI. Reflections</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-</table>
+<button class="save-btn" onclick="saveData()">Save</button>
+<button class="export-btn" onclick="exportToWord()">Export to Word</button>
 
-<br>
+</div>
 
-<button onclick="saveLesson()">Save Lesson</button>
-<p id="status"></p>
+<script>
 
-<script type="module">
+/* ===== SIDEBAR ===== */
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("collapsed");
+}
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+/* ===== WEEK GENERATOR ===== */
+function generateWeek(dateStr) {
+  let date = new Date(dateStr);
+  let day = date.getDay();
+  let monday = new Date(date);
+  monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+  let friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-  authDomain: "teachers-portal-98254.firebaseapp.com",
-  projectId: "teachers-portal-98254",
-  storageBucket: "teachers-portal-98254.firebasestorage.app",
-  messagingSenderId: "479254583768",
-  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-};
+  const options = { month: 'long', day: '2-digit', year: 'numeric' };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  let formatted =
+    monday.toLocaleDateString('en-US', options) +
+    " – " +
+    friday.toLocaleDateString('en-US', options);
 
-  let currentUser = null;
+  document.getElementById("weekRange").innerText = formatted;
+}
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      currentUser = user;
-      loadProfile();
-    } else {
-      window.location.href = "login.html";
-    }
+/* ===== SAVE SAFELY ===== */
+function saveData() {
+  const data = {
+    school: school.value,
+    teacher: teacher.value,
+    grade: grade.value,
+    subject: subject.value,
+    week: weekRange.innerText,
+    time: time.value,
+    contentStandard: contentStandard.value,
+    performanceStandard: performanceStandard.value,
+    competencies: competencies.value,
+    content: content.value,
+    references: references.value,
+    otherResources: otherResources.value,
+    procedure: procedure.value,
+    remarks: remarks.value,
+    reflection: reflection.value
+  };
+
+  localStorage.setItem("lessonPlan", JSON.stringify(data));
+  alert("Saved successfully!");
+}
+
+/* ===== EXPORT TO WORD ===== */
+function exportToWord() {
+
+  let content = document.getElementById("documentArea").innerHTML;
+
+  let header = `
+  <html xmlns:o='urn:schemas-microsoft-com:office:office'
+  xmlns:w='urn:schemas-microsoft-com:office:word'
+  xmlns='http://www.w3.org/TR/REC-html40'>
+  <head><meta charset='utf-8'></head><body>`;
+
+  let footer = "</body></html>";
+
+  let sourceHTML = header + content + footer;
+
+  let blob = new Blob(['\ufeff', sourceHTML], {
+    type: 'application/msword'
   });
 
-  async function loadProfile() {
-    const docRef = doc(db, "users", currentUser.uid);
-    const snap = await getDoc(docRef);
+  let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
 
-    if (snap.exists()) {
-      const data = snap.data();
-      document.getElementById("school").innerText = data.school || "";
-      document.getElementById("teacher").innerText = data.name || "";
-    }
-  }
+  let downloadLink = document.createElement("a");
+  document.body.appendChild(downloadLink);
 
-  function getMonday(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
-  }
+  downloadLink.href = url;
+  downloadLink.download = "Detailed_Lesson_Plan.doc";
+  downloadLink.click();
 
-  function fillWeekDates(date) {
-    const monday = getMonday(date);
-    const days = [
-      document.getElementById("dateMon"),
-      document.getElementById("dateTue"),
-      document.getElementById("dateWed"),
-      document.getElementById("dateThu"),
-      document.getElementById("dateFri")
-    ];
-
-    for (let i = 0; i < 5; i++) {
-      const day = new Date(monday);
-      day.setDate(monday.getDate() + i);
-      days[i].innerText = day.toISOString().split('T')[0];
-    }
-  }
-
-  window.loadLesson = async function() {
-    const date = document.getElementById("lessonDate").value;
-    if (!date) return;
-
-    fillWeekDates(date);
-
-    const docRef = doc(db, "lessonPlans", currentUser.uid + "_" + date);
-    const snap = await getDoc(docRef);
-
-    if (snap.exists()) {
-      const data = snap.data();
-
-      document.getElementById("gradeLevel").value = data.gradeLevel;
-      document.getElementById("learningArea").value = data.learningArea;
-      document.getElementById("quarter").value = data.quarter;
-      document.getElementById("teachingTime").innerText = data.teachingTime;
-
-      document.getElementById("proceduresTable").innerHTML = data.tableHTML;
-    }
-  }
-
-  window.saveLesson = async function() {
-    const date = document.getElementById("lessonDate").value;
-    if (!date) return;
-
-    const lesson = {
-      school: document.getElementById("school").innerText,
-      teacher: document.getElementById("teacher").innerText,
-      gradeLevel: document.getElementById("gradeLevel").value,
-      learningArea: document.getElementById("learningArea").value,
-      quarter: document.getElementById("quarter").value,
-      teachingTime: document.getElementById("teachingTime").innerText,
-      tableHTML: document.getElementById("proceduresTable").innerHTML,
-      date: date,
-      userId: currentUser.uid
-    };
-
-    await setDoc(doc(db, "lessonPlans", currentUser.uid + "_" + date), lesson);
-    document.getElementById("status").innerText = "Lesson saved!";
-  }
+  document.body.removeChild(downloadLink);
+}
 
 </script>
 
