@@ -86,18 +86,22 @@
     <td id="teacher"></td>
     <td>Learning Area</td>
     <td>
-      <select id="learningArea">
-        <option>English</option>
-        <option>Math</option>
-        <option>ESP</option>
-        <option>Araling Panlipunan</option>
-        <option>MAPEH</option>
-        <option>Science</option>
-        <option>TLE</option>
-        <option>Filipino</option>
-        <option><td contenteditable="true"</td></option>
-      </select>
-    </td>
+  <select id="learningArea" onchange="checkLearningArea(this)">
+    <option value="">Select Learning Area</option>
+    <option>English</option>
+    <option>Math</option>
+    <option>ESP</option>
+    <option>Araling Panlipunan</option>
+    <option>MAPEH</option>
+    <option>Science</option>
+    <option>TLE</option>
+    <option>Filipino</option>
+    <option value="other">Others...</option>
+  </select>
+
+  <input type="text" id="otherLearningArea" placeholder="Enter Learning Area"
+         style="display:none; margin-top:5px;">
+</td>
   </tr>
 
   <tr>
@@ -510,6 +514,18 @@ function exportToWord() {
   document.body.removeChild(downloadLink);
 }
 
+</script>
+<script>
+function checkLearningArea(select) {
+  const otherInput = document.getElementById("otherLearningArea");
+
+  if (select.value === "other") {
+    otherInput.style.display = "block";
+    otherInput.focus();
+  } else {
+    otherInput.style.display = "none";
+  }
+}
 </script>
 
 </body>
