@@ -74,7 +74,9 @@
     <td>Grade Level</td>
     <td>
       <select id="gradeLevel">
-        ${[...Array(12)].map((_,i)=>`<option>${i+1}</option>`).join("")}
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
       </select>
     </td>
   </tr>
@@ -143,23 +145,16 @@
   <!-- Roman (No indent) -->
   <tr>
     <td>I. OBJECTIVES</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td>
   </tr>
 
   <!-- Alphabet (Indent 1) -->
   <tr>
     <td class="indent-1">A. GRADE LEVEL STANDARDS</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
     <td contenteditable="true"></td>
   </tr>
 
   <tr>
     <td class="indent-1">B. Learning Competency</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
     <td contenteditable="true"></td>
   </tr>
 
@@ -174,40 +169,25 @@
   <!-- Roman -->
   <tr>
     <td>III. LEARNING RESOURCES</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td>
   </tr>
 
   <!-- Alphabet -->
   <tr>
     <td class="indent-1">A. References</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td>
   </tr>
 
   <!-- Number (Indent 2) -->
   <tr>
     <td class="indent-2">1. Additional Materials from LR Portal</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
     <td contenteditable="true"></td>
   </tr>
 
   <tr>
     <td class="indent-1">B. Other Learning Resources</td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
-    <td contenteditable="true"></td><td contenteditable="true"></td>
     <td contenteditable="true"></td>
   </tr>
 
       <td>IV. PROCEDURES</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
   </tr>
   <tr>
     <td class="indent-1">A. Reviewing previous lesson</td>
@@ -299,6 +279,11 @@
   </tr>
   <tr>
     <td>VI. Reflections</td>
+  </tr>
+    <tr>
+    <td class="indent-1">A. No. of learners who 
+      earned 80% on the 
+      formative assessment</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -306,7 +291,10 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">A. No. of learners who earned 80% on the formative assessment</td>
+    <td class="indent-1">B. No. of  learners who 
+      require additional activities
+      for remediation who scored 
+      below 80%</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -314,7 +302,10 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">B. No. of  learners who require additional activities for remediation who scored below 80%</td>
+    <td class="indent-1">C. Did the remedial 
+      lessons work? No. of learners
+      who have caught up 
+      with the lesson</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -322,7 +313,9 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">C. Did the remedial lessons work? No. of learners who have caught up with the lesson</td>
+    <td class="indent-1">D. No. of learners who
+      continue to require
+      remediation</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -330,7 +323,9 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">D. No. of learners who continue to require remediation</td>
+    <td class="indent-1">E. Which of my teaching
+      strategies worked well? 
+      Why did this work?</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -338,7 +333,10 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">E. Which of my teaching strategies worked well? Why did this work?</td>
+    <td class="indent-1">F. What difficulties did
+      I encountered which my
+      principal or supervisor
+      can help me solve?</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -346,15 +344,11 @@
     <td class="editable" contenteditable="true"></td>
   </tr>
     <tr>
-    <td class="indent-1">F. What difficulties did I encountered which my principal or supervisor can help me solve?</td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
-    <tr>
-    <td class="indent-1">G. What innovation or localized materials did I use/discover which I wish to share with other teachers?</td>
+    <td class="indent-1">G. What innovation or
+      localized materials did
+      I use/discover which I
+      wish to share with other 
+      teachers?</td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
@@ -452,7 +446,16 @@ window.saveLesson = async function(){
   document.getElementById("status").innerText="Lesson Saved!";
 };
 
-  /* ===== SAVE SAFELY ===== */
+ </div>
+
+<button class="save-btn" onclick="saveData()">Save</button>
+<button class="export-btn" onclick="exportToWord()">Export to Word</button>
+
+</div>
+
+<script>
+
+/* ===== SAVE SAFELY ===== */
 function saveData() {
   const data = {
     school: school.value,
