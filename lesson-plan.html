@@ -80,10 +80,11 @@
 
 <h2>Daily Lesson Log</h2>
 
-<div class="top-bar">
+<div class="controls">
+  <label>Select any date:</label>
   <button onclick="location.href='profile.html'">Home</button>
   <input type="date" id="lessonDate">
-  <button onclick="loadLesson()">Load</button>
+  <button type="button" onclick="loadLesson()">Load</button>
 </div>
 
 <table class="infoTable" border="1">
@@ -499,75 +500,47 @@ window.saveLesson = async function(){
   document.getElementById("status").innerText="Lesson Saved!";
 };
 
- </div>
+</div>
 
 <script>
-
-/* ===== SAVE SAFELY ===== */
-function saveData() {
-  const data = {
-    school: school.value,
-    teacher: teacher.value,
-    grade: grade.value,
-    subject: subject.value,
-    week: weekRange.innerText,
-    time: time.value,
-    contentStandard: contentStandard.value,
-    performanceStandard: performanceStandard.value,
-    competencies: competencies.value,
-    content: content.value,
-    references: references.value,
-    otherResources: otherResources.value,
-    procedure: procedure.value,
-    remarks: remarks.value,
-    reflection: reflection.value
-  };
-
-  localStorage.setItem("lessonPlan", JSON.stringify(data));
-  alert("Saved successfully!");
+function getMonday(dateString) {
+  const d = new Date(dateString);
+  const day = d.getDay(); // 0=Sunday
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
 }
 
-/* ===== EXPORT TO WORD ===== */
-function exportToWord() {
-
-  let content = document.getElementById("documentArea").innerHTML;
-
-  let header = `
-  <html xmlns:o='urn:schemas-microsoft-com:office:office'
-  xmlns:w='urn:schemas-microsoft-com:office:word'
-  xmlns='http://www.w3.org/TR/REC-html40'>
-  <head><meta charset='utf-8'></head><body>`;
-
-  let footer = "</body></html>";
-
-  let sourceHTML = header + content + footer;
-
-  let blob = new Blob(['\ufeff', sourceHTML], {
-    type: 'application/msword'
-  });
-
-  let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-
-  let downloadLink = document.createElement("a");
-  document.body.appendChild(downloadLink);
-
-  downloadLink.href = url;
-  downloadLink.download = "Detailed_Lesson_Plan.doc";
-  downloadLink.click();
-
-  document.body.removeChild(downloadLink);
+function formatDate(date) {
+  return date.toISOString().split("T")[0];
 }
 
-</script>
-<script>
-function checkLearningArea(select) {
-  const otherInput = document.getElementById("otherLearningArea");
+function formatRange(monday) {
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  return formatDate(monday) + " to " + formatDate(friday);
+}
 
-  if (select.value === "other") {
-    otherInput.style.display = "block";
-    otherInput.focus();
-  } else {
-    otherInput.style.display = "none";
+function loadLesson() {
+  const selected = document.getElementById("lessonDate").value;
+
+  if (!selected) {
+    alert("Please select a date first.");
+    return;
+  }
+
+  const monday = getMonday(selected);
+
+  // Fill Teaching Dates
+  document.getElementById("teachingDates").innerText =
+    formatRange(monday);
+
+  // Fill Monday to Friday
+  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
+
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    document.getElementById(ids[i]).innerText = formatDate(d);
   }
 }
 </script>
