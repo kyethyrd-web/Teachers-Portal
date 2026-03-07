@@ -445,6 +445,51 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 
+  window.saveLesson = async function(){
+
+  const selected = document.getElementById("lessonDate").value;
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value;
+
+  if(learningArea === "other" && other){
+    learningArea = other;
+  }
+
+  if(!selected){
+    alert("Please select a date first.");
+    return;
+  }
+
+  const lessonKey =
+  currentUser.uid + "_" +
+  selected + "_" +
+  grade + "_" +
+  learningArea + "_" +
+  quarter;
+
+  const data = {
+
+    userId: currentUser.uid,
+    date: selected,
+    grade: grade,
+    learningArea: learningArea,
+    quarter: quarter,
+
+    dateRange: document.getElementById("dateRange").innerText,
+    time: document.getElementById("timeCell").innerText,
+
+    tableHTML: document.getElementById("proceduresTable").innerHTML
+
+  };
+
+  await setDoc(doc(db,"lessonPlans",lessonKey), data);
+
+  document.getElementById("status").innerText = "Lesson Saved!";
+};
+
 /* ===============================
    DATE FUNCTIONS
    =============================== */
@@ -517,8 +562,39 @@ window.loadLesson = function () {
   }
 
   document.getElementById("dateRange").innerText = formatRange(monday);
+const grade = document.getElementById("gradeLevel").value;
+const quarter = document.getElementById("quarter").value;
 
-};
+let learningArea = document.getElementById("learningArea").value;
+const other = document.getElementById("otherLearningArea").value;
+
+if(learningArea === "other" && other){
+  learningArea = other;
+}
+
+const lessonKey =
+currentUser.uid + "_" +
+selected + "_" +
+grade + "_" +
+learningArea + "_" +
+quarter;
+
+const snap = await getDoc(doc(db,"lessonPlans",lessonKey));
+
+if(snap.exists()){
+
+  const data = snap.data();
+
+  document.getElementById("timeCell").innerText = data.time || "";
+  document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
+
+  document.getElementById("status").innerText = "Lesson Loaded";
+
+}else{
+
+  document.getElementById("status").innerText = "New lesson for this selection";
+
+}
 
 </script>
 
