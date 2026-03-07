@@ -402,7 +402,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
@@ -537,7 +537,7 @@ function formatRange(monday) {
    LOAD BUTTON FUNCTION
    =============================== */
 
-window.loadLesson = function () {
+window.loadLesson = async function () {
 
   const selected = document.getElementById("lessonDate").value;
 
