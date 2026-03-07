@@ -160,6 +160,8 @@
   </tr>
 </table>
 
+  <button onclick="copyMonday()">Copy Monday to All Days</button>
+  
 <!-- PROCEDURES TABLE -->
 <table id="proceduresTable">
   <tr>
@@ -398,6 +400,8 @@
 <button onclick="saveLesson()">Save Lesson</button>
 <p id="status"></p>
 
+  <button onclick="exportWord()">Export to Word</button>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -562,6 +566,20 @@ window.loadLesson = async function () {
   }
 
   document.getElementById("dateRange").innerText = formatRange(monday);
+  clearLesson();
+
+  function clearLesson(){
+
+  document.getElementById("timeCell").innerText = "";
+
+  const cells = document.querySelectorAll("#proceduresTable td[contenteditable='true']");
+
+  cells.forEach(cell=>{
+    cell.innerText = "";
+  });
+
+}
+  
 const grade = document.getElementById("gradeLevel").value;
 const quarter = document.getElementById("quarter").value;
 
@@ -593,6 +611,90 @@ if(snap.exists()){
 }else{
 
   document.getElementById("status").innerText = "New lesson for this selection";
+
+}
+
+  setInterval(async () => {
+
+  if(!currentUser) return;
+
+  const selected = document.getElementById("lessonDate").value;
+  if(!selected) return;
+
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value;
+
+  if(learningArea === "other" && other){
+    learningArea = other;
+  }
+
+  const lessonKey =
+  currentUser.uid + "_" +
+  selected + "_" +
+  grade + "_" +
+  learningArea + "_" +
+  quarter;
+
+  const data = {
+
+    userId: currentUser.uid,
+    date: selected,
+    grade: grade,
+    learningArea: learningArea,
+    quarter: quarter,
+
+    dateRange: document.getElementById("dateRange").innerText,
+    time: document.getElementById("timeCell").innerText,
+    tableHTML: document.getElementById("proceduresTable").innerHTML
+
+  };
+
+  await setDoc(doc(db,"lessonPlans",lessonKey), data);
+
+  document.getElementById("status").innerText = "Auto-saved";
+
+}, 5000);
+
+  function copyMonday(){
+
+  const rows = document.querySelectorAll("#proceduresTable tr");
+
+  rows.forEach(row=>{
+
+    const cells = row.querySelectorAll("td");
+
+    if(cells.length === 6){
+
+      const monday = cells[1].innerText;
+
+      for(let i=2;i<6;i++){
+        cells[i].innerText = monday;
+      }
+
+    }
+
+  });
+
+}
+  function exportWord(){
+
+  const content = document.body.innerHTML;
+
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword'
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "Daily_Lesson_Log.doc";
+
+  a.click();
 
 }
   };
