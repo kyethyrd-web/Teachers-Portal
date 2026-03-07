@@ -159,8 +159,6 @@
     <td></td>
   </tr>
 </table>
-
-  <button onclick="copyMonday()">Copy Monday to All Days</button>
   
 <!-- PROCEDURES TABLE -->
 <table id="proceduresTable">
@@ -657,26 +655,6 @@ if(snap.exists()){
   document.getElementById("status").innerText = "Auto-saved";
 
 }, 5000);
-
-  function copyMonday(){
-
-  const rows = document.querySelectorAll("#proceduresTable tr");
-
-  rows.forEach(row=>{
-
-    const cells = row.querySelectorAll("td");
-
-    if(cells.length === 6){
-
-      const monday = cells[1].innerText;
-
-      for(let i=2;i<6;i++){
-        cells[i].innerText = monday;
-      }
-
-    }
-
-  });
 
 }
   function exportWord(){
