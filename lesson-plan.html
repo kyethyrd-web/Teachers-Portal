@@ -402,7 +402,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
@@ -419,7 +419,12 @@ const db = getFirestore(app);
 
 let currentUser;
 
+/* ===============================
+   LOAD USER PROFILE (School/Name)
+   =============================== */
+
 onAuthStateChanged(auth, async (user) => {
+
   if (!user) {
     window.location.href = "login.html";
     return;
@@ -427,26 +432,44 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
 
-  const snap = await getDoc(doc(db,"users",user.uid));
+  const snap = await getDoc(doc(db, "users", user.uid));
 
   if (snap.exists()) {
+
     const data = snap.data();
+
     document.getElementById("school").innerText = data.school || "";
     document.getElementById("teacher").innerText = data.name || "";
+
   }
+
 });
 
+/* ===============================
+   DATE FUNCTIONS
+   =============================== */
 
-function getMonday(date){
+function getMonday(date) {
+
   const d = new Date(date);
   const day = d.getDay();
+
   const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+
   return new Date(d.setDate(diff));
+
 }
 
-function formatRange(monday){
+function formatDate(d) {
+
+  return d.toISOString().split("T")[0];
+
+}
+
+function formatRange(monday) {
+
   const friday = new Date(monday);
-  friday.setDate(monday.getDate()+4);
+  friday.setDate(monday.getDate() + 4);
 
   const options = { month: "long" };
 
@@ -454,109 +477,49 @@ function formatRange(monday){
   const month2 = friday.toLocaleString("default", options);
 
   if (month1 === month2) {
-    return `${month1} ${monday.getDate()}-${friday.getDate()}, ${monday.getFullYear()}`;
+
+    return `${month1} ${monday.getDate()}–${friday.getDate()}, ${monday.getFullYear()}`;
+
   } else {
-    return `${month1} ${monday.getDate()} - ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
+
+    return `${month1} ${monday.getDate()} – ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
+
   }
+
 }
 
-window.loadLesson = async function() {
+/* ===============================
+   LOAD BUTTON FUNCTION
+   =============================== */
+
+window.loadLesson = function () {
+
   const selected = document.getElementById("lessonDate").value;
+
   if (!selected) {
+
     alert("Please select a date first.");
     return;
-  }
 
-  if (!currentUser) {
-    alert("User not ready yet.");
-    return;
   }
 
   const monday = getMonday(selected);
 
-  // Fill Monday–Friday dates
+  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
+
   for (let i = 0; i < 5; i++) {
+
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    document.getElementById(
-      ["dateMon","dateTue","dateWed","dateThu","dateFri"][i]
-    ).innerText = d.toISOString().split("T")[0];
+
+    document.getElementById(ids[i]).innerText = formatDate(d);
+
   }
 
   document.getElementById("dateRange").innerText = formatRange(monday);
 
-  // 🔥 LOAD FROM FIRESTORE
-  const docRef = doc(db, "lessonPlans", currentUser.uid + "_" + selected);
-  const snap = await getDoc(docRef);
-
-  if (snap.exists()) {
-    const data = snap.data();
-    document.getElementById("timeCell").innerText = data.time || "";
-    document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
-    document.getElementById("status").innerText = "Lesson Loaded!";
-  } else {
-    document.getElementById("status").innerText = "New lesson for this date.";
-  }
 };
 
-window.saveLesson = async function(){
-  const selected = document.getElementById("lessonDate").value;
-  if (!selected) return;
-
-  await setDoc(doc(db,"lessonPlans",currentUser.uid+"_"+selected),{
-    date:selected,
-    dateRange:document.getElementById("dateRange").innerText,
-    time:document.getElementById("timeCell").innerText,
-    tableHTML:document.getElementById("proceduresTable").innerHTML,
-    userId:currentUser.uid
-  });
-
-  document.getElementById("status").innerText="Lesson Saved!";
-};
-
-</div>
-
-<script>
-function getMonday(dateString) {
-  const d = new Date(dateString);
-  const day = d.getDay(); // 0=Sunday
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(d.setDate(diff));
-}
-
-function formatDate(date) {
-  return date.toISOString().split("T")[0];
-}
-
-function formatRange(monday) {
-  const friday = new Date(monday);
-  friday.setDate(monday.getDate() + 4);
-  return formatDate(monday) + " to " + formatDate(friday);
-}
-
-function loadLesson() {
-  const selected = document.getElementById("lessonDate").value;
-
-  if (!selected) {
-    alert("Please select a date first.");
-    return;
-  }
-
-  const monday = getMonday(selected);
-
-  // Fill Teaching Dates
-  document.getElementById("teachingDates").innerText =
-    formatRange(monday);
-
-  // Fill Monday to Friday
-  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
-
-  for (let i = 0; i < 5; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    document.getElementById(ids[i]).innerText = formatDate(d);
-  }
-}
 </script>
 
 </body>
