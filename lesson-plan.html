@@ -612,50 +612,6 @@ if(snap.exists()){
 
 }
 
-  setInterval(async () => {
-
-  if(!currentUser) return;
-
-  const selected = document.getElementById("lessonDate").value;
-  if(!selected) return;
-
-  const grade = document.getElementById("gradeLevel").value;
-  const quarter = document.getElementById("quarter").value;
-
-  let learningArea = document.getElementById("learningArea").value;
-  const other = document.getElementById("otherLearningArea").value;
-
-  if(learningArea === "other" && other){
-    learningArea = other;
-  }
-
-  const lessonKey =
-  currentUser.uid + "_" +
-  selected + "_" +
-  grade + "_" +
-  learningArea + "_" +
-  quarter;
-
-  const data = {
-
-    userId: currentUser.uid,
-    date: selected,
-    grade: grade,
-    learningArea: learningArea,
-    quarter: quarter,
-
-    dateRange: document.getElementById("dateRange").innerText,
-    time: document.getElementById("timeCell").innerText,
-    tableHTML: document.getElementById("proceduresTable").innerHTML
-
-  };
-
-  await setDoc(doc(db,"lessonPlans",lessonKey), data);
-
-  document.getElementById("status").innerText = "Auto-saved";
-
-}, 5000);
-
 
   function exportWord(){
 
