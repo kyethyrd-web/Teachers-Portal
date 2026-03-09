@@ -321,14 +321,60 @@ td[contenteditable="true"]{
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
   </tr>
-  <tr>
-    <td><b>V. REMARKS</b></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-    <td class="editable" contenteditable="true"></td>
-  </tr>
+<tr>
+<td><b>V. REMARKS</b></td>
+
+<td>
+<select onchange="handleRemark(0)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(1)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(2)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(3)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(4)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+</tr>
   <tr style="background-color: #bfbfbf;">
     <td colspan="6"><b>VI. REFLECTIONS</b></td>
   </tr>
@@ -648,6 +694,38 @@ window.exportWord = function(){
   a.click();
 
   document.body.removeChild(a);
+
+};
+
+window.handleRemark = function(dayIndex){
+
+const remarkRow = document.querySelectorAll("tr td select");
+const selected = remarkRow[dayIndex].value;
+
+if(selected !== "Not carried-out" && selected !== "Class suspension"){
+return;
+}
+
+const table = document.getElementById("proceduresTable");
+
+for(let r=0;r<table.rows.length;r++){
+
+const row = table.rows[r];
+
+if(row.cells.length < 6) continue;
+
+const today = row.cells[dayIndex+1];
+const next = row.cells[dayIndex+2];
+
+if(!today || !next) continue;
+
+if(today.isContentEditable){
+
+next.innerText = today.innerText;
+
+}
+
+}
 
 };
 </script>
