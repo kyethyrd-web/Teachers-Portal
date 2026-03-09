@@ -460,12 +460,12 @@ onAuthStateChanged(auth, async (user) => {
     learningArea = other;
   }
 
-  if(!formatDate(monday)){
+  if(!selected){
     alert("Please select a date first.");
     return;
   }
 
-const monday = getMonday(formatDate(monday));
+const monday = getMonday(selected);
 
 const lessonKey =
 currentUser.uid + "_" +
@@ -543,16 +543,16 @@ function formatRange(monday) {
 
 window.loadLesson = async function () {
 
-  const formatDate(monday) = document.getElementById("lessonDate").value;
+  const selected = document.getElementById("lessonDate").value;
 
-  if (!formatDate(monday)) {
+  if (!selected) {
 
     alert("Please select a date first.");
     return;
 
   }
 
-  const monday = getMonday(formatDate(monday));
+  const monday = getMonday(selected);
 
   const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
 
@@ -613,7 +613,7 @@ if(snap.exists()){
   document.getElementById("status").innerText = "New lesson for this selection";
 
 }
-
+  };
 
   function exportWord(){
 
