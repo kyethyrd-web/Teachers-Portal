@@ -460,17 +460,19 @@ onAuthStateChanged(auth, async (user) => {
     learningArea = other;
   }
 
-  if(!selected){
+  if(!formatDate(monday)){
     alert("Please select a date first.");
     return;
   }
 
-  const lessonKey =
-  currentUser.uid + "_" +
-  selected + "_" +
-  grade + "_" +
-  learningArea + "_" +
-  quarter;
+const monday = getMonday(formatDate(monday));
+
+const lessonKey =
+currentUser.uid + "_" +
+formatDate(monday) + "_" +
+grade + "_" +
+learningArea + "_" +
+quarter;
 
   const data = {
 
@@ -541,16 +543,16 @@ function formatRange(monday) {
 
 window.loadLesson = async function () {
 
-  const selected = document.getElementById("lessonDate").value;
+  const formatDate(monday) = document.getElementById("lessonDate").value;
 
-  if (!selected) {
+  if (!formatDate(monday)) {
 
     alert("Please select a date first.");
     return;
 
   }
 
-  const monday = getMonday(selected);
+  const monday = getMonday(formatDate(monday));
 
   const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
 
@@ -590,7 +592,7 @@ if(learningArea === "other" && other){
 
 const lessonKey =
 currentUser.uid + "_" +
-selected + "_" +
+formatDate(monday) + "_" +
 grade + "_" +
 learningArea + "_" +
 quarter;
