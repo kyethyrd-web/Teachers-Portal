@@ -60,6 +60,17 @@
       width: 100%;
       padding: 4px;
     }
+    
+td[contenteditable="true"]{
+  text-align: center;
+  vertical-align: middle;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+    
+    .editable{
+  text-align: center;
+}
 
     .editable {
       min-height: 50px;
@@ -86,6 +97,9 @@
 .infoTable td:nth-child(2),
 .infoTable td:nth-child(4){
   width: 30%;
+}
+    td[contenteditable="true"]:focus{
+  outline: 2px solid #4CAF50;
 }
 
   </style>
@@ -615,9 +629,9 @@ if(snap.exists()){
 }
   };
 
-function exportWord(){
+window.exportWord = function(){
 
-  const content = document.body.innerHTML;
+  const content = document.documentElement.outerHTML;
 
   const blob = new Blob(['\ufeff', content], {
     type: 'application/msword'
@@ -630,10 +644,12 @@ function exportWord(){
   a.href = url;
   a.download = "Daily_Lesson_Log.doc";
 
+  document.body.appendChild(a);
   a.click();
 
-}
+  document.body.removeChild(a);
 
+};
 </script>
 
 </body>
