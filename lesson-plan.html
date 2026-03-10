@@ -622,34 +622,33 @@ function formatRange(monday) {
 
 window.loadLesson = async function () {
 
-  const selected = document.getElementById("lessonDate").value;
+const selected = document.getElementById("lessonDate").value;
 
-  if (!selected) {
+if (!selected) {
+alert("Please select a date first.");
+return;
+}
 
-    alert("Please select a date first.");
-    return;
+const monday = getMonday(selected);
 
-  }
+const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
 
-  const monday = getMonday(selected);
+for (let i = 0; i < 5; i++) {
 
-  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
+const d = new Date(monday);
+d.setDate(monday.getDate() + i);
 
-  for (let i = 0; i < 5; i++) {
-
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-
-    document.getElementById(ids[i]).innerText = formatDate(d);
-
-  }
-
-  document.getElementById("dateRange").innerText = formatRange(monday);
-  clearLesson();
-
+document.getElementById(ids[i]).innerText = formatDate(d);
 
 }
-  
+
+document.getElementById("dateRange").innerText = formatRange(monday);
+
+/* CLEAR OLD LESSON */
+clearLesson();
+
+/* GET FILTER VALUES */
+
 const grade = document.getElementById("gradeLevel").value;
 const quarter = document.getElementById("quarter").value;
 
@@ -657,8 +656,10 @@ let learningArea = document.getElementById("learningArea").value;
 const other = document.getElementById("otherLearningArea").value;
 
 if(learningArea === "other" && other){
-  learningArea = other;
+learningArea = other;
 }
+
+/* BUILD LESSON KEY */
 
 const lessonKey =
 currentUser.uid + "_" +
@@ -666,6 +667,8 @@ formatDate(monday) + "_" +
 grade + "_" +
 learningArea + "_" +
 quarter;
+
+/* LOAD FROM FIRESTORE */
 
 const snap = await getDoc(doc(db,"lessonPlans",lessonKey));
 
@@ -681,20 +684,27 @@ document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
 const selects = document.querySelectorAll("#proceduresTable select");
 
 selects.forEach(select=>{
-
 const saved = select.getAttribute("data-selected");
-
 if(saved){
 select.value = saved;
 }
-
 });
 
-function clearLesson(){
+document.getElementById("status").innerText = "Lesson Loaded";
+
+}else{
+
+document.getElementById("status").innerText = "New lesson for this selection";
+
+}
+
+};
+  function clearLesson(){
 
 document.getElementById("timeCell").innerText = "";
 
 const cells = document.querySelectorAll("#proceduresTable td[contenteditable='true']");
+
 cells.forEach(cell=>{
 cell.innerText = "";
 });
@@ -710,6 +720,7 @@ select.parentElement.removeAttribute("data-time");
 });
 
 }
+
 
 window.exportWord = function(){
 
