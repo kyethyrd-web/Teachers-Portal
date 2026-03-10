@@ -101,6 +101,13 @@ td[contenteditable="true"]{
     td[contenteditable="true"]:focus{
   outline: 2px solid #4CAF50;
 }
+    #proceduresTable td[data-time]::after{
+content: " (" attr(data-time) ")";
+font-size: 11px;
+color: gray;
+display:block;
+margin-top:2px;
+}
 
   </style>
 </head>
@@ -713,17 +720,23 @@ window.handleRemark = function(dayIndex){
 const selects = document.querySelectorAll("#proceduresTable select");
 const remark = selects[dayIndex].value;
 
+const now = new Date().toLocaleString();
+
+const remarkCell = selects[dayIndex].parentElement;
+
+/* SHOW TIMESTAMP INSIDE CELL */
+
+remarkCell.setAttribute("data-time", now);
+
+/* COPY TO NEXT DAY IF NEEDED */
+
 if(remark === "Not carried-out" || remark === "Class suspension"){
-
 copyToNextDay(dayIndex);
-
 }
 
-if(remark === "Carried-out" || remark === "Asynchronous Learning"){
+/* AUTO SAVE */
 
-lockDay(dayIndex);
-
-}
+saveLesson();
 
 };
 
@@ -750,28 +763,8 @@ next.innerText = today.innerText;
 
 }
 
-}
 
-  function lockDay(dayIndex){
 
-const table = document.getElementById("proceduresTable");
-
-for(let r=0;r<table.rows.length;r++){
-
-const row = table.rows[r];
-
-if(row.cells.length < 6) continue;
-
-const cell = row.cells[dayIndex+1];
-
-if(cell && cell.isContentEditable){
-
-cell.contentEditable = false;
-cell.style.backgroundColor = "#e0e0e0";
-
-}
-
-}
 
 const now = new Date().toLocaleString();
 
