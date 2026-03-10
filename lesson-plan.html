@@ -647,6 +647,22 @@ window.loadLesson = async function () {
   document.getElementById("dateRange").innerText = formatRange(monday);
   clearLesson();
 
+  document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
+  
+  /* RESTORE DROPDOWN VALUES */
+
+const selects = document.querySelectorAll("#proceduresTable select");
+
+selects.forEach(select => {
+
+const saved = select.getAttribute("data-selected");
+
+if(saved){
+select.value = saved;
+}
+
+});
+
   function clearLesson(){
 
   document.getElementById("timeCell").innerText = "";
@@ -722,14 +738,17 @@ const selects = document.querySelectorAll("#proceduresTable select");
 const remark = selects[dayIndex].value;
 
 const now = new Date().toLocaleString();
-
 const remarkCell = selects[dayIndex].parentElement;
 
-/* SHOW TIMESTAMP INSIDE CELL */
+/* SAVE SELECTED VALUE INTO ATTRIBUTE */
+
+selects[dayIndex].setAttribute("data-selected", remark);
+
+/* SHOW TIMESTAMP */
 
 remarkCell.setAttribute("data-time", now);
 
-/* COPY TO NEXT DAY IF NEEDED */
+/* COPY LESSON IF NEEDED */
 
 if(remark === "Not carried-out" || remark === "Class suspension"){
 copyToNextDay(dayIndex);
