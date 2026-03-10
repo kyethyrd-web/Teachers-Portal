@@ -453,6 +453,17 @@ td[contenteditable="true"]{
     <td class="editable" contenteditable="true"></td>
     <td class="editable" contenteditable="true"></td>
   </tr>
+<tr style="background:#d9d9d9">
+<td colspan="6"><b>CHECKER'S COMMENTS / SUGGESTIONS</b></td>
+</tr>
+
+<tr>
+<td colspan="6">
+<textarea id="checkerComment"
+style="width:100%;height:80px"
+readonly></textarea>
+</td>
+</tr>
 </table>
 
 <button onclick="saveLesson()">Save Lesson</button>
@@ -699,12 +710,24 @@ window.exportWord = function(){
 
 window.handleRemark = function(dayIndex){
 
-const remarkRow = document.querySelectorAll("tr td select");
-const selected = remarkRow[dayIndex].value;
+const selects = document.querySelectorAll("#proceduresTable select");
+const remark = selects[dayIndex].value;
 
-if(selected !== "Not carried-out" && selected !== "Class suspension"){
-return;
+if(remark === "Not carried-out" || remark === "Class suspension"){
+
+copyToNextDay(dayIndex);
+
 }
+
+if(remark === "Carried-out" || remark === "Asynchronous Learning"){
+
+lockDay(dayIndex);
+
+}
+
+};
+
+  function copyToNextDay(dayIndex){
 
 const table = document.getElementById("proceduresTable");
 
@@ -727,7 +750,36 @@ next.innerText = today.innerText;
 
 }
 
-};
+}
+
+  function lockDay(dayIndex){
+
+const table = document.getElementById("proceduresTable");
+
+for(let r=0;r<table.rows.length;r++){
+
+const row = table.rows[r];
+
+if(row.cells.length < 6) continue;
+
+const cell = row.cells[dayIndex+1];
+
+if(cell && cell.isContentEditable){
+
+cell.contentEditable = false;
+cell.style.backgroundColor = "#e0e0e0";
+
+}
+
+}
+
+const now = new Date().toLocaleString();
+
+const header = document.getElementById("dateRange");
+
+header.innerText += " | Saved: " + now;
+
+}
 </script>
 
 </body>
