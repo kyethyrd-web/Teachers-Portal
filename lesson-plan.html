@@ -740,29 +740,26 @@ saveLesson();
 
 };
 
-  function copyToNextDay(dayIndex){
+function copyToNextDay(dayIndex){
 
 const table = document.getElementById("proceduresTable");
 
 for(let r=0;r<table.rows.length;r++){
 
-const row = table.rows[r];
+  const row = table.rows[r];
 
-if(row.cells.length < 6) continue;
+  if(row.cells.length < 6) continue;
 
-const today = row.cells[dayIndex+1];
-const next = row.cells[dayIndex+2];
+  const today = row.cells[dayIndex+1];
+  const next = row.cells[dayIndex+2];
 
-if(!today || !next) continue;
+  if(!today || !next) continue;
 
-if(today.isContentEditable){
-
-next.innerText = today.innerText;
-
-}
+  if(today.isContentEditable){
+    next.innerText = today.innerText;
+  }
 
 }
-
 
 const now = new Date().toLocaleString();
 
@@ -771,7 +768,6 @@ const header = document.getElementById("dateRange");
 header.innerText += " | Saved: " + now;
 
 }
-  };
 </script>
 
 </body>
