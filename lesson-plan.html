@@ -647,30 +647,6 @@ window.loadLesson = async function () {
   document.getElementById("dateRange").innerText = formatRange(monday);
   clearLesson();
 
-  
-  /* RESTORE DROPDOWN VALUES */
-
-const selects = document.querySelectorAll("#proceduresTable select");
-
-selects.forEach(select => {
-
-const saved = select.getAttribute("data-selected");
-
-if(saved){
-select.value = saved;
-}
-
-});
-
-  function clearLesson(){
-
-  document.getElementById("timeCell").innerText = "";
-
-  const cells = document.querySelectorAll("#proceduresTable td[contenteditable='true']");
-
-  cells.forEach(cell=>{
-    cell.innerText = "";
-  });
 
 }
   
@@ -695,19 +671,45 @@ const snap = await getDoc(doc(db,"lessonPlans",lessonKey));
 
 if(snap.exists()){
 
-  const data = snap.data();
+const data = snap.data();
 
-  document.getElementById("timeCell").innerText = data.time || "";
-  document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
+document.getElementById("timeCell").innerText = data.time || "";
+document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
 
-  document.getElementById("status").innerText = "Lesson Loaded";
+/* RESTORE DROPDOWN VALUES */
 
-}else{
+const selects = document.querySelectorAll("#proceduresTable select");
 
-  document.getElementById("status").innerText = "New lesson for this selection";
+selects.forEach(select=>{
+
+const saved = select.getAttribute("data-selected");
+
+if(saved){
+select.value = saved;
+}
+
+});
+
+function clearLesson(){
+
+document.getElementById("timeCell").innerText = "";
+
+const cells = document.querySelectorAll("#proceduresTable td[contenteditable='true']");
+cells.forEach(cell=>{
+cell.innerText = "";
+});
+
+/* CLEAR DROPDOWNS */
+
+const selects = document.querySelectorAll("#proceduresTable select");
+
+selects.forEach(select=>{
+select.value = "";
+select.removeAttribute("data-selected");
+select.parentElement.removeAttribute("data-time");
+});
 
 }
-  };
 
 window.exportWord = function(){
 
