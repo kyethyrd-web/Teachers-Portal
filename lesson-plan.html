@@ -23,7 +23,6 @@
       margin: 20px;
       background:#f5f7fb;
 }
-    }
 
     h2 {
       margin-bottom: 10px;
@@ -110,14 +109,14 @@ color: gray;
 display:block;
 margin-top:2px;
 }
-    .header{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:40px
-margin-bottom:20px;
-border-bottom:3px solid #004aad;
-padding-bottom:10px;
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:40px
+  margin-bottom:20px;
+  border-bottom:3px solid #004aad;
+  padding-bottom:10px;
 }
 
 .header-text{
@@ -208,6 +207,7 @@ line-height:1.4;
   </style>
 </head>
 <body>
+<div class="container">
 <div class="header">
   <img src="images/DepEd-logo.png.png" class="logo-left">
 
@@ -586,11 +586,11 @@ readonly></textarea>
   
 </tr>
 </table>
-  <div class="container">
 
 
 <div id="statusBox">Status: Ready</div>
-
+</div>
+  
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -691,7 +691,7 @@ quarter;
 
   await setDoc(doc(db,"lessonPlans",lessonKey), data);
 
-  document.getElementById("status").innerText = "Lesson Saved!";
+  document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
 };
 
 /* ===============================
@@ -811,11 +811,11 @@ select.value = saved;
 }
 });
 document.getElementById("statusBox").innerText = "Status: Auto-saving...";
-document.getElementById("status").innerText = "Lesson Loaded";
+document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
 
 }else{
 document.getElementById("statusBox").innerText = "Status: Saved ✔";
-document.getElementById("status").innerText = "New lesson for this selection";
+document.getElementById("statusBox").innerText = "Status: Lesson Loaded";
 
 }
 
@@ -850,8 +850,8 @@ window.exportWord = function () {
   const school = document.getElementById("school")?.innerText || "";
   const teacher = document.getElementById("teacher")?.innerText || "";
   const grade = document.getElementById("gradeLevel")?.value || "";
-  const learningAreaSelect = document.getElementById("learningArea");
-  let learningArea = learningAreaSelect ? learningAreaSelect.value : "";
+
+  let learningArea = document.getElementById("learningArea")?.value || "";
   const otherLearningArea = document.getElementById("otherLearningArea")?.value || "";
   if (learningArea === "other" && otherLearningArea) {
     learningArea = otherLearningArea;
@@ -862,20 +862,18 @@ window.exportWord = function () {
   const time = document.getElementById("timeCell")?.innerText || "";
 
   const proceduresTable = document.getElementById("proceduresTable");
-
-  // clone the table so we can clean it for export
   const clonedTable = proceduresTable.cloneNode(true);
 
-  // convert dropdowns in V. REMARKS into plain text
   const selects = clonedTable.querySelectorAll("select");
   selects.forEach(select => {
     const td = select.parentElement;
     const text = select.value || "";
     const stamp = td.getAttribute("data-time");
-    td.innerHTML = text ? `${text}${stamp ? `<div style="font-size:10px;color:#555;margin-top:4px;">${stamp}</div>` : ""}` : "";
+    td.innerHTML = text
+      ? `${text}${stamp ? `<div style="font-size:10px;color:#555;margin-top:4px;">${stamp}</div>` : ""}`
+      : "";
   });
 
-  // remove checker textarea border style ugliness
   const checkerComment = clonedTable.querySelector("#checkerComment");
   if (checkerComment) {
     const parent = checkerComment.parentElement;
@@ -894,77 +892,51 @@ window.exportWord = function () {
         size: landscape;
         margin: 0.5in;
       }
-
       body {
         font-family: Arial, sans-serif;
         font-size: 11pt;
         color: #000;
       }
-
       .header {
         width: 100%;
         text-align: center;
         margin-bottom: 12px;
         line-height: 1.3;
       }
-
       .header h2, .header h3, .header div {
         margin: 2px 0;
       }
-
       .title {
         text-align: center;
         font-weight: bold;
         font-size: 14pt;
         margin: 10px 0 14px 0;
       }
-
       table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
         margin-bottom: 12px;
       }
-
       td, th {
         border: 1px solid #000;
         padding: 6px;
         vertical-align: top;
         word-wrap: break-word;
       }
-
       .infoTable td:nth-child(1),
       .infoTable td:nth-child(3) {
         width: 18%;
         font-weight: bold;
       }
-
       .infoTable td:nth-child(2),
       .infoTable td:nth-child(4) {
         width: 32%;
       }
-
       #proceduresExport td:first-child {
         width: 26%;
         font-weight: bold;
         background: #f2f2f2;
-      }
-
-      #proceduresExport tr.section td {
-        background: #d9d9d9;
-        font-weight: bold;
-      }
-
-      .center {
-        text-align: center;
-      }
-
-      .indent-1 {
-        padding-left: 18px;
-      }
-
-      .indent-2 {
-        padding-left: 36px;
       }
     </style>
   </head>
@@ -1010,7 +982,11 @@ window.exportWord = function () {
       ${clonedTable.innerHTML}
     </table>
   </body>
-  </html>
+  </html>`;
+
+  const safeDate = dateRange.replace(/,/g, "").replace(/\s+/g, "_");
+  const safeSubject = learningArea.replace(/\s+/g, "_");
+  const fileName = `DLL_${safeSubject}_Grade${grade}_${safeDate}.doc`;
 
   const blob = new Blob(['\ufeff', exportHTML], {
     type: 'application/msword'
@@ -1019,13 +995,13 @@ window.exportWord = function () {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "Daily_Lesson_Log.doc";
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
-
+  
 window.handleRemark = function(dayIndex){
 
 const selects = document.querySelectorAll("#proceduresTable select");
@@ -1077,7 +1053,7 @@ for(let r=0;r<table.rows.length;r++){
 
 const now = new Date().toLocaleString();
 
-document.getElementById("status").innerText = "Saved: " + now;
+document.getElementById("statusBox").innerText = "Status: New lesson for this selection";
 
 }
   if(!document.getElementById("checkerComment")){
