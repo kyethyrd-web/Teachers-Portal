@@ -184,6 +184,25 @@ padding:20px;
 border-radius:8px;
 box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
+    .header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.logo{
+width:80px;
+height:80px;
+object-fit:contain;
+}
+
+.header-text{
+text-align:center;
+flex:1;
+font-size:14px;
+line-height:1.4;
+}
   </style>
 </head>
 <body>
@@ -193,7 +212,9 @@ box-shadow:0 3px 10px rgba(0,0,0,0.1);
   <div class="header-text">
     <h3>Republic of the Philippines</h3>
     <h2>Department of Education</h2>
-    <h3 id="schoolHeader">Your School Name</h3>
+    <div id="districtHeader">District of ______</div>
+    <div id="schoolHeader"><b>School Name</b></div>
+    <div id="schoolIdHeader">School ID: ______</div>
   </div>
 
   <img src="Matatag-logo.png" class="logo-right">
@@ -208,7 +229,6 @@ box-shadow:0 3px 10px rgba(0,0,0,0.1);
 
 <div class="controls">
   <label>Select any date:</label>
-  <button onclick="location.href='profile.html'">Home</button>
   <input type="date" id="lessonDate">
   <button type="button" onclick="loadLesson()">Load</button>
 </div>
@@ -565,11 +585,11 @@ readonly></textarea>
 </tr>
 </table>
   <div class="container">
+<img src="images/DepEd-logo.png" class="logo">
+<img src="images/Matatag-logo.png" class="logo">
 
-<button onclick="saveLesson()">Save Lesson</button>
+
 <div id="statusBox">Status: Ready</div>
-
-  <button onclick="exportWord()">Export to Word</button>
 
 <script type="module">
 
@@ -613,7 +633,14 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById("school").innerText = data.school || "";
     document.getElementById("teacher").innerText = data.name || "";
+document.getElementById("districtHeader").innerText =
+"District of " + (data.district || "");
 
+document.getElementById("schoolHeader").innerText =
+data.school || "";
+
+document.getElementById("schoolIdHeader").innerText =
+"School ID: " + (data.schoolId || "");
   }
 
 });
