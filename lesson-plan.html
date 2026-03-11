@@ -214,7 +214,7 @@ line-height:1.4;
     <h2>Department of Education</h2>
     <div id="districtHeader">District of ______</div>
     <div id="schoolHeader"><b>School Name</b></div>
-    <div id="schoolIdHeader"><b>schoolId</b></div>
+   <div id="schoolIdHeader"><b>School ID: ______</b></div>
   </div>
 
   <img src="Matatag-logo.png" class="logo-right">
@@ -625,21 +625,23 @@ onAuthStateChanged(auth, async (user) => {
 
   const snap = await getDoc(doc(db, "users", user.uid));
 
-  if (snap.exists()) {
+if (snap.exists()) {
 
-    const data = snap.data();
+  const data = snap.data();
 
-    document.getElementById("school").innerText = data.school || "";
-    document.getElementById("teacher").innerText = data.name || "";
-document.getElementById("districtHeader").innerText =
-"District of " + (data.district || "");
+  document.getElementById("school").innerText = data.school || "";
+  document.getElementById("teacher").innerText = data.name || "";
 
-document.getElementById("schoolHeader").innerText =
-data.school || "";
+  document.getElementById("districtHeader").innerText =
+    "District of " + (data.district || "______");
 
-document.getElementById("schoolIdHeader").innerText =
-"School ID: " + (data.schoolId || "");
-  }
+  document.getElementById("schoolHeader").innerText =
+    data.school || "School Name";
+
+  document.getElementById("schoolIdHeader").innerText =
+    "School ID: " + (data.schoolId || "______");
+
+}
 
 });
 
