@@ -203,11 +203,28 @@ flex:1;
 font-size:14px;
 line-height:1.4;
 }
+    .header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+.logo-left, .logo-right{
+  width:80px;
+  height:80px;
+  object-fit:contain;
+}
+
+.header-text{
+  text-align:center;
+  flex:1;
+}
   </style>
 </head>
 <body>
 <div class="header">
-  <img src="DepEd-logo.png.png" class="logo-left">
+  <img src="images/DepEd-logo.png.png" class="logo-left">
 
   <div class="header-text">
     <h3>Republic of the Philippines</h3>
@@ -217,7 +234,7 @@ line-height:1.4;
    <div id="schoolIdHeader"><b>School ID: ______</b></div>
   </div>
 
-  <img src="Matatag-logo.png.png" class="logo-right">
+  <img src="images/Matatag-logo.png.png" class="logo-right">
 </div>
   <div class="navbar">
 <button onclick="location.href='profile.html'">Home</button>
