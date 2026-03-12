@@ -299,7 +299,6 @@ School Head
 
 <div class="section-title">Personal Information</div>
 <input type="text" id="regName" placeholder="Full Name">
-<input type="email" id="regDepedEmail" placeholder="DepEd Email Address">
 <input type="text" id="regPermanentAddress" placeholder="Permanent Address">
 <input type="text" id="regMobilePhone" placeholder="Mobile Phone">
 
@@ -408,7 +407,6 @@ const regPassword = document.getElementById("regPassword").value;
 const regConfirmPassword = document.getElementById("regConfirmPassword").value;
 
 const name = document.getElementById("regName").value.trim();
-const depedEmail = document.getElementById("regDepedEmail").value.trim();
 const permanentAddress = document.getElementById("regPermanentAddress").value.trim();
 const mobilePhone = document.getElementById("regMobilePhone").value.trim();
 
@@ -431,7 +429,6 @@ return;
 
 if(
 !name ||
-!depedEmail ||
 !permanentAddress ||
 !mobilePhone ||
 !division ||
@@ -454,7 +451,7 @@ email: regEmail,
 role: selectedRole,
 
 name: name,
-depedEmail: depedEmail,
+depedEmail: regEmail,
 permanentAddress: permanentAddress,
 mobilePhone: mobilePhone,
 
@@ -482,7 +479,6 @@ document.getElementById("regEmail").value = "";
 document.getElementById("regPassword").value = "";
 document.getElementById("regConfirmPassword").value = "";
 document.getElementById("regName").value = "";
-document.getElementById("regDepedEmail").value = "";
 document.getElementById("regPermanentAddress").value = "";
 document.getElementById("regMobilePhone").value = "";
 document.getElementById("regDivision").value = "";
