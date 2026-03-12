@@ -955,15 +955,20 @@ async function imageToDataUrl(path){
   const clonedTable = proceduresTable.cloneNode(true);
 
   // Convert remark dropdowns to plain text
-  const selects = clonedTable.querySelectorAll("select");
-  selects.forEach(select => {
-    const td = select.parentElement;
-    const text = select.value || "";
-    const stamp = td.getAttribute("data-time");
-    td.innerHTML = text
-      ? `${text}${stamp ? `<div style="font-size:10px;color:#555;margin-top:4px;">${stamp}</div>` : ""}`
-      : "";
-  });
+const originalSelects = proceduresTable.querySelectorAll("select");
+const clonedSelects = clonedTable.querySelectorAll("select");
+
+clonedSelects.forEach((select, index) => {
+  const originalSelect = originalSelects[index];
+  const td = select.parentElement;
+
+  const text = originalSelect ? originalSelect.value : "";
+  const stamp = originalSelect ? originalSelect.parentElement.getAttribute("data-time") : "";
+
+  td.innerHTML = text
+    ? `${text}${stamp ? `<div style="font-size:9px;color:#666;margin-top:3px;">(${stamp})</div>` : ""}`
+    : "";
+});
 
   // Convert checker comment textarea to plain text
   const checkerComment = clonedTable.querySelector("#checkerComment");
@@ -1094,18 +1099,18 @@ async function imageToDataUrl(path){
 
       <table class="header-table">
         <tr>
-          <td style="width:15%; text-align:left;">
-            ${depedLogo ? `<img src="${depedLogo}" style="width:95px; height:auto;">` : ""}
+          <td style="width:12%; text-align:left;">
+            ${depedLogo ? `<img src="${depedLogo}" style="width:50px; height:auto;">` : ""}
           </td>
-          <td class="header-center" style="width:70%;">
+          <td class="header-center" style="width:76%;">
             <div>Republic of the Philippines</div>
             <div><strong>Department of Education</strong></div>
             <div>${district}</div>
             <div><strong>${schoolHeader}</strong></div>
             <div>${schoolIdHeader}</div>
           </td>
-          <td style="width:15%; text-align:right;">
-            ${matatagLogo ? `<img src="${matatagLogo}" style="width:110px; height:auto;">` : ""}
+          <td style="width:12%; text-align:right;">
+            ${matatagLogo ? `<img src="${matatagLogo}" style="width:60px; height:auto;">` : ""}
           </td>
         </tr>
       </table>
