@@ -611,7 +611,26 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUser;
+function attachAutoDraftListeners(){
+  document.getElementById("lessonDate").addEventListener("input", savePageDraftToLocal);
+  document.getElementById("gradeLevel").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("learningArea").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("otherLearningArea").addEventListener("input", savePageDraftToLocal);
+  document.getElementById("quarter").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("timeCell").addEventListener("input", savePageDraftToLocal);
 
+  document.addEventListener("input", function(e){
+    if(e.target.closest("#proceduresTable")){
+      savePageDraftToLocal();
+    }
+  });
+
+  document.addEventListener("change", function(e){
+    if(e.target.closest("#proceduresTable")){
+      savePageDraftToLocal();
+    }
+  });
+}
 /* ===============================
    LOAD USER PROFILE (School/Name)
    =============================== */
@@ -626,7 +645,8 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const snap = await getDoc(doc(db, "users", user.uid));
-
+restorePageDraftFromLocal();
+attachAutoDraftListeners();
 if (snap.exists()) {
 
   const data = snap.data();
@@ -644,7 +664,7 @@ if (snap.exists()) {
     "School ID: " + (data.schoolId || "______");
 
 }
-
+restorePageDraftFromLocal();
 });
 
   window.saveLesson = async function(){
@@ -702,6 +722,7 @@ const data = {
   await setDoc(doc(db,"lessonPlans",lessonKey), data);
 
   document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
+  savePageDraftToLocal();
 };
 
 /* ===============================
@@ -822,11 +843,11 @@ select.value = saved;
 });
 document.getElementById("statusBox").innerText = "Status: Auto-saving...";
 document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
-
+savePageDraftToLocal();
 }else{
 document.getElementById("statusBox").innerText = "Status: Saved ✔";
 document.getElementById("statusBox").innerText = "Status: Lesson Loaded";
-
+savePageDraftToLocal();
 }
 
 };
@@ -1137,6 +1158,64 @@ window.checkLearningArea = function(select){
     otherInput.value = "";
   }
 };
+
+  function getCurrentLearningAreaValue(){
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
+
+  if(learningArea === "other" && other){
+    return other;
+  }
+
+  return learningArea;
+}
+
+function savePageDraftToLocal(){
+  const draft = {
+    lessonDate: document.getElementById("lessonDate").value,
+    gradeLevel: document.getElementById("gradeLevel").value,
+    learningArea: document.getElementById("learningArea").value,
+    otherLearningArea: document.getElementById("otherLearningArea").value,
+    quarter: document.getElementById("quarter").value,
+    dateRange: document.getElementById("dateRange").innerText,
+    timeCell: document.getElementById("timeCell").innerText,
+    tableHTML: document.getElementById("proceduresTable").innerHTML
+  };
+
+  localStorage.setItem("currentLessonDraft", JSON.stringify(draft));
+}
+  function restorePageDraftFromLocal(){
+  const saved = localStorage.getItem("currentLessonDraft");
+  if(!saved) return;
+
+  const draft = JSON.parse(saved);
+
+  document.getElementById("lessonDate").value = draft.lessonDate || "";
+  document.getElementById("gradeLevel").value = draft.gradeLevel || "1";
+  document.getElementById("learningArea").value = draft.learningArea || "";
+  document.getElementById("otherLearningArea").value = draft.otherLearningArea || "";
+  document.getElementById("quarter").value = draft.quarter || "1st";
+  document.getElementById("dateRange").innerText = draft.dateRange || "";
+  document.getElementById("timeCell").innerText = draft.timeCell || "";
+
+  if(draft.learningArea === "other"){
+    document.getElementById("otherLearningArea").style.display = "block";
+  } else {
+    document.getElementById("otherLearningArea").style.display = "none";
+  }
+
+  if(draft.tableHTML){
+    document.getElementById("proceduresTable").innerHTML = draft.tableHTML;
+
+    const selects = document.querySelectorAll("#proceduresTable select");
+    selects.forEach(select=>{
+      const savedValue = select.getAttribute("data-selected");
+      if(savedValue){
+        select.value = savedValue;
+      }
+    });
+  }
+}
 </script>
 
 </body>
