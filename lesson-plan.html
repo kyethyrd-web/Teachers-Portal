@@ -674,20 +674,59 @@ grade + "_" +
 learningArea + "_" +
 quarter;
 
-  const data = {
+const data = {
+  userId: currentUser.uid,
+  teacherName: document.getElementById("teacher").innerText,
+  school: document.getElementById("school").innerText,
+  date: selected,
+  weekKey: formatDate(monday),
+  grade: grade,
+  learningArea: learningArea,
+  quarter: quarter,
+  dateRange: document.getElementById("dateRange").innerText,
+  time: document.getElementById("timeCell").innerText,
+  tableHTML: document.getElementById("proceduresTable").innerHTML,
+  status: "draft",
+  submittedAt: "",
+  checkedAt: "",
+  approvedAt: "",
+  checkerComment: "",
+  checkedBy: "",
+  approvedBy: ""
+};
+    window.submitLesson = async function() {
+  const selected = document.getElementById("lessonDate").value;
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
 
-    userId: currentUser.uid,
-    date: selected,
-    grade: grade,
-    learningArea: learningArea,
-    quarter: quarter,
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value;
 
-    dateRange: document.getElementById("dateRange").innerText,
-    time: document.getElementById("timeCell").innerText,
+  if (learningArea === "other" && other) {
+    learningArea = other;
+  }
 
-    tableHTML: document.getElementById("proceduresTable").innerHTML
+  if (!selected) {
+    alert("Please select a date first.");
+    return;
+  }
 
-  };
+  const monday = getMonday(selected);
+
+  const lessonKey =
+    currentUser.uid + "_" +
+    formatDate(monday) + "_" +
+    grade + "_" +
+    learningArea + "_" +
+    quarter;
+
+  await setDoc(doc(db, "lessonPlans", lessonKey), {
+    status: "submitted",
+    submittedAt: new Date().toLocaleString()
+  }, { merge: true });
+
+  document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
+};
 
   await setDoc(doc(db,"lessonPlans",lessonKey), data);
 
