@@ -592,7 +592,10 @@ readonly></textarea>
 </div>
   
 <script type="module">
-
+let currentUser;
+const urlParams = new URLSearchParams(window.location.search);
+const openDocId = urlParams.get("docId");
+const reuseDocId = urlParams.get("reuse");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -645,28 +648,54 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const snap = await getDoc(doc(db, "users", user.uid));
-restorePageDraftFromLocal();
-attachAutoDraftListeners();
-if (snap.exists()) {
 
-  const data = snap.data();
+  if (snap.exists()) {
+    const data = snap.data();
 
-  document.getElementById("school").innerText = data.school || "";
-  document.getElementById("teacher").innerText = data.name || "";
+    document.getElementById("school").innerText = data.school || "";
+    document.getElementById("teacher").innerText = data.name || "";
 
-  document.getElementById("districtHeader").innerText =
-    "District of " + (data.district || "______");
+    document.getElementById("districtHeader").innerText =
+      "District of " + (data.district || "______");
 
-  document.getElementById("schoolHeader").innerText =
-    data.school || "School Name";
+    document.getElementById("schoolHeader").innerText =
+      data.school || "School Name";
 
-  document.getElementById("schoolIdHeader").innerText =
-    "School ID: " + (data.schoolId || "______");
+    document.getElementById("schoolIdHeader").innerText =
+      "School ID: " + (data.schoolId || "______");
+  }
 
-}
-restorePageDraftFromLocal();
+  // IMPORTANT: only restore local draft if there is no open/reuse request
+  if(openDocId){
+    await loadLessonByDocumentId(openDocId, "open");
+  } else if(reuseDocId){
+    await loadLessonByDocumentId(reuseDocId, "reuse");
+  } else {
+    if(typeof restorePageDraftFromLocal === "function"){
+      restorePageDraftFromLocal();
+    }
+  }
+
+  if(typeof attachAutoDraftListeners === "function"){
+    attachAutoDraftListeners();
+  }
 });
+function setLearningAreaValue(value){
+  const select = document.getElementById("learningArea");
+  const otherInput = document.getElementById("otherLearningArea");
 
+  const optionValues = Array.from(select.options).map(opt => opt.value || opt.text);
+
+  if(optionValues.includes(value)){
+    select.value = value;
+    otherInput.style.display = "none";
+    otherInput.value = "";
+  } else {
+    select.value = "other";
+    otherInput.style.display = "block";
+    otherInput.value = value || "";
+  }
+}
   window.saveLesson = async function(){
 
   const selected = document.getElementById("lessonDate").value;
@@ -767,7 +796,18 @@ function formatRange(monday) {
   }
 
 }
+function updateWeekDates(selectedDate){
+  const monday = getMonday(selectedDate);
+  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
 
+  for(let i = 0; i < 5; i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    document.getElementById(ids[i]).innerText = formatDate(d);
+  }
+
+  document.getElementById("dateRange").innerText = formatRange(monday);
+}
 /* ===============================
    LOAD BUTTON FUNCTION
    =============================== */
@@ -1214,6 +1254,66 @@ function savePageDraftToLocal(){
         select.value = savedValue;
       }
     });
+  }
+}
+  async function loadLessonByDocumentId(docId, mode = "open"){
+  try{
+    const snap = await getDoc(doc(db, "lessonPlans", docId));
+
+    if(!snap.exists()){
+      document.getElementById("statusBox").innerText = "Status: Lesson not found";
+      return;
+    }
+
+    const data = snap.data();
+
+    document.getElementById("lessonDate").value = data.date || "";
+    document.getElementById("gradeLevel").value = data.grade || "1";
+    document.getElementById("quarter").value = data.quarter || "1st";
+
+    setLearningAreaValue(data.learningArea || "");
+
+    document.getElementById("timeCell").innerText = data.time || "";
+    document.getElementById("dateRange").innerText = data.dateRange || "";
+
+    if(data.tableHTML){
+      document.getElementById("proceduresTable").innerHTML = data.tableHTML;
+    }
+
+    // Restore saved remark dropdown values
+    const selects = document.querySelectorAll("#proceduresTable select");
+    selects.forEach(select => {
+      const saved = select.getAttribute("data-selected");
+      if(saved){
+        select.value = saved;
+      }
+    });
+
+    if(mode === "reuse"){
+      // Keep content, but treat it like a new draft
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("lessonDate").value = today;
+      updateWeekDates(today);
+
+      document.getElementById("statusBox").innerText =
+        "Status: Reused from previous lesson. Review and save as a new lesson.";
+    } else {
+      if(data.date){
+        updateWeekDates(data.date);
+      }
+      document.getElementById("statusBox").innerText =
+        "Status: Previous lesson opened";
+    }
+
+    // Save what was loaded into local draft so page doesn't revert
+    if(typeof savePageDraftToLocal === "function"){
+      savePageDraftToLocal();
+    }
+
+  } catch(error){
+    console.error("Failed to load lesson by document ID:", error);
+    document.getElementById("statusBox").innerText =
+      "Status: Failed to load lesson";
   }
 }
 </script>
