@@ -273,9 +273,11 @@ try{
 
 const user=await signInWithEmailAndPassword(auth,email,password);
 
-const snap=await getDoc(doc(db,"users",user.user.uid));
+const snap = await getDoc(doc(db, "users", user.user.uid));
+const data = snap.exists() ? snap.data() : {};
 
-const data=snap.data();
+console.log("Logged in UID:", user.user.uid);
+console.log("Firestore data:", data);
 
 if(data.role !== selectedRole && data.role !== "super_admin"){
 document.getElementById("message").innerText="Wrong role selected.";
