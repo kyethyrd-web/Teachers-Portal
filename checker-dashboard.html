@@ -240,11 +240,11 @@ async function loadSubmittedDLLs() {
       const snap = await getDoc(doc(db, "users", user.uid));
       const data = snap.exists() ? snap.data() : {};
 
-      if ((data.role || "") !== "department_head") {
-        alert("Unauthorized access.");
-        window.location.href = "login.html";
-        return;
-      }
+if ((data.role || "") !== "department_head" && (data.role || "") !== "super_admin") {
+  alert("Unauthorized access.");
+  window.location.href = "login.html";
+  return;
+}
 
       document.getElementById("checkerEmail").innerText =
         "Logged in as: " + (data.name || user.email);
