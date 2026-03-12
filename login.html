@@ -1,75 +1,338 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Login</title>
+  <title>Teacher Portal Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #dff1ff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("images/DepEd-logo.png.png") center center no-repeat;
+      background-size: 420px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .login-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 74, 173, 0.15);
+      padding: 32px 28px;
+      text-align: center;
+      border-top: 6px solid #004aad;
+    }
+
+    .logo {
+      width: 95px;
+      height: 95px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .subtext {
+      margin: 0 0 4px 0;
+      color: #444;
+      font-size: 14px;
+    }
+
+    .title {
+      margin: 0 0 8px 0;
+      color: #004aad;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      margin: 0 0 24px 0;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .role-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .role-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .role-buttons {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .role-btn {
+      border: 1px solid #b7d4ff;
+      background: #f4f9ff;
+      color: #004aad;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .role-btn:hover {
+      background: #e7f1ff;
+    }
+
+    .role-btn.active {
+      background: #004aad;
+      color: white;
+      border-color: #004aad;
+    }
+
+    .field-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .field-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #c7d9f7;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
+      background: #fff;
+    }
+
+    .field-group input:focus {
+      border-color: #004aad;
+      box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.12);
+    }
+
+    .login-btn,
+    .register-btn {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .login-btn {
+      background: #004aad;
+      color: white;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+
+    .login-btn:hover {
+      background: #00307a;
+    }
+
+    .register-btn {
+      background: #eaf3ff;
+      color: #004aad;
+      border: 1px solid #b7d4ff;
+    }
+
+    .register-btn:hover {
+      background: #dcecff;
+    }
+
+    #message {
+      margin-top: 14px;
+      min-height: 18px;
+      font-size: 14px;
+      color: #b00020;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Teacher Login</h2>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <img src="images/DepEd-logo.png.png" alt="DepEd Logo" class="logo">
 
-  <input type="email" id="email" placeholder="Email"><br><br>
-  <input type="password" id="password" placeholder="Password"><br><br>
+      <p class="subtext">Republic of the Philippines</p>
+      <h1 class="title">Teacher Portal</h1>
+      <p class="subtitle">Department of Education Login System</p>
 
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
+      <div class="role-group">
+        <label class="role-label">Login as</label>
+        <div class="role-buttons">
+          <button type="button" class="role-btn active" onclick="setRole('teacher', this)">Teacher</button>
+          <button type="button" class="role-btn" onclick="setRole('department_head', this)">Department Head (Checker)</button>
+          <button type="button" class="role-btn" onclick="setRole('school_head', this)">School Head (Approver)</button>
+        </div>
+      </div>
 
-  <p id="message"></p>
+      <div class="field-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email">
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password">
+      </div>
+
+      <button class="login-btn" onclick="login()">Login</button>
+      <button class="register-btn" onclick="register()">Register</button>
+
+      <p id="message"></p>
+
+      <div class="footer-note">
+        Daily Lesson Log Management System
+      </div>
+    </div>
+  </div>
 
   <script type="module">
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getAuth,
-      setPersistence,
-      browserLocalPersistence,
       signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
+      createUserWithEmailAndPassword,
+      setPersistence,
+      browserLocalPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-  authDomain: "teachers-portal-98254.firebaseapp.com",
-  projectId: "teachers-portal-98254",
-  storageBucket: "teachers-portal-98254.firebasestorage.app",
-  messagingSenderId: "479254583768",
-  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      authDomain: "teachers-portal-98254.firebaseapp.com",
+      projectId: "teachers-portal-98254",
+      storageBucket: "teachers-portal-98254.firebasestorage.app",
+      messagingSenderId: "479254583768",
+      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Enable persistence AFTER auth exists
-    setPersistence(auth, browserLocalPersistence)
-      .catch(error => console.error(error));
+    await setPersistence(auth, browserLocalPersistence);
 
-    window.login = function() {
-      const email = document.getElementById("email").value;
+    let selectedRole = "teacher";
+
+    window.setRole = function(role, button) {
+      selectedRole = role;
+
+      document.querySelectorAll(".role-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+    };
+
+    window.login = async function() {
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("message").innerText = "Login Successful!";
+      if (!email || !password) {
+        message.innerText = "Please enter your email and password.";
+        return;
+      }
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        const snap = await getDoc(doc(db, "users", uid));
+        const data = snap.exists() ? snap.data() : {};
+        const savedRole = data.role || "teacher";
+
+        if (savedRole !== selectedRole) {
+          message.innerText = "This account is not registered for the selected login role.";
+          return;
+        }
+
+        message.style.color = "green";
+        message.innerText = "Login successful!";
+
+        if (selectedRole === "teacher") {
           window.location.href = "profile.html";
-        })
-        .catch(error => {
-          document.getElementById("message").innerText = error.message;
-        });
-    }
+        } else if (selectedRole === "department_head") {
+          window.location.href = "checker-dashboard.html";
+        } else if (selectedRole === "school_head") {
+          window.location.href = "approver-dashboard.html";
+        }
 
-    window.register = function() {
-      const email = document.getElementById("email").value;
+      } catch (error) {
+        message.style.color = "#b00020";
+        message.innerText = error.message;
+      }
+    };
+
+    window.register = async function() {
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("message").innerText = "Account Created!";
-        })
-        .catch(error => {
-          document.getElementById("message").innerText = error.message;
-        });
-    }
+      if (!email || !password) {
+        message.innerText = "Please enter your email and password.";
+        return;
+      }
 
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        await setDoc(doc(db, "users", uid), {
+          email: email,
+          role: selectedRole
+        }, { merge: true });
+
+        message.style.color = "green";
+        message.innerText = "Account created successfully!";
+      } catch (error) {
+        message.style.color = "#b00020";
+        message.innerText = error.message;
+      }
+    };
   </script>
-
 </body>
 </html>
