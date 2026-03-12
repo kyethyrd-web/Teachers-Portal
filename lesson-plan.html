@@ -587,7 +587,7 @@ readonly></textarea>
 </tr>
 </table>
 
-
+<button onclick="submitLesson()">Submit</button>
 <div id="statusBox">Status: Ready</div>
 </div>
   
@@ -1072,6 +1072,39 @@ cell2.colSpan = 6;
 cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" readonly></textarea>';
 
 }
+
+  window.submitLesson = async function () {
+  const selected = document.getElementById("lessonDate").value;
+  if (!selected) {
+    alert("Please select a date first.");
+    return;
+  }
+
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value;
+  if (learningArea === "other" && other) {
+    learningArea = other;
+  }
+
+  const monday = getMonday(selected);
+
+  const lessonKey =
+    currentUser.uid + "_" +
+    formatDate(monday) + "_" +
+    grade + "_" +
+    learningArea + "_" +
+    quarter;
+
+  await setDoc(doc(db, "lessonPlans", lessonKey), {
+    status: "submitted",
+    submittedAt: new Date().toLocaleString()
+  }, { merge: true });
+
+  document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
+};
 
 </script>
 
