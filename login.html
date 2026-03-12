@@ -277,11 +277,9 @@ const snap=await getDoc(doc(db,"users",user.user.uid));
 
 const data=snap.data();
 
-if(data.role!==selectedRole){
-
+if(data.role !== selectedRole && data.role !== "super_admin"){
 document.getElementById("message").innerText="Wrong role selected.";
 return;
-
 }
 
 if(selectedRole==="teacher"){
