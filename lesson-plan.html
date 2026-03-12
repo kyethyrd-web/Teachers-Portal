@@ -1097,23 +1097,33 @@ clonedSelects.forEach((select, index) => {
   <body>
     <div class="Section1">
 
-      <table class="header-table">
-        <tr>
-        <td style="width:18%; text-align:center; padding-left:1.2cm;">
-          ${depedLogo ? `<img src="${depedLogo}" style="width:3.26cm; height:3.15cm;">` : ""}
-        </td>
-            <td class="header-center" style="width:64%;">
-            <div>Republic of the Philippines</div>
-            <div><strong>Department of Education</strong></div>
-            <div>${district}</div>
-            <div><strong>${schoolHeader}</strong></div>
-            <div>${schoolIdHeader}</div>
-        </td>
-        <td style="width:18%; text-align:center; padding-right:1.2cm;">
-          ${matatagLogo ? `<img src="${matatagLogo}" style="width:3.92cm; height:2.03cm;">` : ""}
-      </td>
-        </tr>
-      </table>
+<table class="header-table">
+<tr>
+
+<td style="width:20%; text-align:left;">
+<img src="${depedLogo}"
+     width="123"
+     height="119"
+     style="width:3.26cm;height:3.15cm;margin-left:0.6cm;">
+</td>
+
+<td class="header-center" style="width:60%;">
+<div>Republic of the Philippines</div>
+<div><strong>Department of Education</strong></div>
+<div>${district}</div>
+<div><strong>${schoolHeader}</strong></div>
+<div>${schoolIdHeader}</div>
+</td>
+
+<td style="width:20%; text-align:right;">
+<img src="${matatagLogo}"
+     width="148"
+     height="77"
+     style="width:3.92cm;height:2.03cm;margin-right:0.6cm;">
+</td>
+
+</tr>
+</table>
 
       <div class="title">DAILY LESSON LOG</div>
 
