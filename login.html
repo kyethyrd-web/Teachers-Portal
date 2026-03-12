@@ -248,7 +248,18 @@ margin-bottom:12px;
 width:95%;
 flex-direction:column;
 }
+/* Hide browser default password reveal icon (Edge, Chrome) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+display: none;
+}
 
+/* Hide default reveal icon in Chromium browsers */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+visibility: hidden;
+display: none !important;
+pointer-events: none;
+}
 .left-panel,
 .right-panel{
 flex:none;
