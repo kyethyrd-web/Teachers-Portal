@@ -694,39 +694,6 @@ const data = {
   checkedBy: "",
   approvedBy: ""
 };
-    window.submitLesson = async function() {
-  const selected = document.getElementById("lessonDate").value;
-  const grade = document.getElementById("gradeLevel").value;
-  const quarter = document.getElementById("quarter").value;
-
-  let learningArea = document.getElementById("learningArea").value;
-  const other = document.getElementById("otherLearningArea").value;
-
-  if (learningArea === "other" && other) {
-    learningArea = other;
-  }
-
-  if (!selected) {
-    alert("Please select a date first.");
-    return;
-  }
-
-  const monday = getMonday(selected);
-
-  const lessonKey =
-    currentUser.uid + "_" +
-    formatDate(monday) + "_" +
-    grade + "_" +
-    learningArea + "_" +
-    quarter;
-
-  await setDoc(doc(db, "lessonPlans", lessonKey), {
-    status: "submitted",
-    submittedAt: new Date().toLocaleString()
-  }, { merge: true });
-
-  document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
-};
 
   await setDoc(doc(db,"lessonPlans",lessonKey), data);
 
@@ -1144,9 +1111,9 @@ cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" 
 
   document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
 };
-function goToLessonLogHistory(){
+window.goToLessonLogHistory = function(){
   window.location.href = "lesson-log-history.html";
-}
+};
 </script>
 
 </body>
