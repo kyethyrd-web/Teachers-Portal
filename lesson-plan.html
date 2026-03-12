@@ -223,7 +223,7 @@ line-height:1.4;
 </div>
   <div class="navbar">
 <button onclick="location.href='profile.html'">Home</button>
-<button onclick="location.href='dll.html'">Lesson Log</button>
+<button onclick="goToLessonLogHistory()">Lesson Log</button>
 <button onclick="exportWord()">Export</button>
 <button onclick="saveLesson()">Save</button>
 </div>
@@ -1144,7 +1144,9 @@ cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" 
 
   document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
 };
-
+function goToLessonLogHistory(){
+  window.location.href = "lesson-log-history.html";
+}
 </script>
 
 </body>
