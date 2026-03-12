@@ -226,6 +226,10 @@ margin-top:-8px;
 margin-bottom:12px;
 }
 
+.hidden{
+display:none;
+}
+
 @media (max-width: 900px){
 .login-container{
 width:95%;
@@ -236,9 +240,6 @@ flex-direction:column;
 .right-panel{
 flex:none;
 width:100%;
-}
-  .hidden{
-display:none;
 }
 }
 </style>
@@ -384,6 +385,11 @@ document.getElementById("regDepartmentHead").value = "";
 window.toggleRegisterPane = function(){
 const pane = document.getElementById("registerPane");
 pane.classList.toggle("show");
+
+const activeBtn = document.querySelector(".role-btn.active");
+if(activeBtn){
+setRole(selectedRole, activeBtn);
+}
 };
 
 
