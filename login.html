@@ -1,242 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>DepEd Teacher Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DepEd DLL System - Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dff1ff, #b9def7);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-*{
-box-sizing:border-box;
-}
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
 
-body{
-margin:0;
-font-family:Arial, sans-serif;
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#dceeff;
-position:relative;
-}
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      padding: 30px;
+    }
 
-/* Background DepEd watermark */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-body::before{
-content:"";
-position:absolute;
-inset:0;
-background:url("images/DepEd-logo.png.png") center no-repeat;
-background-size:600px;
-opacity:0.05;
-}
+    .logo-area img {
+      width: 80px;
+      opacity: 0.9;
+    }
 
-/* Main login container */
+    h2 {
+      margin: 10px 0 20px;
+      text-align: center;
+      color: #0b5fa5;
+    }
 
-.login-container{
-position:relative;
-z-index:1;
-width:900px;
-background:white;
-border-radius:12px;
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
-display:flex;
-overflow:hidden;
-}
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #0b5fa5;
+      border-bottom: 2px solid #d6ecfb;
+      padding-bottom: 6px;
+      font-size: 18px;
+    }
 
-/* Left panel */
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      margin-top: 12px;
+      color: #333;
+      font-weight: bold;
+    }
 
-.left-panel{
-flex:1;
-background:#004aad;
-color:white;
-padding:50px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-}
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #c7dceb;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
 
-.left-panel img{
-width:130px;
-margin-bottom:20px;
-}
+    input:focus, select:focus, textarea:focus {
+      border-color: #0b5fa5;
+      box-shadow: 0 0 0 3px rgba(11,95,165,0.12);
+    }
 
-.left-panel h1{
-margin:0;
-font-size:34px;
-}
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
 
-.left-panel p{
-margin-top:10px;
-opacity:0.9;
-}
+    .btn-primary {
+      background: #0b5fa5;
+      color: white;
+    }
 
-/* Right login panel */
+    .btn-primary:hover {
+      background: #094d86;
+    }
 
-.right-panel{
-flex:1;
-padding:50px;
-}
+    .btn-secondary {
+      background: #2f89d9;
+      color: white;
+    }
 
-.right-panel h2{
-margin-top:0;
-color:#004aad;
-}
+    .btn-secondary:hover {
+      background: #1e74c0;
+    }
 
-/* Role buttons */
+    .message {
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: none;
+    }
 
-.role-buttons{
-display:flex;
-gap:10px;
-margin-bottom:25px;
-}
+    .success {
+      background: #e3f7e8;
+      color: #1f7a35;
+      border: 1px solid #b7e3c2;
+    }
 
-.role-btn{
-flex:1;
-padding:12px;
-border:2px solid #004aad;
-background:white;
-color:#004aad;
-border-radius:8px;
-font-weight:bold;
-cursor:pointer;
-transition:0.2s;
-}
+    .error {
+      background: #fde8e8;
+      color: #b42318;
+      border: 1px solid #f5b5b5;
+    }
 
-.role-btn.active{
-background:#004aad;
-color:white;
-}
+    .small-note {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      margin-top: 10px;
+    }
 
-.role-btn:hover{
-background:#e6f0ff;
-}
-
-/* Input fields */
-
-input{
-width:100%;
-padding:14px;
-margin-bottom:16px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:15px;
-}
-
-input:focus{
-outline:none;
-border-color:#004aad;
-}
-
-/* Buttons */
-
-.login-btn{
-width:100%;
-padding:14px;
-background:#004aad;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin-top:5px;
-}
-
-.login-btn:hover{
-background:#00307a;
-}
-
-.register-btn{
-width:100%;
-padding:12px;
-margin-top:10px;
-background:#eef5ff;
-border:1px solid #004aad;
-color:#004aad;
-border-radius:8px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.register-btn:hover{
-background:#ddeaff;
-}
-
-#message{
-margin-top:10px;
-font-size:14px;
-color:red;
-}
-
-</style>
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="login-container">
+  <div class="container">
+    <!-- LOGIN CARD -->
+    <div class="card">
+      <div class="logo-area">
+        <!-- Replace with your actual logo path -->
+        <img src="deped-logo.png" alt="DepEd Logo">
+      </div>
+      <h2>DepEd DLL System Login</h2>
 
-<!-- LEFT SIDE -->
+      <label for="loginRole">Select Role</label>
+      <select id="loginRole">
+        <option value="">-- Select Role --</option>
+        <option value="teacher">Teacher</option>
+        <option value="department_head">Department Head</option>
+        <option value="school_head">School Head</option>
+      </select>
 
-<div class="left-panel">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="Enter email">
 
-<img src="images/DepEd-logo.png.png">
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter password">
 
-<h1>Teacher Portal</h1>
+      <button class="btn btn-primary" id="loginBtn">Login</button>
 
-<p>Department of Education<br>
-Daily Lesson Log Management System</p>
+      <div id="loginMessage" class="message"></div>
+    </div>
 
-</div>
+    <!-- REGISTER CARD -->
+    <div class="card">
+      <div class="logo-area">
+        <img src="deped-logo.png" alt="DepEd Logo">
+      </div>
+      <h2>Register New User</h2>
 
+      <label for="registerRole">Select Role</label>
+      <select id="registerRole">
+        <option value="">-- Select Role --</option>
+        <option value="teacher">Teacher</option>
+        <option value="department_head">Department Head</option>
+        <option value="school_head">School Head</option>
+      </select>
 
-<!-- RIGHT SIDE LOGIN -->
+      <label for="registerEmail">Email</label>
+      <input type="email" id="registerEmail" placeholder="Enter email">
 
-<div class="right-panel">
+      <label for="registerPassword">Password</label>
+      <input type="password" id="registerPassword" placeholder="Enter password">
 
-<h2>Login</h2>
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm password">
 
-<label>Select Role</label>
+      <h3>Personal Information</h3>
 
-<div class="role-buttons">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" placeholder="Enter full name">
 
-<button class="role-btn active" onclick="setRole('teacher',this)">
-Teacher
-</button>
+      <label for="depedEmail">DepEd Email Address</label>
+      <input type="email" id="depedEmail" placeholder="Enter DepEd email">
 
-<button class="role-btn" onclick="setRole('department_head',this)">
-Department Head
-</button>
+      <label for="permanentAddress">Permanent Address</label>
+      <input type="text" id="permanentAddress" placeholder="Enter permanent address">
 
-<button class="role-btn" onclick="setRole('school_head',this)">
-School Head
-</button>
+      <label for="mobilePhone">Mobile Phone</label>
+      <input type="text" id="mobilePhone" placeholder="Enter mobile number">
 
-</div>
+      <h3>School Information</h3>
 
-<input type="email" id="email" placeholder="Email Address">
+      <label for="division">Division</label>
+      <input type="text" id="division" placeholder="Enter division">
 
-<input type="password" id="password" placeholder="Password">
+      <label for="district">District</label>
+      <input type="text" id="district" placeholder="Enter district">
 
-<button class="login-btn" onclick="login()">Login</button>
+      <label for="school">School</label>
+      <input type="text" id="school" placeholder="Enter school name">
 
-<button class="register-btn" onclick="register()">Register</button>
+      <label for="schoolId">School ID</label>
+      <input type="text" id="schoolId" placeholder="Enter school ID">
 
-<p id="message"></p>
+      <label for="schoolHead">School Head</label>
+      <input type="text" id="schoolHead" placeholder="Enter school head">
 
-</div>
+      <label for="departmentHead">Department Head</label>
+      <input type="text" id="departmentHead" placeholder="Enter department head">
 
-</div>
+      <button class="btn btn-secondary" id="registerBtn">Register</button>
 
+      <div id="registerMessage" class="message"></div>
+      <div class="small-note">New users will automatically have their profile information saved.</div>
+    </div>
+  </div>
 
-<script type="module">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+    // ---------------- FIREBASE CONFIG ----------------
 const firebaseConfig = {
 apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
 authDomain: "teachers-portal-98254.firebaseapp.com",
@@ -246,89 +268,160 @@ messagingSenderId: "479254583768",
 appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-let selectedRole = "teacher";
+    // ---------------- HELPERS ----------------
+    function showMessage(elementId, text, type) {
+      const el = document.getElementById(elementId);
+      el.style.display = "block";
+      el.textContent = text;
+      el.className = `message ${type}`;
+    }
 
-window.setRole=function(role,btn){
+    function clearMessage(elementId) {
+      const el = document.getElementById(elementId);
+      el.style.display = "none";
+      el.textContent = "";
+      el.className = "message";
+    }
 
-selectedRole=role;
+    // ---------------- LOGIN ----------------
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      clearMessage("loginMessage");
 
-document.querySelectorAll(".role-btn").forEach(b=>{
-b.classList.remove("active");
-});
+      const role = document.getElementById("loginRole").value;
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
 
-btn.classList.add("active");
+      if (!role || !email || !password) {
+        showMessage("loginMessage", "Please fill in role, email, and password.", "error");
+        return;
+      }
 
-};
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-window.login = async function(){
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
+        if (!userSnap.exists()) {
+          showMessage("loginMessage", "User profile not found in Firestore.", "error");
+          return;
+        }
 
-try{
+        const userData = userSnap.data();
+        const savedRole = userData.role;
 
-const user=await signInWithEmailAndPassword(auth,email,password);
+        if (savedRole !== role && savedRole !== "super_admin") {
+          showMessage("loginMessage", "Wrong role selected.", "error");
+          return;
+        }
 
-const snap = await getDoc(doc(db, "users", user.user.uid));
-const data = snap.exists() ? snap.data() : {};
+        showMessage("loginMessage", "Login successful.", "success");
 
-console.log("Logged in UID:", user.user.uid);
-console.log("Firestore data:", data);
+        if (role === "teacher") {
+          window.location.href = "profile.html";
+        } else if (role === "department_head") {
+          window.location.href = "checker-dashboard.html";
+        } else if (role === "school_head") {
+          window.location.href = "approver-dashboard.html";
+        }
 
-if(data.role !== selectedRole && data.role !== "super_admin"){
-document.getElementById("message").innerText="Wrong role selected.";
-return;
-}
+      } catch (error) {
+        showMessage("loginMessage", error.message, "error");
+      }
+    });
 
-if(selectedRole==="teacher"){
-window.location.href="profile.html";
-}
+    // ---------------- REGISTER ----------------
+    document.getElementById("registerBtn").addEventListener("click", async () => {
+      clearMessage("registerMessage");
 
-if(selectedRole==="department_head"){
-window.location.href="checker-dashboard.html";
-}
+      const role = document.getElementById("registerRole").value;
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
 
-if(selectedRole==="school_head"){
-window.location.href="approver-dashboard.html";
-}
+      const fullName = document.getElementById("fullName").value.trim();
+      const depedEmail = document.getElementById("depedEmail").value.trim();
+      const permanentAddress = document.getElementById("permanentAddress").value.trim();
+      const mobilePhone = document.getElementById("mobilePhone").value.trim();
 
-}catch(error){
+      const division = document.getElementById("division").value.trim();
+      const district = document.getElementById("district").value.trim();
+      const school = document.getElementById("school").value.trim();
+      const schoolId = document.getElementById("schoolId").value.trim();
+      const schoolHead = document.getElementById("schoolHead").value.trim();
+      const departmentHead = document.getElementById("departmentHead").value.trim();
 
-document.getElementById("message").innerText=error.message;
+      if (
+        !role || !email || !password || !confirmPassword ||
+        !fullName || !depedEmail || !permanentAddress || !mobilePhone ||
+        !division || !district || !school || !schoolId || !schoolHead || !departmentHead
+      ) {
+        showMessage("registerMessage", "Please complete all registration fields.", "error");
+        return;
+      }
 
-}
+      if (password !== confirmPassword) {
+        showMessage("registerMessage", "Passwords do not match.", "error");
+        return;
+      }
 
-};
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-window.register = async function(){
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: email,
+          role: role,
 
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
+          // Personal Information
+          name: fullName,
+          depedEmail: depedEmail,
+          permanentAddress: permanentAddress,
+          mobilePhone: mobilePhone,
 
-try{
+          // School Information
+          division: division,
+          district: district,
+          school: school,
+          schoolId: schoolId,
+          schoolHead: schoolHead,
+          departmentHead: departmentHead,
 
-const user=await createUserWithEmailAndPassword(auth,email,password);
+          // Optional profile fields for later use
+          employeeId: "",
+          prcLicense: "",
+          philhealth: "",
+          tin: "",
+          gsis: "",
+          pagibig: "",
+          photoURL: "",
 
-await setDoc(doc(db,"users",user.user.uid),{
-email:email,
-role:selectedRole
-});
+          createdAt: serverTimestamp()
+        });
 
-document.getElementById("message").innerText="Account created.";
+        showMessage("registerMessage", "Registration successful. User profile has been created.", "success");
 
-}catch(error){
+        // Optional auto-redirect after registration
+        setTimeout(() => {
+          if (role === "teacher") {
+            window.location.href = "profile.html";
+          } else if (role === "department_head") {
+            window.location.href = "checker-dashboard.html";
+          } else if (role === "school_head") {
+            window.location.href = "approver-dashboard.html";
+          }
+        }, 1200);
 
-document.getElementById("message").innerText=error.message;
-
-}
-
-};
-
-</script>
-
+      } catch (error) {
+        showMessage("registerMessage", error.message, "error");
+      }
+    });
+  </script>
 </body>
 </html>
