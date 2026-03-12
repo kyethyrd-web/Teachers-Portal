@@ -4,7 +4,6 @@
 <title>DepEd Teacher Portal</title>
 
 <style>
-
 *{
 box-sizing:border-box;
 }
@@ -21,7 +20,6 @@ position:relative;
 }
 
 /* Background DepEd watermark */
-
 body::before{
 content:"";
 position:absolute;
@@ -32,7 +30,6 @@ opacity:0.05;
 }
 
 /* Main login container */
-
 .login-container{
 position:relative;
 z-index:1;
@@ -45,7 +42,6 @@ overflow:hidden;
 }
 
 /* Left panel */
-
 .left-panel{
 flex:1;
 background:#004aad;
@@ -74,7 +70,6 @@ opacity:0.9;
 }
 
 /* Right login panel */
-
 .right-panel{
 flex:1;
 padding:50px;
@@ -88,7 +83,6 @@ color:#004aad;
 }
 
 /* Role buttons */
-
 .role-buttons{
 display:flex;
 gap:10px;
@@ -117,7 +111,6 @@ background:#e6f0ff;
 }
 
 /* Input fields */
-
 input{
 width:100%;
 padding:14px;
@@ -132,8 +125,31 @@ outline:none;
 border-color:#004aad;
 }
 
-/* Buttons */
+/* Password wrapper */
+.password-wrap{
+position:relative;
+margin-bottom:16px;
+}
 
+.password-wrap input{
+margin-bottom:0;
+padding-right:48px;
+}
+
+.eye-btn{
+position:absolute;
+right:10px;
+top:50%;
+transform:translateY(-50%);
+border:none;
+background:none;
+cursor:pointer;
+font-size:18px;
+color:#555;
+padding:4px 6px;
+}
+
+/* Buttons */
 .login-btn{
 width:100%;
 padding:14px;
@@ -191,7 +207,6 @@ color:red;
 }
 
 /* Collapsible registration pane */
-
 .register-pane{
 display:none;
 margin-top:20px;
@@ -228,6 +243,18 @@ margin-top:-8px;
 margin-bottom:12px;
 }
 
+@media (max-width: 900px){
+.login-container{
+width:95%;
+flex-direction:column;
+}
+
+.left-panel,
+.right-panel{
+flex:none;
+width:100%;
+}
+}
 </style>
 </head>
 
@@ -236,21 +263,14 @@ margin-bottom:12px;
 <div class="login-container">
 
 <!-- LEFT SIDE -->
-
 <div class="left-panel">
-
 <img src="images/DepEd-logo.png.png">
-
 <h1>Teacher Portal</h1>
-
 <p>Department of Education<br>
 Daily Lesson Log Management System</p>
-
 </div>
 
-
 <!-- RIGHT SIDE LOGIN -->
-
 <div class="right-panel">
 
 <h2>Login</h2>
@@ -258,7 +278,6 @@ Daily Lesson Log Management System</p>
 <label>Select Role</label>
 
 <div class="role-buttons">
-
 <button class="role-btn active" onclick="setRole('teacher',this)">
 Teacher
 </button>
@@ -270,12 +289,14 @@ Department Head
 <button class="role-btn" onclick="setRole('school_head',this)">
 School Head
 </button>
-
 </div>
 
 <input type="email" id="email" placeholder="Email Address">
 
+<div class="password-wrap">
 <input type="password" id="password" placeholder="Password">
+<button type="button" class="eye-btn" onclick="togglePassword('password', this)">👁</button>
+</div>
 
 <button class="login-btn" onclick="login()">Login</button>
 
@@ -284,21 +305,31 @@ School Head
 <p id="message"></p>
 
 <!-- COLLAPSIBLE REGISTER PANE -->
-
 <div id="registerPane" class="register-pane">
 
 <h3>New User Registration</h3>
 <p class="small-text">Fill out the details below to automatically create your profile.</p>
 
-<div class="section-title">Personal Information</div>
+<div class="section-title">Account Information</div>
+<input type="email" id="regEmail" placeholder="Email Address">
 
+<div class="password-wrap">
+<input type="password" id="regPassword" placeholder="Password">
+<button type="button" class="eye-btn" onclick="togglePassword('regPassword', this)">👁</button>
+</div>
+
+<div class="password-wrap">
+<input type="password" id="regConfirmPassword" placeholder="Confirm Password">
+<button type="button" class="eye-btn" onclick="togglePassword('regConfirmPassword', this)">👁</button>
+</div>
+
+<div class="section-title">Personal Information</div>
 <input type="text" id="regName" placeholder="Full Name">
 <input type="email" id="regDepedEmail" placeholder="DepEd Email Address">
 <input type="text" id="regPermanentAddress" placeholder="Permanent Address">
 <input type="text" id="regMobilePhone" placeholder="Mobile Phone">
 
 <div class="section-title">School Information</div>
-
 <input type="text" id="regDivision" placeholder="Division">
 <input type="text" id="regDistrict" placeholder="District">
 <input type="text" id="regSchool" placeholder="School">
@@ -311,12 +342,9 @@ School Head
 </div>
 
 </div>
-
 </div>
 
-
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -336,16 +364,20 @@ const db = getFirestore(app);
 
 let selectedRole = "teacher";
 
-window.setRole=function(role,btn){
+function setMessage(text, color="red"){
+const message = document.getElementById("message");
+message.style.color = color;
+message.innerText = text;
+}
 
-selectedRole=role;
+window.setRole = function(role, btn){
+selectedRole = role;
 
 document.querySelectorAll(".role-btn").forEach(b=>{
 b.classList.remove("active");
 });
 
 btn.classList.add("active");
-
 };
 
 window.toggleRegisterPane = function(){
@@ -353,14 +385,28 @@ const pane = document.getElementById("registerPane");
 pane.classList.toggle("show");
 };
 
-window.login = async function(){
+window.togglePassword = function(inputId, btn){
+const input = document.getElementById(inputId);
+if(input.type === "password"){
+input.type = "text";
+btn.innerText = "🙈";
+}else{
+input.type = "password";
+btn.innerText = "👁";
+}
+};
 
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
+window.login = async function(){
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value;
+
+if(!email || !password){
+setMessage("Please enter your email and password.");
+return;
+}
 
 try{
-
-const user=await signInWithEmailAndPassword(auth,email,password);
+const user = await signInWithEmailAndPassword(auth, email, password);
 
 const snap = await getDoc(doc(db, "users", user.user.uid));
 const data = snap.exists() ? snap.data() : {};
@@ -369,49 +415,53 @@ console.log("Logged in UID:", user.user.uid);
 console.log("Firestore data:", data);
 
 if(data.role !== selectedRole && data.role !== "super_admin"){
-document.getElementById("message").innerText="Wrong role selected.";
+setMessage("Wrong role selected.");
 return;
 }
 
-if(selectedRole==="teacher"){
-window.location.href="profile.html";
+setMessage("Login successful.", "green");
+
+if(selectedRole === "teacher"){
+window.location.href = "profile.html";
 }
 
-if(selectedRole==="department_head"){
-window.location.href="checker-dashboard.html";
+if(selectedRole === "department_head"){
+window.location.href = "checker-dashboard.html";
 }
 
-if(selectedRole==="school_head"){
-window.location.href="approver-dashboard.html";
+if(selectedRole === "school_head"){
+window.location.href = "approver-dashboard.html";
 }
 
 }catch(error){
-
-document.getElementById("message").innerText=error.message;
-
+setMessage(error.message);
 }
-
 };
 
 window.registerNewUser = async function(){
+const regEmail = document.getElementById("regEmail").value.trim();
+const regPassword = document.getElementById("regPassword").value;
+const regConfirmPassword = document.getElementById("regConfirmPassword").value;
 
-const email=document.getElementById("email").value.trim();
-const password=document.getElementById("password").value;
+const name = document.getElementById("regName").value.trim();
+const depedEmail = document.getElementById("regDepedEmail").value.trim();
+const permanentAddress = document.getElementById("regPermanentAddress").value.trim();
+const mobilePhone = document.getElementById("regMobilePhone").value.trim();
 
-const name=document.getElementById("regName").value.trim();
-const depedEmail=document.getElementById("regDepedEmail").value.trim();
-const permanentAddress=document.getElementById("regPermanentAddress").value.trim();
-const mobilePhone=document.getElementById("regMobilePhone").value.trim();
+const division = document.getElementById("regDivision").value.trim();
+const district = document.getElementById("regDistrict").value.trim();
+const school = document.getElementById("regSchool").value.trim();
+const schoolId = document.getElementById("regSchoolId").value.trim();
+const schoolHead = document.getElementById("regSchoolHead").value.trim();
+const departmentHead = document.getElementById("regDepartmentHead").value.trim();
 
-const division=document.getElementById("regDivision").value.trim();
-const district=document.getElementById("regDistrict").value.trim();
-const school=document.getElementById("regSchool").value.trim();
-const schoolId=document.getElementById("regSchoolId").value.trim();
-const schoolHead=document.getElementById("regSchoolHead").value.trim();
-const departmentHead=document.getElementById("regDepartmentHead").value.trim();
+if(!regEmail || !regPassword || !regConfirmPassword){
+setMessage("Please fill in email, password, and confirm password for registration.");
+return;
+}
 
-if(!email || !password){
-document.getElementById("message").innerText="Please enter email and password first.";
+if(regPassword !== regConfirmPassword){
+setMessage("Password and confirm password do not match.");
 return;
 }
 
@@ -427,55 +477,67 @@ if(
 !schoolHead ||
 !departmentHead
 ){
-document.getElementById("message").innerText="Please complete all registration fields.";
+setMessage("Please complete all registration fields.");
 return;
 }
 
 try{
+const userCredential = await createUserWithEmailAndPassword(auth, regEmail, regPassword);
+const uid = userCredential.user.uid;
 
-const user=await createUserWithEmailAndPassword(auth,email,password);
+await setDoc(doc(db, "users", uid), {
+email: regEmail,
+role: selectedRole,
 
-await setDoc(doc(db,"users",user.user.uid),{
-email:email,
-role:selectedRole,
+name: name,
+depedEmail: depedEmail,
+permanentAddress: permanentAddress,
+mobilePhone: mobilePhone,
 
-name:name,
-depedEmail:depedEmail,
-permanentAddress:permanentAddress,
-mobilePhone:mobilePhone,
+division: division,
+district: district,
+school: school,
+schoolId: schoolId,
+schoolHead: schoolHead,
+departmentHead: departmentHead,
 
-division:division,
-district:district,
-school:school,
-schoolId:schoolId,
-schoolHead:schoolHead,
-departmentHead:departmentHead,
+employeeId: "",
+prcLicense: "",
+philhealth: "",
+tin: "",
+gsis: "",
+pagibig: "",
+photoURL: "",
 
-employeeId:"",
-prcLicense:"",
-philhealth:"",
-tin:"",
-gsis:"",
-pagibig:"",
-photoURL:"",
-
-createdAt:serverTimestamp()
+createdAt: serverTimestamp()
 });
 
-document.getElementById("message").style.color="green";
-document.getElementById("message").innerText="Account created successfully.";
+setMessage("Account created successfully.", "green");
+
+document.getElementById("regEmail").value = "";
+document.getElementById("regPassword").value = "";
+document.getElementById("regConfirmPassword").value = "";
+document.getElementById("regName").value = "";
+document.getElementById("regDepedEmail").value = "";
+document.getElementById("regPermanentAddress").value = "";
+document.getElementById("regMobilePhone").value = "";
+document.getElementById("regDivision").value = "";
+document.getElementById("regDistrict").value = "";
+document.getElementById("regSchool").value = "";
+document.getElementById("regSchoolId").value = "";
+document.getElementById("regSchoolHead").value = "";
+document.getElementById("regDepartmentHead").value = "";
 
 document.getElementById("registerPane").classList.remove("show");
 
 }catch(error){
-
-document.getElementById("message").style.color="red";
-document.getElementById("message").innerText=error.message;
-
+if(error.code === "auth/email-already-in-use"){
+setMessage("That email is already registered. Please use another email.");
+}else{
+setMessage(error.message);
 }
-
+}
 };
-
 </script>
 
 </body>
