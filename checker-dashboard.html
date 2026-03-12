@@ -174,23 +174,7 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Juan Dela Cruz</td>
-              <td>English</td>
-              <td>9</td>
-              <td>March 10–14, 2026</td>
-              <td><span class="tag">Pending</span></td>
-              <td><button class="btn-small">Open</button></td>
-            </tr>
-            <tr>
-              <td>Maria Santos</td>
-              <td>Science</td>
-              <td>8</td>
-              <td>March 10–14, 2026</td>
-              <td><span class="tag">Pending</span></td>
-              <td><button class="btn-small">Open</button></td>
-            </tr>
+          <tbody id="dllTableBody">
           </tbody>
         </table>
       </div>
@@ -200,7 +184,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
@@ -220,7 +204,39 @@
         window.location.href = "login.html";
         return;
       }
+async function loadSubmittedDLLs() {
+  const tableBody = document.getElementById("dllTableBody");
+  tableBody.innerHTML = "";
 
+  const q = query(collection(db, "lessonPlans"), where("status", "==", "submitted"));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6">No submitted DLLs found.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const row = `
+      <tr>
+        <td>${data.teacherName || ""}</td>
+        <td>${data.learningArea || ""}</td>
+        <td>${data.grade || ""}</td>
+        <td>${data.dateRange || ""}</td>
+        <td><span class="tag">Submitted</span></td>
+        <td>
+          <button class="btn-small" onclick="openDLL('${docSnap.id}')">Open</button>
+        </td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+}
       const snap = await getDoc(doc(db, "users", user.uid));
       const data = snap.exists() ? snap.data() : {};
 
@@ -232,6 +248,10 @@
 
       document.getElementById("checkerEmail").innerText =
         "Logged in as: " + (data.name || user.email);
+      loadSubmittedDLLs();
+      window.openDLL = function(docId) {
+  window.location.href = "checker-review.html?id=" + docId;
+};
     });
 
     window.logout = function() {
