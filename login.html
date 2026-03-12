@@ -417,6 +417,8 @@ const schoolId = document.getElementById("regSchoolId").value.trim();
 const schoolHead = document.getElementById("regSchoolHead").value.trim();
 const departmentHead = document.getElementById("regDepartmentHead").value.trim();
 
+console.log("Trying to register email:", regEmail);
+
 if(!regEmail || !regPassword || !regConfirmPassword){
 setMessage("Please fill in email, password, and confirm password for registration.");
 return;
@@ -469,7 +471,6 @@ tin: "",
 gsis: "",
 pagibig: "",
 photoURL: "",
-
 createdAt: serverTimestamp()
 });
 
@@ -491,10 +492,12 @@ document.getElementById("regDepartmentHead").value = "";
 document.getElementById("registerPane").classList.remove("show");
 
 }catch(error){
+console.error("Registration error:", error);
+
 if(error.code === "auth/email-already-in-use"){
-setMessage("That email is already registered. Please use another email.");
+setMessage("This email already exists in Firebase Authentication. Check Authentication > Users in Firebase console.", "red");
 }else{
-setMessage(error.message);
+setMessage(error.message, "red");
 }
 }
 };
