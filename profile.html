@@ -3,90 +3,218 @@
 <head>
   <title>Teacher Portal - Profile</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
-    .container { display: flex; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #dceeff;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
 
     .sidebar {
-      width: 220px;
-      background: #f4f4f4;
-      padding: 15px;
-      height: 100vh;
+      width: 240px;
+      background: #004aad;
+      color: white;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 22px;
     }
 
     .sidebar button {
       width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
+      margin-bottom: 12px;
+      padding: 12px;
       cursor: pointer;
       border: none;
-      background: #ddd;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .sidebar button:hover {
+      background: rgba(255,255,255,0.28);
     }
 
     .content {
-      padding: 30px;
       flex: 1;
+      padding: 30px;
     }
 
-    h2 { margin-bottom: 20px; }
+    .page-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      padding: 30px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+      margin: 0;
+      color: #004aad;
+      font-size: 30px;
+    }
+
+    .page-header p {
+      margin-top: 8px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .profile-top {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
 
     .profile-pic-container {
       text-align: center;
-      margin-bottom: 20px;
     }
 
     #profilePic {
-      width: 150px;
-      height: 150px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid #ccc;
+      border: 4px solid #bcdcff;
       cursor: pointer;
+      background: #f4f9ff;
     }
 
     #profilePic:hover {
-      opacity: 0.8;
+      opacity: 0.88;
+    }
+
+    .photo-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      margin-bottom: 12px;
+      color: #004aad;
+      font-size: 20px;
+      border-left: 5px solid #004aad;
+      padding-left: 10px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
+      padding: 12px;
+      border: 1px solid #e4edf7;
+      vertical-align: middle;
     }
 
     td:first-child {
       width: 30%;
       font-weight: bold;
-      background: #f9f9f9;
+      background: #f3f8ff;
+      color: #1f3b63;
     }
 
     input {
       width: 100%;
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 10px 12px;
+      border: 1px solid #c9d9ee;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
     }
 
     input:disabled {
-      background: #f0f0f0;
+      background: #f1f5f9;
+      color: #333;
     }
 
     .buttons {
       margin-top: 20px;
+      text-align: center;
     }
 
     .buttons button {
-      padding: 10px 20px;
-      margin-right: 10px;
+      padding: 12px 24px;
+      margin: 0 8px;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.2s;
     }
 
-    #saveBtn { display: none; }
+    #editBtn {
+      background: #004aad;
+      color: white;
+    }
+
+    #editBtn:hover {
+      background: #00307a;
+    }
+
+    #saveBtn {
+      display: none;
+      background: #0b8f3c;
+      color: white;
+    }
+
+    #saveBtn:hover {
+      background: #086d2e;
+    }
+
+    #saveStatus {
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+      color: #0b8f3c;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      td:first-child {
+        width: 38%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -94,51 +222,64 @@
 <div class="container">
 
   <div class="sidebar">
-    <h3>Menu</h3>
+    <h3>Teacher Portal</h3>
     <button onclick="location.href='profile.html'">Profile</button>
     <button onclick="location.href='lesson-plan.html'">Lesson Plan</button>
     <button onclick="logout()">Logout</button>
   </div>
 
   <div class="content">
+    <div class="page-card">
 
-    <h2>Profile Information</h2>
+      <div class="page-header">
+        <h2>Profile Information</h2>
+        <p>Manage your personal, school, and government records</p>
+      </div>
 
-    <div class="profile-pic-container">
-      <img id="profilePic" src="https://via.placeholder.com/150">
-      <input type="file" id="photoInput" accept="image/*" style="display:none;">
-      <p style="font-size:13px;">Click photo to change</p>
+      <div class="profile-top">
+        <div class="profile-pic-container">
+          <img id="profilePic" src="https://via.placeholder.com/160">
+          <input type="file" id="photoInput" accept="image/*" style="display:none;">
+          <div class="photo-note">Click photo to change</div>
+        </div>
+      </div>
+
+      <div class="section-title">Personal Information</div>
+      <table>
+        <tr><td>Name</td><td><input id="name" disabled></td></tr>
+        <tr><td>DepEd Email Address</td><td><input id="depedEmail" disabled></td></tr>
+        <tr><td>Permanent Address</td><td><input id="permanentAddress" disabled></td></tr>
+        <tr><td>Mobile Phone</td><td><input id="mobilePhone" disabled></td></tr>
+      </table>
+
+      <div class="section-title">School Information</div>
+      <table>
+        <tr><td>Division</td><td><input id="division" disabled></td></tr>
+        <tr><td>District</td><td><input id="district" disabled></td></tr>
+        <tr><td>School</td><td><input id="school" disabled></td></tr>
+        <tr><td>School ID</td><td><input id="schoolId" disabled></td></tr>
+        <tr><td>School Head</td><td><input id="schoolHead" disabled></td></tr>
+        <tr><td>Department Head</td><td><input id="departmentHead" disabled></td></tr>
+      </table>
+
+      <div class="section-title">Government Information</div>
+      <table>
+        <tr><td>Employee ID</td><td><input id="employeeId" disabled></td></tr>
+        <tr><td>PRC License</td><td><input id="prcLicense" disabled></td></tr>
+        <tr><td>PhilHealth No.</td><td><input id="philhealth" disabled></td></tr>
+        <tr><td>TIN</td><td><input id="tin" disabled></td></tr>
+        <tr><td>GSIS BP No.</td><td><input id="gsis" disabled></td></tr>
+        <tr><td>Pag-IBIG No.</td><td><input id="pagibig" disabled></td></tr>
+      </table>
+
+      <div class="buttons">
+        <button id="editBtn" onclick="enableEdit()">Edit</button>
+        <button id="saveBtn" onclick="saveProfile()">Save Profile</button>
+      </div>
+
+      <p id="saveStatus"></p>
+
     </div>
-
-    <h3>Personal Information</h3>
-    <table>
-      <tr><td>Full Name</td><td><input id="name" disabled></td></tr>
-      <tr><td>Email</td><td><input id="email" disabled></td></tr>
-      <tr><td>School</td><td><input id="school" disabled></td></tr>
-      <tr><td>School ID</td><td><input id="schoolId" disabled></td></tr>
-      <tr><td>Position</td><td><input id="position" disabled></td></tr>
-    </table>
-
-    <h3>Government Information</h3>
-    <table>
-      <tr><td>Employee ID</td><td><input id="employeeId" disabled></td></tr>
-      <tr><td>PRC License</td><td><input id="prcLicense" disabled></td></tr>
-      <tr><td>DepEd Email</td><td><input id="depedEmail" disabled></td></tr>
-      <tr><td>District</td><td><input id="district" disabled></td></tr>
-      <tr><td>Division</td><td><input id="division" disabled></td></tr>
-      <tr><td>PhilHealth No.</td><td><input id="philhealth" disabled></td></tr>
-      <tr><td>TIN No.</td><td><input id="tin" disabled></td></tr>
-      <tr><td>GSIS BP No.</td><td><input id="gsis" disabled></td></tr>
-      <tr><td>Pag-IBIG No.</td><td><input id="pagibig" disabled></td></tr>
-    </table>
-
-    <div class="buttons">
-      <button id="editBtn" onclick="enableEdit()">Edit</button>
-      <button id="saveBtn" onclick="saveProfile()">Save Profile</button>
-    </div>
-
-    <p id="saveStatus"></p>
-
   </div>
 </div>
 
@@ -171,7 +312,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   currentUser = user;
-  document.getElementById("email").value = user.email;
   loadProfile();
 });
 
@@ -194,15 +334,17 @@ async function loadProfile() {
 
 window.enableEdit = function() {
   document.querySelectorAll("input").forEach(input => {
-    if (input.id !== "email") input.disabled = false;
+    if (input.id !== "photoInput") input.disabled = false;
   });
 
   document.getElementById("editBtn").style.display = "none";
   document.getElementById("saveBtn").style.display = "inline-block";
-}
+  document.getElementById("saveStatus").innerText = "";
+};
 
 window.saveProfile = async function() {
   const data = {};
+
   document.querySelectorAll("input").forEach(input => {
     if (input.id !== "photoInput") {
       data[input.id] = input.value;
@@ -211,12 +353,14 @@ window.saveProfile = async function() {
 
   await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
 
-  document.querySelectorAll("input").forEach(input => input.disabled = true);
+  document.querySelectorAll("input").forEach(input => {
+    if (input.id !== "photoInput") input.disabled = true;
+  });
 
   document.getElementById("editBtn").style.display = "inline-block";
   document.getElementById("saveBtn").style.display = "none";
   document.getElementById("saveStatus").innerText = "Profile saved successfully!";
-}
+};
 
 document.getElementById("profilePic").addEventListener("click", () => {
   document.getElementById("photoInput").click();
@@ -231,13 +375,12 @@ document.getElementById("photoInput").addEventListener("change", async function(
   const url = await getDownloadURL(storageRef);
 
   await setDoc(doc(db, "users", currentUser.uid), { photoURL: url }, { merge: true });
-
   document.getElementById("profilePic").src = url;
 });
 
 window.logout = function() {
   signOut(auth).then(() => window.location.href = "login.html");
-}
+};
 </script>
 
 </body>
