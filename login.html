@@ -237,6 +237,9 @@ flex-direction:column;
 flex:none;
 width:100%;
 }
+  .hidden{
+display:none;
+}
 }
 </style>
 </head>
@@ -307,8 +310,13 @@ School Head
 <input type="text" id="regDistrict" placeholder="District">
 <input type="text" id="regSchool" placeholder="School">
 <input type="text" id="regSchoolId" placeholder="School ID">
-<input type="text" id="regSchoolHead" placeholder="School Head">
-<input type="text" id="regDepartmentHead" placeholder="Department Head">
+<div id="schoolHeadGroup">
+  <input type="text" id="regSchoolHead" placeholder="School Head">
+</div>
+
+<div id="departmentHeadGroup">
+  <input type="text" id="regDepartmentHead" placeholder="Department Head">
+</div>
 
 <button id="createAccountBtn" onclick="registerNewUser()">Create Account</button>
 
@@ -351,8 +359,28 @@ b.classList.remove("active");
 });
 
 btn.classList.add("active");
-};
 
+const schoolHeadGroup = document.getElementById("schoolHeadGroup");
+const departmentHeadGroup = document.getElementById("departmentHeadGroup");
+
+if(role === "teacher"){
+schoolHeadGroup.classList.remove("hidden");
+departmentHeadGroup.classList.remove("hidden");
+}
+
+if(role === "department_head"){
+schoolHeadGroup.classList.remove("hidden");
+departmentHeadGroup.classList.add("hidden");
+document.getElementById("regDepartmentHead").value = "";
+}
+
+if(role === "school_head"){
+schoolHeadGroup.classList.add("hidden");
+departmentHeadGroup.classList.add("hidden");
+document.getElementById("regSchoolHead").value = "";
+document.getElementById("regDepartmentHead").value = "";
+}
+};
 window.toggleRegisterPane = function(){
 const pane = document.getElementById("registerPane");
 pane.classList.toggle("show");
@@ -436,12 +464,24 @@ if(
 !division ||
 !district ||
 !school ||
-!schoolId ||
-!schoolHead ||
-!departmentHead
+!schoolId
 ){
-setMessage("Please complete all registration fields.");
+setMessage("Please complete all required registration fields.");
 return;
+}
+
+if(selectedRole === "teacher"){
+if(!schoolHead || !departmentHead){
+setMessage("Please complete all required registration fields.");
+return;
+}
+}
+
+if(selectedRole === "department_head"){
+if(!schoolHead){
+setMessage("Please complete all required registration fields.");
+return;
+}
 }
 
 try{
@@ -461,8 +501,8 @@ division: division,
 district: district,
 school: school,
 schoolId: schoolId,
-schoolHead: schoolHead,
-departmentHead: departmentHead,
+schoolHead: selectedRole === "school_head" ? "" : schoolHead,
+departmentHead: selectedRole === "teacher" ? departmentHead : "",
 
 employeeId: "",
 prcLicense: "",
@@ -473,7 +513,6 @@ pagibig: "",
 photoURL: "",
 createdAt: serverTimestamp()
 });
-
 setMessage("Account created successfully.", "green");
 
 document.getElementById("regEmail").value = "";
