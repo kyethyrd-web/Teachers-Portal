@@ -50,6 +50,7 @@
       border-radius:6px;
       cursor:pointer;
       font-size:14px;
+      font-weight:bold;
     }
 
     .navbar button:hover{
@@ -104,6 +105,12 @@
     li{
       margin-bottom:8px;
     }
+
+    #message{
+      margin-top:15px;
+      color:red;
+      font-weight:bold;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +129,7 @@
     <button onclick="goToMyLessonPlan()">My Lesson Plan</button>
     <button onclick="goToTeacherSubmissions()">Teacher Submissions</button>
     <button onclick="goToReviewQueue()">Review Queue</button>
+    <button onclick="logout()">Logout</button>
   </div>
 
   <div class="container">
@@ -140,7 +148,6 @@
         <h3>Submitted This Week</h3>
         <div class="count" id="submittedThisWeekCount">0</div>
       </div>
-
     </div>
 
     <div class="section">
@@ -148,14 +155,15 @@
       <ul id="notificationsList">
         <li>Loading notifications...</li>
       </ul>
+      <div id="message"></div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    
+
     const firebaseConfig = {
       apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
       authDomain: "teachers-portal-98254.firebaseapp.com",
@@ -172,6 +180,14 @@
     let currentUser;
     let currentProfile;
 
+    function setMessage(text, color = "red"){
+      const el = document.getElementById("message");
+      if(el){
+        el.style.color = color;
+        el.innerText = text;
+      }
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if(!user){
         window.location.href = "login.html";
@@ -180,124 +196,139 @@
 
       currentUser = user;
 
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if(snap.exists()){
+      try{
+        const snap = await getDoc(doc(db, "users", user.uid));
+
+        if(!snap.exists()){
+          window.location.href = "login.html";
+          return;
+        }
+
         currentProfile = snap.data();
+
+        if(currentProfile.role !== "department_head" && currentProfile.role !== "super_admin"){
+          alert("Access denied.");
+          window.location.href = "login.html";
+          return;
+        }
 
         document.getElementById("deptHeadName").innerText =
           currentProfile.name || "Department Head";
 
         document.getElementById("deptHeadSchool").innerText =
           currentProfile.school || "";
-      }
 
-      loadDashboardData();
+        loadDashboardData();
+
+      }catch(error){
+        console.error("Auth/Profile load error:", error);
+        setMessage("Failed to load dashboard profile.");
+      }
     });
 
-async function loadDashboardData(){
-  try{
-    const snap = await getDocs(collection(db, "lessonPlans"));
+    async function loadDashboardData(){
+      try{
+        const snap = await getDocs(collection(db, "lessonPlans"));
 
-    const currentSchoolId = (currentProfile.schoolId || "").trim();
-    const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
-    const currentUserId = currentUser.uid;
+        const currentSchoolId = (currentProfile.schoolId || "").trim();
+        const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
 
-    let pendingReviews = 0;
-    let returnedCount = 0;
-    let submittedThisWeek = 0;
-    let myOwnPlansCount = 0;
+        let pendingReviews = 0;
+        let returnedCount = 0;
+        let submittedThisWeek = 0;
+        let notifications = [];
 
-    let notifications = [];
+        const today = new Date();
+        const monday = new Date(today);
+        const day = monday.getDay();
+        const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
+        monday.setDate(diff);
+        monday.setHours(0,0,0,0);
 
-    const today = new Date();
-    const monday = new Date(today);
-    const day = monday.getDay();
-    const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
-    monday.setDate(diff);
-    monday.setHours(0,0,0,0);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23,59,59,999);
 
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23,59,59,999);
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
 
-    snap.forEach(docSnap => {
-      const data = docSnap.data();
+          const lessonSchoolId = (data.schoolId || "").trim();
+          const lessonDeptHead = (data.assignedDepartmentHead || "").trim().toLowerCase();
 
-      const lessonSchoolId = (data.schoolId || "").trim();
-      const lessonDeptHead = (data.assignedDepartmentHead || "").trim().toLowerCase();
+          const belongsToThisDeptHead =
+            lessonSchoolId === currentSchoolId &&
+            lessonDeptHead === currentDeptHeadName;
 
-      const belongsToThisDeptHead =
-        lessonSchoolId === currentSchoolId &&
-        lessonDeptHead === currentDeptHeadName;
+          if(belongsToThisDeptHead){
+            if(data.status === "submitted"){
+              pendingReviews++;
+            }
 
-      if(belongsToThisDeptHead){
-        if(data.status === "submitted"){
-          pendingReviews++;
-        }
+            if(data.status === "returned"){
+              returnedCount++;
+            }
 
-        if(data.status === "returned"){
-          returnedCount++;
-        }
+            if(data.status === "submitted" && data.submittedAt){
+              const submittedDate = new Date(data.submittedAt);
+              if(!isNaN(submittedDate) && submittedDate >= monday && submittedDate <= sunday){
+                submittedThisWeek++;
+              }
+            }
 
-        if(data.status === "submitted" && data.submittedAt){
-          const submittedDate = new Date(data.submittedAt);
-          if(!isNaN(submittedDate) && submittedDate >= monday && submittedDate <= sunday){
-            submittedThisWeek++;
+            notifications.push({
+              teacherName: data.teacherName || "Unknown Teacher",
+              learningArea: data.learningArea || "",
+              grade: data.grade || "",
+              dateRange: data.dateRange || "",
+              submittedAt: data.submittedAt || "",
+              status: data.status || ""
+            });
           }
-        }
-
-        notifications.push({
-          teacherName: data.teacherName || "Unknown Teacher",
-          learningArea: data.learningArea || "",
-          grade: data.grade || "",
-          dateRange: data.dateRange || "",
-          submittedAt: data.submittedAt || "",
-          status: data.status || ""
         });
+
+        const pendingEl = document.getElementById("pendingReviewsCount");
+        const returnedEl = document.getElementById("returnedCount");
+        const submittedWeekEl = document.getElementById("submittedThisWeekCount");
+
+        if(pendingEl) pendingEl.innerText = pendingReviews;
+        if(returnedEl) returnedEl.innerText = returnedCount;
+        if(submittedWeekEl) submittedWeekEl.innerText = submittedThisWeek;
+
+        renderNotifications(notifications);
+
+      }catch(error){
+        console.error("Dashboard load error:", error);
+        document.getElementById("notificationsList").innerHTML =
+          `<li>Failed to load dashboard notifications: ${error.message}</li>`;
+      }
+    }
+
+    function renderNotifications(notifications){
+      const list = document.getElementById("notificationsList");
+
+      if(!list) return;
+
+      if(!notifications.length){
+        list.innerHTML = "<li>No recent submission notifications.</li>";
+        return;
       }
 
-      if(data.userId === currentUserId){
-        myOwnPlansCount++;
-      }
-    });
+      notifications.sort((a, b) => {
+        return (b.submittedAt || "").localeCompare(a.submittedAt || "");
+      });
 
-    document.getElementById("pendingReviewsCount").innerText = pendingReviews;
-    document.getElementById("returnedCount").innerText = returnedCount;
-    document.getElementById("submittedThisWeekCount").innerText = submittedThisWeek;
-    document.getElementById("myOwnPlansCount").innerText = myOwnPlansCount;
+      const recent = notifications.slice(0, 5);
 
-    renderNotifications(notifications);
+      list.innerHTML = recent.map(item => `
+        <li>
+          <strong>${item.teacherName}</strong> submitted
+          <strong>Grade ${item.grade} ${item.learningArea}</strong>
+          for <strong>${item.dateRange}</strong>
+          (${item.status})
+        </li>
+      `).join("");
+    }
 
-  }catch(error){
-    console.error("Dashboard load error:", error);
-    document.getElementById("notificationsList").innerHTML =
-      "<li>Failed to load dashboard notifications.</li>";
-  }
-}
-
-function renderNotifications(notifications){
-  const list = document.getElementById("notificationsList");
-
-  if(!notifications.length){
-    list.innerHTML = "<li>No recent submission notifications.</li>";
-    return;
-  }
-
-  notifications.sort((a, b) => {
-    return (b.submittedAt || "").localeCompare(a.submittedAt || "");
-  });
-
-  const recent = notifications.slice(0, 5);
-
-  list.innerHTML = recent.map(item => `
-    <li>
-      <strong>${item.teacherName}</strong> submitted
-      <strong>Grade ${item.grade} ${item.learningArea}</strong>
-      for <strong>${item.dateRange}</strong>
-      (${item.status})
-    </li>
-  `).join("");
-}    
     window.goToDashboard = function(){
       window.location.href = "checker-dashboard.html";
     };
@@ -318,8 +349,10 @@ function renderNotifications(notifications){
       window.location.href = "checker-review-list.html";
     };
 
-    window.goHome = function(){
-      window.location.href = "profile.html";
+    window.logout = function(){
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
     };
   </script>
 
