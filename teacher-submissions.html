@@ -165,7 +165,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      padding: 0 34px; /* moves logos inward */
+      padding: 0 34px;
     }
 
     .header-left,
@@ -611,16 +611,31 @@
       return `${month1} ${monday.getDate()} – ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
     }
 
-    function determineTimeliness(submittedAt, monday) {
-      if (!submittedAt) return "not_yet";
+    function determineTimeliness(submission, monday) {
+      if (!submission) return "not_yet";
 
-      const submittedDate = new Date(submittedAt);
-      if (isNaN(submittedDate.getTime())) return "late";
+      const submittedAtRaw = submission.submittedAt;
+      if (!submittedAtRaw) return "not_yet";
 
-      const cutoff = new Date(monday);
-      cutoff.setHours(23, 59, 59, 999);
+      const submittedDate = new Date(submittedAtRaw);
+      if (isNaN(submittedDate.getTime())) return "not_yet";
 
-      return submittedDate <= cutoff ? "on_time" : "late";
+      const weekStart = new Date(monday);
+      weekStart.setHours(0, 0, 0, 0);
+
+      const friday = new Date(monday);
+      friday.setDate(monday.getDate() + 4);
+      friday.setHours(23, 59, 59, 999);
+
+      if (submittedDate >= weekStart && submittedDate <= friday) {
+        return "on_time";
+      }
+
+      if (submittedDate > friday) {
+        return "late";
+      }
+
+      return "on_time";
     }
 
     function getDistrictDisplay(profile) {
@@ -632,10 +647,14 @@
       document.getElementById("districtHeader").innerText = getDistrictDisplay(currentProfile);
       document.getElementById("schoolNameHeader").innerText = currentProfile.school || "SCHOOL NAME";
       document.getElementById("schoolIdHeader").innerText = currentProfile.schoolId || "______";
-      document.getElementById("departmentHeader").innerText = (currentProfile.departmentName || "DEPARTMENT").toUpperCase();
-      document.getElementById("preparedByName").innerText = (currentProfile.name || "DEPARTMENT HEAD").toUpperCase();
-      document.getElementById("preparedByRole").innerText = currentProfile.positionRank || "Department Head";
-      document.getElementById("notedByName").innerText = (currentProfile.schoolHead || "SCHOOL HEAD").toUpperCase();
+      document.getElementById("departmentHeader").innerText =
+        (currentProfile.departmentName || "DEPARTMENT").toUpperCase();
+      document.getElementById("preparedByName").innerText =
+        (currentProfile.name || "DEPARTMENT HEAD").toUpperCase();
+      document.getElementById("preparedByRole").innerText =
+        currentProfile.positionRank || "Department Head";
+      document.getElementById("notedByName").innerText =
+        (currentProfile.schoolHead || "SCHOOL HEAD").toUpperCase();
     }
 
     async function preloadData() {
@@ -679,19 +698,23 @@
       const currentSchoolId = (currentProfile.schoolId || "").trim();
       const currentDeptHeadName = normalizeText(currentProfile.name);
 
+      const validStatuses = ["submitted", "checked", "returned", "for_approval", "approved"];
+
       const matches = lessonPlansList.filter((item) => {
         const itemTeacher = normalizeText(item.teacherName);
         const itemWeek = (item.weekKey || "").trim();
         const itemQuarter = (item.quarter || "").trim();
         const itemSchoolId = (item.schoolId || "").trim();
         const itemDeptHead = normalizeText(item.assignedDepartmentHead);
+        const itemStatus = normalizeText(item.status);
 
         return (
           itemTeacher === normalizedTeacher &&
           itemWeek === weekKey &&
           itemQuarter === quarter &&
           itemSchoolId === currentSchoolId &&
-          itemDeptHead === currentDeptHeadName
+          itemDeptHead === currentDeptHeadName &&
+          validStatuses.includes(itemStatus)
         );
       });
 
@@ -744,6 +767,7 @@
       if (learningArea && grade) return `${learningArea} ${grade}`;
       if (learningArea) return learningArea;
       if (grade) return grade;
+
       return "—";
     }
 
@@ -805,14 +829,14 @@
 
         const submittedAt = submission?.submittedAt || "";
         const dateSubmitted = submittedAt ? formatReadableDate(submittedAt) : "";
-        const timeliness = determineTimeliness(submittedAt, monday);
+        const timeliness = determineTimeliness(submission, monday);
 
         const rowData = {
           teacherName: teacher.name || "",
-          levelSubject: levelSubject,
+          levelSubject,
           weekCovered: submission?.dateRange || weekDisplay,
-          dateSubmitted: dateSubmitted,
-          timeliness: timeliness,
+          dateSubmitted,
+          timeliness,
           signature: submission ? "Submitted" : "",
           remarks: getRemarksText(submission),
           group: groupTitle
@@ -941,7 +965,6 @@
 
       const depedLogo = await imageToDataUrl("images/DepEd-logo.png.png");
       const matatagLogo = await imageToDataUrl("images/Matatag-logo.png.png");
-      const bagongPilipinasLogo = await imageToDataUrl("images/Bagong-Pilipinas-logo.png.png");
 
       const districtText = document.getElementById("districtHeader").innerText;
       const schoolName = document.getElementById("schoolNameHeader").innerText;
@@ -1098,8 +1121,7 @@
                   <div class="sub-line"><strong>School ID: ${schoolId}</strong></div>
                 </td>
                 <td style="width:18%; text-align:center;">
-                  ${matatagLogo ? `<img src="${matatagLogo}" style="width:65px;height:65px;object-fit:contain;margin-right:8px;">` : ""}
-                  ${bagongPilipinasLogo ? `<img src="${bagongPilipinasLogo}" style="width:65px;height:65px;object-fit:contain;">` : ""}
+                  ${matatagLogo ? `<img src="${matatagLogo}" style="width:65px;height:65px;object-fit:contain;">` : ""}
                 </td>
               </tr>
             </table>
