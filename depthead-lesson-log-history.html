@@ -1,1 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lesson Log History</title>
+  <style>
+    *{
+      box-sizing:border-box;
+    }
 
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#f4f8fc;
+      color:#333;
+    }
+
+    .header{
+      background:#004aad;
+      color:white;
+      padding:20px 30px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .header h1{
+      margin:0;
+      font-size:24px;
+    }
+
+    .back-btn{
+      background:white;
+      color:#004aad;
+      border:none;
+      padding:10px 16px;
+      border-radius:8px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:30px auto;
+      background:white;
+      padding:25px;
+      border-radius:12px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .controls{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    .controls input,
+    .controls select{
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      font-size:14px;
+    }
+
+    .controls input{
+      flex:1;
+      min-width:250px;
+    }
+
+    .controls select{
+      min-width:180px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+
+    th, td{
+      padding:14px 12px;
+      border-bottom:1px solid #e3e8ef;
+      text-align:left;
+      font-size:14px;
+    }
+
+    th{
+      background:#eef5ff;
+      color:#004aad;
+    }
+
+    .status{
+      font-weight:bold;
+      text-transform:capitalize;
+    }
+
+    .status.draft{
+      color:#cc8400;
+    }
+
+    .status.saved{
+      color:#0066cc;
+    }
+
+    .status.submitted{
+      color:#1a7f37;
+    }
+
+    .action-btn{
+      padding:8px 12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:bold;
+      margin-right:6px;
+    }
+
+    .open-btn{
+      background:#004aad;
+      color:white;
+    }
+
+    .reuse-btn{
+      background:#0b7a3e;
+      color:white;
+    }
+
+    .empty{
+      text-align:center;
+      padding:30px;
+      color:#777;
+      font-size:15px;
+    }
+
+    #message{
+      margin-top:15px;
+      color:red;
+      font-size:14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Lesson Log History</h1>
+    <button class="back-btn" onclick="goBack()">← Back to Lesson Plan</button>
+  </div>
+
+  <div class="container">
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search by subject, grade, quarter, date..." oninput="filterLessonPlans()">
+
+      <select id="statusFilter" onchange="filterLessonPlans()">
+        <option value="">All Status</option>
+        <option value="draft">Draft</option>
+        <option value="saved">Saved</option>
+        <option value="submitted">Submitted</option>
+      </select>
+    </div>
+
+    <div id="message"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date Range</th>
+          <th>Grade</th>
+          <th>Learning Area</th>
+          <th>Quarter</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="lessonLogTableBody">
+        <tr>
+          <td colspan="6" class="empty">Loading lesson logs...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      query, 
+      where, 
+      getDocs, 
+      orderBy 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+      authDomain: "teachers-portal-98254.firebaseapp.com",
+      projectId: "teachers-portal-98254",
+      storageBucket: "teachers-portal-98254.firebasestorage.app",
+      messagingSenderId: "479254583768",
+      appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let allLessonPlans = [];
+
+    function setMessage(text, color="red"){
+      const msg = document.getElementById("message");
+      msg.style.color = color;
+      msg.innerText = text;
+    }
+
+window.goBack = function(){
+  window.location.href = "depthead-lesson-plan.html";
+};
+
+    async function loadLessonPlans(userId){
+      try{
+        const q = query(
+          collection(db, "lessonPlans"),
+          where("userId", "==", userId),
+          orderBy("createdAt", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        allLessonPlans = [];
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          allLessonPlans.push({
+            id: docSnap.id,
+            ...data
+          });
+        });
+
+        renderLessonPlans(allLessonPlans);
+
+      }catch(error){
+        console.error(error);
+        setMessage("Failed to load lesson logs: " + error.message);
+      }
+    }
+
+    function renderLessonPlans(lessonPlans){
+      const tbody = document.getElementById("lessonLogTableBody");
+
+      if(lessonPlans.length === 0){
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty">No lesson logs found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = "";
+
+      lessonPlans.forEach(plan => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${plan.dateRange || ""}</td>
+          <td>${plan.grade || ""}</td>
+          <td>${plan.learningArea || ""}</td>
+          <td>${plan.quarter || ""}</td>
+          <td><span class="status ${plan.status || ""}">${plan.status || ""}</span></td>
+          <td>
+            <button class="action-btn open-btn" onclick="openLessonPlan('${plan.id}')">Open</button>
+            <button class="action-btn reuse-btn" onclick="reuseLessonPlan('${plan.id}')">Reuse</button>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    window.filterLessonPlans = function(){
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+      const statusValue = document.getElementById("statusFilter").value.toLowerCase();
+
+      const filtered = allLessonPlans.filter(plan => {
+        const combinedText = `
+          ${plan.dateRange || ""}
+          ${plan.grade || ""}
+          ${plan.learningArea || ""}
+          ${plan.quarter || ""}
+          ${plan.status || ""}
+        `.toLowerCase();
+
+        const matchesSearch = combinedText.includes(searchValue);
+        const matchesStatus = !statusValue || (plan.status || "").toLowerCase() === statusValue;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      renderLessonPlans(filtered);
+    };
+
+window.openLessonPlan = function(docId){
+  window.location.href = "depthead-lesson-plan.html?docId=" + docId;
+};
+
+window.reuseLessonPlan = function(docId){
+  window.location.href = "depthead-lesson-plan.html?reuse=" + docId;
+};
+
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        loadLessonPlans(user.uid);
+      }else{
+        setMessage("No user is logged in.");
+      }
+    });
+  </script>
+
+</body>
+</html>
