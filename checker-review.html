@@ -1,1 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Review Lesson Plan</title>
+  <style>
+    *{
+      box-sizing:border-box;
+    }
 
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#eef4fb;
+      color:#333;
+    }
+
+    .container{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:240px;
+      background:#004aad;
+      color:white;
+      padding:20px;
+      box-shadow:2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h3{
+      margin-top:0;
+      margin-bottom:20px;
+      text-align:center;
+      font-size:22px;
+    }
+
+    .sidebar button{
+      width:100%;
+      margin-bottom:12px;
+      padding:12px;
+      cursor:pointer;
+      border:none;
+      border-radius:8px;
+      background:rgba(255,255,255,0.15);
+      color:white;
+      font-weight:bold;
+      font-size:14px;
+      transition:0.2s;
+    }
+
+    .sidebar button:hover{
+      background:rgba(255,255,255,0.28);
+    }
+
+    .content{
+      flex:1;
+      padding:30px;
+    }
+
+    .page-card{
+      background:white;
+      border-radius:14px;
+      padding:25px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .page-header{
+      margin-bottom:20px;
+    }
+
+    .page-header h2{
+      margin:0;
+      color:#004aad;
+      font-size:28px;
+    }
+
+    .page-header p{
+      margin-top:8px;
+      color:#666;
+      font-size:14px;
+    }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .info-box{
+      background:#f4f8ff;
+      border:1px solid #dbe8fa;
+      border-radius:8px;
+      padding:12px;
+    }
+
+    .info-box strong{
+      display:block;
+      color:#004aad;
+      margin-bottom:6px;
+    }
+
+    .lesson-table-wrapper{
+      overflow:auto;
+      margin-bottom:20px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:white;
+      font-size:14px;
+    }
+
+    td, th{
+      border:1px solid #dce7f5;
+      padding:10px;
+      vertical-align:top;
+    }
+
+    .checker-section{
+      margin-top:20px;
+    }
+
+    .checker-section h3{
+      color:#004aad;
+      margin-bottom:10px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:120px;
+      padding:12px;
+      border:1px solid #c8d7ea;
+      border-radius:8px;
+      font-size:14px;
+      resize:vertical;
+    }
+
+    .actions{
+      margin-top:20px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .approve-btn,
+    .return-btn,
+    .back-btn{
+      border:none;
+      padding:12px 18px;
+      border-radius:8px;
+      font-weight:bold;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .approve-btn{
+      background:#0b8f3c;
+      color:white;
+    }
+
+    .approve-btn:hover{
+      background:#086d2e;
+    }
+
+    .return-btn{
+      background:#c62828;
+      color:white;
+    }
+
+    .return-btn:hover{
+      background:#a91f1f;
+    }
+
+    .back-btn{
+      background:#004aad;
+      color:white;
+    }
+
+    .back-btn:hover{
+      background:#00307a;
+    }
+
+    #statusMessage{
+      margin-top:15px;
+      font-weight:bold;
+    }
+
+    .readonly-note{
+      margin-top:10px;
+      color:#666;
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="sidebar">
+    <h3>Dept Head Portal</h3>
+    <button onclick="location.href='checker-dashboard.html'">Dashboard</button>
+    <button onclick="location.href='depthead-profile.html'">My Profile</button>
+    <button onclick="location.href='depthead-lesson-plan.html'">My Lesson Plan</button>
+    <button onclick="location.href='teacher-submissions.html'">Teacher Submissions</button>
+    <button onclick="location.href='checker-review-list.html'">Review Queue</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="content">
+    <div class="page-card">
+
+      <div class="page-header">
+        <h2>Review Lesson Plan</h2>
+        <p>Check the submitted DLL, provide comments, and approve or return it.</p>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <strong>Teacher</strong>
+          <span id="teacherName">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>School</strong>
+          <span id="schoolName">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Grade</strong>
+          <span id="gradeLevel">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Learning Area</strong>
+          <span id="learningArea">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Quarter</strong>
+          <span id="quarter">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Date Range</strong>
+          <span id="dateRange">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Time</strong>
+          <span id="timeValue">-</span>
+        </div>
+
+        <div class="info-box">
+          <strong>Submitted At</strong>
+          <span id="submittedAt">-</span>
+        </div>
+      </div>
+
+      <div class="lesson-table-wrapper">
+        <table id="lessonTablePreview">
+          <tr>
+            <td>Loading lesson plan...</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="checker-section">
+        <h3>Checker's Comments / Suggestions</h3>
+        <textarea id="checkerCommentInput" placeholder="Write your comments or suggestions here..."></textarea>
+        <div class="readonly-note">Use this box to provide feedback before approving or returning the lesson plan.</div>
+      </div>
+
+      <div class="actions">
+        <button class="back-btn" onclick="goBack()">Back to Review Queue</button>
+        <button class="approve-btn" onclick="approveLesson()">Approve</button>
+        <button class="return-btn" onclick="returnLesson()">Return to Teacher</button>
+      </div>
+
+      <div id="statusMessage"></div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+  authDomain: "teachers-portal-98254.firebaseapp.com",
+  projectId: "teachers-portal-98254",
+  storageBucket: "teachers-portal-98254.firebasestorage.app",
+  messagingSenderId: "479254583768",
+  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser;
+let currentProfile;
+let currentLessonId = null;
+let currentLessonData = null;
+
+const params = new URLSearchParams(window.location.search);
+const docId = params.get("docId");
+
+function setStatusMessage(text, color = "#004aad"){
+  const el = document.getElementById("statusMessage");
+  el.style.color = color;
+  el.innerText = text;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  if(!userSnap.exists()){
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentProfile = userSnap.data();
+
+  if(currentProfile.role !== "department_head" && currentProfile.role !== "super_admin"){
+    alert("Access denied.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  if(!docId){
+    setStatusMessage("No lesson plan document ID was provided.", "red");
+    return;
+  }
+
+  currentLessonId = docId;
+  loadLessonForReview();
+});
+
+async function loadLessonForReview(){
+  try{
+    const lessonSnap = await getDoc(doc(db, "lessonPlans", currentLessonId));
+
+    if(!lessonSnap.exists()){
+      setStatusMessage("Lesson plan not found.", "red");
+      return;
+    }
+
+    const data = lessonSnap.data();
+    currentLessonData = data;
+
+    // Extra safety: make sure the logged-in dept head is really the assigned one
+    const lessonSchoolId = (data.schoolId || "").trim();
+    const lessonDeptHead = (data.assignedDepartmentHead || "").trim().toLowerCase();
+
+    const currentSchoolId = (currentProfile.schoolId || "").trim();
+    const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
+
+    if(
+      lessonSchoolId !== currentSchoolId ||
+      lessonDeptHead !== currentDeptHeadName
+    ){
+      setStatusMessage("This lesson plan is not assigned to you.", "red");
+      return;
+    }
+
+    document.getElementById("teacherName").innerText = data.teacherName || "-";
+    document.getElementById("schoolName").innerText = data.school || "-";
+    document.getElementById("gradeLevel").innerText = data.grade || "-";
+    document.getElementById("learningArea").innerText = data.learningArea || "-";
+    document.getElementById("quarter").innerText = data.quarter || "-";
+    document.getElementById("dateRange").innerText = data.dateRange || "-";
+    document.getElementById("timeValue").innerText = data.time || "-";
+    document.getElementById("submittedAt").innerText = data.submittedAt || "-";
+
+    document.getElementById("checkerCommentInput").value = data.checkerComment || "";
+
+    if(data.tableHTML){
+      document.getElementById("lessonTablePreview").innerHTML = data.tableHTML;
+
+      // Make table readonly for checker review
+      document.querySelectorAll("#lessonTablePreview td[contenteditable='true']").forEach(td => {
+        td.removeAttribute("contenteditable");
+      });
+
+      document.querySelectorAll("#lessonTablePreview select").forEach(select => {
+        select.disabled = true;
+
+        const saved = select.getAttribute("data-selected");
+        if(saved){
+          select.value = saved;
+        }
+      });
+
+      const commentArea = document.getElementById("lessonTablePreview").querySelector("#checkerComment");
+      if(commentArea){
+        commentArea.value = data.checkerComment || "";
+        commentArea.readOnly = true;
+      }
+    }
+
+    setStatusMessage("Lesson plan loaded for review.", "#0b8f3c");
+
+  }catch(error){
+    console.error("Load review lesson error:", error);
+    setStatusMessage("Failed to load lesson plan for review.", "red");
+  }
+}
+
+window.approveLesson = async function(){
+  const commentText = document.getElementById("checkerCommentInput").value.trim();
+
+  try{
+    await setDoc(doc(db, "lessonPlans", currentLessonId), {
+      status: "checked",
+      checkedAt: new Date().toLocaleString(),
+      checkedBy: currentProfile.name || "",
+      checkerComment: commentText
+    }, { merge: true });
+
+    setStatusMessage("Lesson plan approved and forwarded.", "#0b8f3c");
+
+    setTimeout(() => {
+      window.location.href = "checker-review-list.html";
+    }, 1200);
+
+  }catch(error){
+    console.error("Approve error:", error);
+    setStatusMessage("Failed to approve lesson plan.", "red");
+  }
+};
+
+window.returnLesson = async function(){
+  const commentText = document.getElementById("checkerCommentInput").value.trim();
+
+  if(!commentText){
+    alert("Please enter a comment before returning the lesson plan.");
+    return;
+  }
+
+  try{
+    await setDoc(doc(db, "lessonPlans", currentLessonId), {
+      status: "returned",
+      checkedAt: new Date().toLocaleString(),
+      checkedBy: currentProfile.name || "",
+      checkerComment: commentText
+    }, { merge: true });
+
+    setStatusMessage("Lesson plan returned to teacher.", "#c62828");
+
+    setTimeout(() => {
+      window.location.href = "checker-review-list.html";
+    }, 1200);
+
+  }catch(error){
+    console.error("Return error:", error);
+    setStatusMessage("Failed to return lesson plan.", "red");
+  }
+};
+
+window.goBack = function(){
+  window.location.href = "checker-review-list.html";
+};
+
+window.logout = function(){
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+};
+</script>
+
+</body>
+</html>
