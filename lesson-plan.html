@@ -1350,7 +1350,13 @@ window.checkLearningArea = function(select){
   return learningArea;
 }
 
+function getDraftKey(){
+  return `currentLessonDraft_${currentUser.uid}`;
+}
+
 function savePageDraftToLocal(){
+  if(!currentUser) return;
+
   const draft = {
     lessonDate: document.getElementById("lessonDate").value,
     gradeLevel: document.getElementById("gradeLevel").value,
@@ -1362,10 +1368,12 @@ function savePageDraftToLocal(){
     tableHTML: document.getElementById("proceduresTable").innerHTML
   };
 
-  localStorage.setItem("currentLessonDraft", JSON.stringify(draft));
+  localStorage.setItem(getDraftKey(), JSON.stringify(draft));
 }
-  function restorePageDraftFromLocal(){
-  const saved = localStorage.getItem("currentLessonDraft");
+function restorePageDraftFromLocal(){
+  if(!currentUser) return;
+
+  const saved = localStorage.getItem(getDraftKey());
   if(!saved) return;
 
   const draft = JSON.parse(saved);
@@ -1388,7 +1396,7 @@ function savePageDraftToLocal(){
     document.getElementById("proceduresTable").innerHTML = draft.tableHTML;
 
     const selects = document.querySelectorAll("#proceduresTable select");
-    selects.forEach(select=>{
+    selects.forEach(select => {
       const savedValue = select.getAttribute("data-selected");
       if(savedValue){
         select.value = savedValue;
@@ -1396,7 +1404,7 @@ function savePageDraftToLocal(){
     });
   }
 }
-  async function loadLessonByDocumentId(docId, mode = "open"){
+async function loadLessonByDocumentId(docId, mode = "open"){
   try{
     const snap = await getDoc(doc(db, "lessonPlans", docId));
 
@@ -1406,6 +1414,14 @@ function savePageDraftToLocal(){
     }
 
     const data = snap.data();
+
+    // SECURITY CHECK
+    if(data.userId !== currentUser.uid){
+      alert("You are not allowed to open this lesson.");
+      document.getElementById("statusBox").innerText = "Status: Access denied";
+      window.location.href = "lesson-log-history.html";
+      return;
+    }
 
     document.getElementById("lessonDate").value = data.date || "";
     document.getElementById("gradeLevel").value = data.grade || "1";
@@ -1420,7 +1436,6 @@ function savePageDraftToLocal(){
       document.getElementById("proceduresTable").innerHTML = data.tableHTML;
     }
 
-    // Restore saved remark dropdown values
     const selects = document.querySelectorAll("#proceduresTable select");
     selects.forEach(select => {
       const saved = select.getAttribute("data-selected");
@@ -1430,7 +1445,6 @@ function savePageDraftToLocal(){
     });
 
     if(mode === "reuse"){
-      // Keep content, but treat it like a new draft
       const today = new Date().toISOString().split("T")[0];
       document.getElementById("lessonDate").value = today;
       updateWeekDates(today);
@@ -1445,10 +1459,7 @@ function savePageDraftToLocal(){
         "Status: Previous lesson opened";
     }
 
-    // Save what was loaded into local draft so page doesn't revert
-    if(typeof savePageDraftToLocal === "function"){
-      savePageDraftToLocal();
-    }
+    savePageDraftToLocal();
 
   } catch(error){
     console.error("Failed to load lesson by document ID:", error);
