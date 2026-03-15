@@ -319,21 +319,35 @@ document.getElementById("saveBtn").style.display="inline-block";
 
 };
 
-window.saveProfile=async function(){
+window.saveProfile = async function(){
 
-const data={};
+  const data = {};
 
-document.querySelectorAll("input").forEach(input=>{
-if(input.id!=="photoInput"){
-data[input.id]=input.value;
-}
-});
+  document.querySelectorAll("input").forEach(input=>{
+    if(input.id !== "photoInput"){
+      data[input.id] = input.value.trim();
+    }
+  });
 
-await setDoc(doc(db,"users",currentUser.uid),data,{merge:true});
+  try{
+    await setDoc(doc(db,"users",currentUser.uid), data, { merge:true });
 
-document.querySelectorAll("input").forEach(input=>{
-if(input.id!=="photoInput") input.disabled=true;
-});
+    document.querySelectorAll("input").forEach(input=>{
+      if(input.id !== "photoInput") input.disabled = true;
+    });
+
+    document.getElementById("editBtn").style.display = "inline-block";
+    document.getElementById("saveBtn").style.display = "none";
+
+    alert("Profile saved successfully.");
+
+    loadProfile(); // reload from Firestore so you know it really saved
+
+  }catch(error){
+    console.error("Save failed:", error);
+    alert("Failed to save profile.");
+  }
+};
 
 document.getElementById("editBtn").style.display="inline-block";
 document.getElementById("saveBtn").style.display="none";
