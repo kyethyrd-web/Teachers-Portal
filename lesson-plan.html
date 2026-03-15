@@ -1275,6 +1275,7 @@ cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" 
 
 window.submitLesson = async function () {
   const selected = document.getElementById("lessonDate").value;
+
   if (!selected) {
     alert("Please select a date first.");
     return;
@@ -1308,7 +1309,8 @@ window.submitLesson = async function () {
     status: "submitted",
     submittedAt: new Date().toLocaleString(),
 
-    assignedDepartmentHead: window.currentProfile?.departmentHead || "",
+    schoolId: window.currentProfile?.schoolId || "",
+    assignedDepartmentHead: (window.currentProfile?.departmentHead || "").trim(),
     teacherName: document.getElementById("teacher").innerText,
     school: document.getElementById("school").innerText,
     grade: grade,
