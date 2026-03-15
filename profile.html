@@ -142,7 +142,7 @@
       color: #1f3b63;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #c9d9ee;
@@ -151,7 +151,7 @@
       background: white;
     }
 
-    input:disabled {
+    input:disabled, select:disabled {
       background: #f1f5f9;
       color: #333;
     }
@@ -261,6 +261,38 @@
         <tr><td>School ID</td><td><input id="schoolId" disabled></td></tr>
         <tr><td>School Head</td><td><input id="schoolHead" disabled></td></tr>
         <tr><td>Department Head</td><td><input id="departmentHead" disabled></td></tr>
+
+        <tr>
+          <td>Teaching Level</td>
+          <td>
+            <select id="teachingLevel" disabled>
+              <option value="">Select Level</option>
+              <option value="Junior High School">Junior High School</option>
+              <option value="Senior High School">Senior High School</option>
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Position / Rank</td>
+          <td>
+            <select id="positionRank" disabled>
+              <option value="">Select Rank</option>
+              <option value="Teacher I">Teacher I</option>
+              <option value="Teacher II">Teacher II</option>
+              <option value="Teacher III">Teacher III</option>
+              <option value="Teacher IV">Teacher IV</option>
+              <option value="Teacher V">Teacher V</option>
+              <option value="Teacher VI">Teacher VI</option>
+              <option value="Teacher VII">Teacher VII</option>
+              <option value="Master Teacher I">Master Teacher I</option>
+              <option value="Master Teacher II">Master Teacher II</option>
+              <option value="Master Teacher III">Master Teacher III</option>
+              <option value="Master Teacher IV">Master Teacher IV</option>
+              <option value="Master Teacher V">Master Teacher V</option>
+            </select>
+          </td>
+        </tr>
       </table>
 
       <div class="section-title">Government Information</div>
@@ -327,6 +359,9 @@ async function loadProfile() {
       if (el) el.value = data[id];
     });
 
+    document.getElementById("teachingLevel").value = data.teachingLevel || "";
+    document.getElementById("positionRank").value = data.positionRank || "";
+
     if (data.photoURL) {
       document.getElementById("profilePic").src = data.photoURL;
     }
@@ -334,32 +369,34 @@ async function loadProfile() {
 }
 
 window.enableEdit = function() {
-  document.querySelectorAll("input").forEach(input => {
-    if (input.id !== "photoInput") input.disabled = false;
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") field.disabled = false;
   });
 
   document.getElementById("editBtn").style.display = "none";
   document.getElementById("saveBtn").style.display = "inline-block";
+  document.getElementById("saveStatus").style.color = "#0b8f3c";
   document.getElementById("saveStatus").innerText = "";
 };
 
 window.saveProfile = async function() {
   const data = {};
 
-  document.querySelectorAll("input").forEach(input => {
-    if (input.id !== "photoInput") {
-      data[input.id] = input.value;
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") {
+      data[field.id] = field.value.trim();
     }
   });
 
   await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
 
-  document.querySelectorAll("input").forEach(input => {
-    if (input.id !== "photoInput") input.disabled = true;
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") field.disabled = true;
   });
 
   document.getElementById("editBtn").style.display = "inline-block";
   document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("saveStatus").style.color = "#0b8f3c";
   document.getElementById("saveStatus").innerText = "Profile saved successfully!";
 };
 
