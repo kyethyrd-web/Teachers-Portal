@@ -1273,7 +1273,7 @@ cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" 
 
 }
 
-  window.submitLesson = async function () {
+window.submitLesson = async function () {
   const selected = document.getElementById("lessonDate").value;
   if (!selected) {
     alert("Please select a date first.");
@@ -1284,16 +1284,17 @@ cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" 
   const quarter = document.getElementById("quarter").value;
 
   let learningArea = document.getElementById("learningArea").value;
-  const other = document.getElementById("otherLearningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
 
-if (learningArea === "other" && other) {
-  learningArea = other;
-}
+  if (learningArea === "other" && other) {
+    learningArea = other;
+  }
 
-if (learningArea === "other" && !other.trim()) {
-  alert("Please enter the learning area.");
-  return;
-}
+  if (learningArea === "other" && !other) {
+    alert("Please enter the learning area.");
+    return;
+  }
+
   const monday = getMonday(selected);
 
   const lessonKey =
@@ -1305,10 +1306,19 @@ if (learningArea === "other" && !other.trim()) {
 
   await setDoc(doc(db, "lessonPlans", lessonKey), {
     status: "submitted",
-    submittedAt: new Date().toLocaleString()
+    submittedAt: new Date().toLocaleString(),
+
+    assignedDepartmentHead: window.currentProfile?.departmentHead || "",
+    teacherName: document.getElementById("teacher").innerText,
+    school: document.getElementById("school").innerText,
+    grade: grade,
+    learningArea: learningArea,
+    quarter: quarter,
+    dateRange: document.getElementById("dateRange").innerText
   }, { merge: true });
 
   document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
+  savePageDraftToLocal();
 };
 window.goToLessonLogHistory = function(){
   window.location.href = "lesson-log-history.html";
