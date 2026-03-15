@@ -267,12 +267,21 @@ async function loadTeacherSubmissions(){
     snap.forEach(docSnap => {
       const data = docSnap.data();
 
-      if(data.assignedDepartmentHead === currentProfile.name){
-        allSubmissions.push({
-          id: docSnap.id,
-          ...data
-        });
-      }
+const lessonSchoolId = (data.schoolId || "").trim();
+const lessonDeptHead = (data.assignedDepartmentHead || "").trim().toLowerCase();
+
+const currentSchoolId = (currentProfile.schoolId || "").trim();
+const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
+
+if(
+  lessonSchoolId === currentSchoolId &&
+  lessonDeptHead === currentDeptHeadName
+){
+  allSubmissions.push({
+    id: docSnap.id,
+    ...data
+  });
+}
     });
 
     // newest submissions first
