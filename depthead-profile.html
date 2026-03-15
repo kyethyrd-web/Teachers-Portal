@@ -117,15 +117,19 @@
       background: #f3f8ff;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 10px;
       border: 1px solid #c9d9ee;
       border-radius: 8px;
+      font-size: 14px;
+      background: white;
     }
 
-    input:disabled {
+    input:disabled,
+    select:disabled {
       background: #f1f5f9;
+      color: #333;
     }
 
     .buttons {
@@ -150,6 +154,13 @@
       background: #0b8f3c;
       color: white;
       display: none;
+    }
+
+    #saveStatus {
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+      color: #0b8f3c;
     }
   </style>
 </head>
@@ -199,6 +210,38 @@
 <tr><td>School</td><td><input id="school" disabled></td></tr>
 <tr><td>School ID</td><td><input id="schoolId" disabled></td></tr>
 <tr><td>School Head</td><td><input id="schoolHead" disabled></td></tr>
+
+<tr>
+  <td>Teaching Level</td>
+  <td>
+    <select id="teachingLevel" disabled>
+      <option value="">Select Level</option>
+      <option value="Junior High School">Junior High School</option>
+      <option value="Senior High School">Senior High School</option>
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td>Position / Rank</td>
+  <td>
+    <select id="positionRank" disabled>
+      <option value="">Select Rank</option>
+      <option value="Teacher I">Teacher I</option>
+      <option value="Teacher II">Teacher II</option>
+      <option value="Teacher III">Teacher III</option>
+      <option value="Teacher IV">Teacher IV</option>
+      <option value="Teacher V">Teacher V</option>
+      <option value="Teacher VI">Teacher VI</option>
+      <option value="Teacher VII">Teacher VII</option>
+      <option value="Master Teacher I">Master Teacher I</option>
+      <option value="Master Teacher II">Master Teacher II</option>
+      <option value="Master Teacher III">Master Teacher III</option>
+      <option value="Master Teacher IV">Master Teacher IV</option>
+      <option value="Master Teacher V">Master Teacher V</option>
+    </select>
+  </td>
+</tr>
 </table>
 
 <div class="section-title">Government Information</div>
@@ -215,6 +258,8 @@
 <button id="editBtn" onclick="enableEdit()">Edit</button>
 <button id="saveBtn" onclick="saveProfile()">Save Profile</button>
 </div>
+
+<p id="saveStatus"></p>
 
 </div>
 </div>
@@ -244,35 +289,32 @@ const storage = getStorage(app);
 let currentUser;
 
 onAuthStateChanged(auth, async (user) => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
 
-if(!user){
-window.location.href="login.html";
-return;
-}
+  currentUser = user;
 
-currentUser=user;
+  const snap = await getDoc(doc(db,"users",user.uid));
 
-const snap = await getDoc(doc(db,"users",user.uid));
+  if(!snap.exists()){
+    window.location.href = "login.html";
+    return;
+  }
 
-if(!snap.exists()){
-window.location.href="login.html";
-return;
-}
+  const data = snap.data();
 
-const data=snap.data();
+  if(data.role !== "department_head" && data.role !== "super_admin"){
+    alert("Access denied.");
+    window.location.href = "login.html";
+    return;
+  }
 
-if(data.role !== "department_head" && data.role !== "super_admin"){
-alert("Access denied.");
-window.location.href="login.html";
-return;
-}
-
-loadProfile();
-
+  loadProfile();
 });
 
 async function loadProfile(){
-
   const snap = await getDoc(doc(db,"users",currentUser.uid));
 
   if(!snap.exists()) return;
@@ -291,6 +333,8 @@ async function loadProfile(){
   document.getElementById("school").value = data.school || "";
   document.getElementById("schoolId").value = data.schoolId || "";
   document.getElementById("schoolHead").value = data.schoolHead || "";
+  document.getElementById("teachingLevel").value = data.teachingLevel || "";
+  document.getElementById("positionRank").value = data.positionRank || "";
 
   /* Government */
   document.getElementById("employeeId").value = data.employeeId || "";
@@ -307,67 +351,65 @@ async function loadProfile(){
 }
 
 window.enableEdit = function(){
-  document.querySelectorAll("input").forEach(input=>{
-    if(input.id !== "photoInput") input.disabled = false;
+  document.querySelectorAll("input, select").forEach(field => {
+    if(field.id !== "photoInput") field.disabled = false;
   });
 
   document.getElementById("editBtn").style.display = "none";
   document.getElementById("saveBtn").style.display = "inline-block";
+  document.getElementById("saveStatus").style.color = "#0b8f3c";
+  document.getElementById("saveStatus").innerText = "";
 };
 
 window.saveProfile = async function(){
-
   const data = {};
 
-  document.querySelectorAll("input").forEach(input=>{
-    if(input.id !== "photoInput"){
-      data[input.id] = input.value.trim();
+  document.querySelectorAll("input, select").forEach(field => {
+    if(field.id !== "photoInput"){
+      data[field.id] = field.value.trim();
     }
   });
 
   try{
     await setDoc(doc(db,"users",currentUser.uid), data, { merge:true });
 
-    document.querySelectorAll("input").forEach(input=>{
-      if(input.id !== "photoInput") input.disabled = true;
+    document.querySelectorAll("input, select").forEach(field => {
+      if(field.id !== "photoInput") field.disabled = true;
     });
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
+    document.getElementById("saveStatus").style.color = "#0b8f3c";
+    document.getElementById("saveStatus").innerText = "Profile saved successfully!";
 
-    alert("Profile saved successfully.");
     loadProfile();
 
   }catch(error){
     console.error("Save failed:", error);
-    alert("Failed to save profile.");
+    document.getElementById("saveStatus").style.color = "red";
+    document.getElementById("saveStatus").innerText = "Failed to save profile.";
   }
 };
 
-
-document.getElementById("profilePic").addEventListener("click",()=>{
-document.getElementById("photoInput").click();
+document.getElementById("profilePic").addEventListener("click", () => {
+  document.getElementById("photoInput").click();
 });
 
-document.getElementById("photoInput").addEventListener("change",async function(){
+document.getElementById("photoInput").addEventListener("change", async function(){
+  const file = this.files[0];
+  if(!file) return;
 
-const file=this.files[0];
-if(!file) return;
+  const storageRef = ref(storage, `profilePics/${currentUser.uid}`);
 
-const storageRef=ref(storage,`profilePics/${currentUser.uid}`);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
 
-await uploadBytes(storageRef,file);
-
-const url=await getDownloadURL(storageRef);
-
-await setDoc(doc(db,"users",currentUser.uid),{photoURL:url},{merge:true});
-
-document.getElementById("profilePic").src=url;
-
+  await setDoc(doc(db,"users",currentUser.uid), { photoURL:url }, { merge:true });
+  document.getElementById("profilePic").src = url;
 });
 
-window.logout=function(){
-signOut(auth).then(()=>window.location.href="login.html");
+window.logout = function(){
+  signOut(auth).then(() => window.location.href = "login.html");
 };
 
 </script>
