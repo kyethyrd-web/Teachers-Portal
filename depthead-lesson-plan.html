@@ -1,321 +1,1461 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Department Head - Lesson Plan</title>
+  <title>Daily Lesson Log</title>
+  <link rel="icon" type="image/png" href="images/deped-favicon.png">
 
-<style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#eef4fb;
+  <style>
+    #proceduresTable td:first-child {
+  width: 320px;
+}
+    #proceduresTable td:not(:first-child) {
+  width: 160px;
+}
+    .editable {
+  word-wrap: break-word;
+  white-space: normal;
+}
+    #proceduresTable {
+  table-layout: fixed;
+  width: 100%;
+}
+    body {
+      font-family: Arial;
+      margin: 20px;
+      background:#f5f7fb;
 }
 
-.container{
-display:flex;
-min-height:100vh;
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="date"] {
+      width: 160px; /* shorter date box */
+      padding: 5px;
+    }
+
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    td {
+      border: 1px solid black;
+      padding: 6px;
+      vertical-align: top;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 4px;
+    }
+    
+td[contenteditable="true"]{
+  text-align: center;
+  vertical-align: middle;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+    
+    .editable{
+  text-align: center;
 }
 
-.sidebar{
-width:240px;
+    .editable {
+      min-height: 50px;
+    }
+
+    .indent-1 { padding-left: 20px; }
+    .indent-2 { padding-left: 40px; }
+.infoTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.infoTable td {
+  border: 1px solid black;
+  padding: 6px;
+}
+.infoTable td:nth-child(1),
+.infoTable td:nth-child(3){
+  width: 20%;
+  white-space: nowrap;
+}
+
+.infoTable td:nth-child(2),
+.infoTable td:nth-child(4){
+  width: 30%;
+}
+    td[contenteditable="true"]:focus{
+  outline: 2px solid #4CAF50;
+}
+    #proceduresTable td[data-time]::after{
+content: " (" attr(data-time) ")";
+font-size: 11px;
+color: gray;
+display:block;
+margin-top:2px;
+}
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:40px;
+  margin-bottom:20px;
+  border-bottom:3px solid #004aad;
+  padding-bottom:10px;
+}
+
+.header-text{
+text-align:center;
+flex:1;
+}
+
+.header-text h2{
+margin:2px;
+color:#004aad;
+}
+
+.header-text h3{
+margin:2px;
+font-weight:normal;
+}
+    button{
 background:#004aad;
 color:white;
-padding:20px;
-}
-
-.sidebar h3{
-text-align:center;
-margin-bottom:20px;
-}
-
-.sidebar button{
-width:100%;
-padding:12px;
-margin-bottom:12px;
 border:none;
+padding:8px 16px;
 border-radius:6px;
-background:rgba(255,255,255,0.15);
-color:white;
+font-size:14px;
 cursor:pointer;
-font-weight:bold;
+transition:0.2s;
 }
 
-.sidebar button:hover{
-background:rgba(255,255,255,0.3);
+button:hover{
+background:#00307a;
 }
-
-.content{
-flex:1;
-padding:30px;
-}
-
-.page-card{
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-.header h2{
-color:#004aad;
-margin:0;
-}
-
-.actions{
+    .navbar{
 display:flex;
 gap:10px;
-flex-wrap:wrap;
+margin-bottom:20px;
+}
+#statusBox{
+margin-top:10px;
+padding:8px;
+background:#f0f4ff;
+border-left:4px solid #004aad;
+font-size:14px;
+}
+    table{
+font-size:14px;
 }
 
-.actions button{
-padding:10px 16px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-font-weight:bold;
+#proceduresTable td:first-child{
+font-weight:600;
+background:#f7f7f7;
 }
 
-.saveBtn{
-background:#004aad;
-color:white;
+#proceduresTable tr:hover{
+background:#f9fbff;
+}
+    .container{
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
-.submitBtn{
-background:#0b8f3c;
-color:white;
+.header-text{
+text-align:center;
+flex:1;
+font-size:14px;
+line-height:1.4;
 }
 
-.exportBtn{
-background:#555;
-color:white;
+.logo-left{
+  width:130px;
+  height:130px;
+  object-fit:contain;
+  margin-right:40px;
 }
 
-.logBtn{
-background:#f39c12;
-color:white;
+.logo-right{
+  width:150px;
+  height:150px;
+  object-fit:contain;
+  margin-left:40px;
 }
 
-textarea{
-width:100%;
-height:400px;
-padding:10px;
-font-family:Arial;
-border:1px solid #ccc;
-border-radius:6px;
+.header-text{
+  text-align:center;
+  max-width:600px;
+  flex:1;
 }
-
-.status{
-margin-top:15px;
-font-weight:bold;
-color:#004aad;
-}
-
-</style>
+  </style>
 </head>
-
 <body>
-
 <div class="container">
-
-<div class="sidebar">
-
-<h3>Dept Head Portal</h3>
-
-<button onclick="location.href='checker-dashboard.html'">Dashboard</button>
-
-<button onclick="location.href='depthead-profile.html'">My Profile</button>
-
-<button onclick="location.href='depthead-lesson-plan.html'">My Lesson Plan</button>
-
-<button onclick="location.href='depthead-lesson-log-history.html'">Lesson Log</button>
-
-<button onclick="location.href='teacher-submissions.html'">Teacher Submissions</button>
-
-<button onclick="location.href='checker-review-list.html'">Review Queue</button>
-
-<button onclick="logout()">Logout</button>
-
-</div>
-
-<div class="content">
-
-<div class="page-card">
-
 <div class="header">
+  <img src="images/DepEd-logo.png.png" class="logo-left">
 
-<h2>Department Head Lesson Plan</h2>
+  <div class="header-text">
+    <h3>Republic of the Philippines</h3>
+    <h2>Department of Education</h2>
+    <div id="districtHeader">District of ______</div>
+    <div id="schoolHeader"><b>School Name</b></div>
+   <div id="schoolIdHeader"><b>School ID: ______</b></div>
+  </div>
 
-<div class="actions">
+  <img src="images/Matatag-logo.png.png" class="logo-right">
+</div>
+  <div class="navbar">
+<button onclick="location.href='checker-dashboard.html'">Dashboard</button>
+<button onclick="goToLessonLogHistory()">Lesson Log</button>
+<button onclick="exportWord()">Export</button>
+<button onclick="saveLesson()">Save</button>
+</div>
+<h2>Daily Lesson Log</h2>
 
-<button class="logBtn" onclick="openLessonLog()">Lesson Log</button>
-
-<button class="saveBtn" onclick="saveLesson()">Save Draft</button>
-
-<button class="submitBtn" onclick="submitLesson()">Submit to School Head</button>
-
-<button class="exportBtn" onclick="exportLesson()">Export</button>
-
+<div class="controls">
+  <label>Select any date:</label>
+  <input type="date" id="lessonDate">
+  <button type="button" onclick="loadLesson()">Load</button>
 </div>
 
+<table class="infoTable" border="1">
+  <tr>
+    <td>School</td>
+    <td id="school"></td>
+    <td>Grade Level</td>
+    <td>
+      <select id="gradeLevel">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Teacher</td>
+    <td id="teacher"></td>
+    <td>Learning Area</td>
+    <td>
+  <select id="learningArea" onchange="checkLearningArea(this)">
+    <option value="">Select Learning Area</option>
+    <option>English</option>
+    <option>Math</option>
+    <option>ESP</option>
+    <option>Araling Panlipunan</option>
+    <option>MAPEH</option>
+    <option>Science</option>
+    <option>TLE</option>
+    <option>Filipino</option>
+    <option value="other">Others...</option>
+  </select>
+
+  <input type="text" id="otherLearningArea" placeholder="Enter Learning Area"
+         style="display:none; margin-top:5px;">
+</td>
+  </tr>
+
+  <tr>
+    <td>Teaching Dates</td>
+    <td id="dateRange"></td>
+    <td>Quarter</td>
+    <td>
+      <select id="quarter">
+        <option>1st</option>
+        <option>2nd</option>
+        <option>3rd</option>
+        <option>4th</option>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Time</td>
+    <td contenteditable="true" id="timeCell"></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+  
+<!-- PROCEDURES TABLE -->
+<table id="proceduresTable">
+  <tr>
+    <td></td>
+    <td>MONDAY</td>
+    <td>TUESDAY</td>
+    <td>WEDNESDAY</td>
+    <td>THURSDAY</td>
+    <td>FRIDAY</td>
+  </tr>
+
+  <tr>
+    <td>Date</td>
+    <td id="dateMon"></td>
+    <td id="dateTue"></td>
+    <td id="dateWed"></td>
+    <td id="dateThu"></td>
+    <td id="dateFri"></td>
+  </tr>
+
+  <!-- Roman (No indent) -->
+  <tr style="background-color: #bfbfbf;">
+    <td colspan="6"><b>I. OBJECTIVES</b></td>
+  </tr>
+
+  <!-- Alphabet (Indent 1) -->
+  <tr>
+    <td class="indent-1">A. GRADE LEVEL STANDARDS</td>
+    <td colspan="5" contenteditable="true"></td>
+  </tr>
+
+  <tr>
+    <td class="indent-1">B. Learning Competency</td>
+    <td colspan="5" contenteditable="true"></td>
+  </tr>
+
+  <!-- Roman -->
+  <tr>
+    <td><b>II. CONTENT</b></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td><td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+
+  <!-- Roman -->
+  <tr style="background-color: #bfbfbf;">
+    <td colspan="6"><b>III. LEARNING RESOURCES</b></td>
+  </tr>
+
+  <!-- Alphabet -->
+  <tr style="background-color: #bfbfbf;">
+    <td class="indent-1" colspan="6"><b>A. References</b></td>
+  </tr>
+
+  <!-- Number (Indent 2) -->
+  <tr>
+    <td class="indent-2">1. Additional Materials from LR Portal</td>
+    <td colspan="5" contenteditable="true"></td>
+  </tr>
+
+  <tr>
+    <td class="indent-1">B. Other Learning Resources</td>
+    <td colspan="5" contenteditable="true"></td>
+  </tr>
+  <tr style="background-color: #bfbfbf;">
+    <td colspan="6"><b>IV. PROCEDURES</b></td>
+  </tr>
+  <tr>
+    <td class="indent-1">A. Reviewing previous lesson</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">B. Establish a purpose</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">C. Examples/Instances</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">D. Discussing skills #1</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">E. Discussing skills #2</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">F. Developing Mastery</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">G. Applications</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">H. Generalization</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">I. Evaluating Learning</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td class="indent-1">J. Additional activities</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+<tr>
+<td><b>V. REMARKS</b></td>
+
+<td>
+<select onchange="handleRemark(0)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(1)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(2)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(3)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+<td>
+<select onchange="handleRemark(4)">
+<option value="">Select</option>
+<option>Carried-out</option>
+<option>Not carried-out</option>
+<option>Class suspension</option>
+<option>Asynchronous Learning</option>
+</select>
+</td>
+
+</tr>
+  <tr style="background-color: #bfbfbf;">
+    <td colspan="6"><b>VI. REFLECTIONS</b></td>
+  </tr>
+    <tr>
+    <td class="indent-1">A. No. of learners who 
+      earned 80% on the 
+      formative assessment</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">B. No. of  learners who 
+      require additional activities
+      for remediation who scored 
+      below 80%</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">C. Did the remedial 
+      lessons work? No. of learners
+      who have caught up 
+      with the lesson</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">D. No. of learners who
+      continue to require
+      remediation</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">E. Which of my teaching
+      strategies worked well? 
+      Why did this work?</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">F. What difficulties did
+      I encountered which my
+      principal or supervisor
+      can help me solve?</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+    <tr>
+    <td class="indent-1">G. What innovation or
+      localized materials did
+      I use/discover which I
+      wish to share with other 
+      teachers?</td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+    <td class="editable" contenteditable="true"></td>
+  </tr>
+<tr style="background:#d9d9d9">
+<td colspan="6"><b>CHECKER'S COMMENTS / SUGGESTIONS</b></td>
+</tr>
+
+<tr>
+<td colspan="6">
+<textarea id="checkerComment"
+style="width:100%;height:80px"
+readonly></textarea>
+</td>
+  
+</tr>
+</table>
+
+<button onclick="submitLesson()">Submit</button>
+<div id="statusBox">Status: Ready</div>
 </div>
-
-<textarea id="lessonContent" placeholder="Write your lesson plan here..."></textarea>
-
-<div class="status" id="statusMsg"></div>
-
-</div>
-
-</div>
-
-</div>
-
+  
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth,onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore,collection,addDoc,serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+let currentUser;
+const urlParams = new URLSearchParams(window.location.search);
+const openDocId = urlParams.get("docId");
+const reuseDocId = urlParams.get("reuse");
+  
 const firebaseConfig = {
-apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
-authDomain: "teachers-portal-98254.firebaseapp.com",
-projectId: "teachers-portal-98254",
-storageBucket: "teachers-portal-98254.firebasestorage.app",
-messagingSenderId: "479254583768",
-appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+  authDomain: "teachers-portal-98254.firebaseapp.com",
+  projectId: "teachers-portal-98254",
+  storageBucket: "teachers-portal-98254.firebasestorage.app",
+  messagingSenderId: "479254583768",
+  appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser;
+function attachAutoDraftListeners(){
+  document.getElementById("lessonDate").addEventListener("input", savePageDraftToLocal);
+  document.getElementById("gradeLevel").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("learningArea").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("otherLearningArea").addEventListener("input", savePageDraftToLocal);
+  document.getElementById("quarter").addEventListener("change", savePageDraftToLocal);
+  document.getElementById("timeCell").addEventListener("input", savePageDraftToLocal);
 
-onAuthStateChanged(auth,(user)=>{
+  document.addEventListener("input", function(e){
+    if(e.target.closest("#proceduresTable")){
+      savePageDraftToLocal();
+    }
+  });
 
-if(!user){
-window.location.href="login.html";
+  document.addEventListener("change", function(e){
+    if(e.target.closest("#proceduresTable")){
+      savePageDraftToLocal();
+    }
+  });
+}
+/* ===============================
+   LOAD USER PROFILE (School/Name)
+   =============================== */
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+
+  if (snap.exists()) {
+    const data = snap.data();
+    window.currentProfile = data;
+    document.getElementById("school").innerText = data.school || "";
+    document.getElementById("teacher").innerText = data.name || "";
+
+    document.getElementById("districtHeader").innerText =
+      "District of " + (data.district || "______");
+
+    document.getElementById("schoolHeader").innerText =
+      data.school || "School Name";
+
+    document.getElementById("schoolIdHeader").innerText =
+      "School ID: " + (data.schoolId || "______");
+  }
+
+  // IMPORTANT: only restore local draft if there is no open/reuse request
+  if(openDocId){
+    await loadLessonByDocumentId(openDocId, "open");
+  } else if(reuseDocId){
+    await loadLessonByDocumentId(reuseDocId, "reuse");
+  } else {
+    if(typeof restorePageDraftFromLocal === "function"){
+      restorePageDraftFromLocal();
+    }
+  }
+
+  if(typeof attachAutoDraftListeners === "function"){
+    attachAutoDraftListeners();
+  }
+});
+function setLearningAreaValue(value){
+  const select = document.getElementById("learningArea");
+  const otherInput = document.getElementById("otherLearningArea");
+
+  const optionValues = Array.from(select.options).map(opt => opt.value || opt.text);
+
+  if(optionValues.includes(value)){
+    select.value = value;
+    otherInput.style.display = "none";
+    otherInput.value = "";
+  } else {
+    select.value = "other";
+    otherInput.style.display = "block";
+    otherInput.value = value || "";
+  }
+}
+  window.saveLesson = async function(){
+
+  const selected = document.getElementById("lessonDate").value;
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value;
+
+  if(learningArea === "other" && other){
+    learningArea = other;
+  }
+  if(learningArea === "other" && !other.trim()){
+  alert("Please enter the learning area.");
+  return;
+}
+  if(!selected){
+    alert("Please select a date first.");
+    return;
+  }
+
+const monday = getMonday(selected);
+
+const lessonKey =
+currentUser.uid + "_" +
+formatDate(monday) + "_" +
+grade + "_" +
+learningArea + "_" +
+quarter;
+
+const data = {
+  userId: currentUser.uid,
+  teacherName: document.getElementById("teacher").innerText,
+  school: document.getElementById("school").innerText,
+  date: selected,
+  weekKey: formatDate(monday),
+  grade: grade,
+  learningArea: learningArea,
+  quarter: quarter,
+  dateRange: document.getElementById("dateRange").innerText,
+  time: document.getElementById("timeCell").innerText,
+  tableHTML: document.getElementById("proceduresTable").innerHTML,
+  status: "draft",
+  createdAt: new Date(),
+  submittedAt: "",
+  checkedAt: "",
+  approvedAt: "",
+  checkerComment: "",
+  checkedBy: "",
+  approvedBy: ""
+};
+
+  await setDoc(doc(db,"lessonPlans",lessonKey), data);
+
+  document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
+  savePageDraftToLocal();
+};
+
+/* ===============================
+   DATE FUNCTIONS
+   =============================== */
+
+function getMonday(date) {
+
+  const d = new Date(date);
+  const day = d.getDay();
+
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+
+  return new Date(d.setDate(diff));
+
+}
+
+function formatDate(d) {
+
+  return d.toISOString().split("T")[0];
+
+}
+
+function formatRange(monday) {
+
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const options = { month: "long" };
+
+  const month1 = monday.toLocaleString("default", options);
+  const month2 = friday.toLocaleString("default", options);
+
+  if (month1 === month2) {
+
+    return `${month1} ${monday.getDate()}–${friday.getDate()}, ${monday.getFullYear()}`;
+
+  } else {
+
+    return `${month1} ${monday.getDate()} – ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
+
+  }
+
+}
+function updateWeekDates(selectedDate){
+  const monday = getMonday(selectedDate);
+  const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
+
+  for(let i = 0; i < 5; i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    document.getElementById(ids[i]).innerText = formatDate(d);
+  }
+
+  document.getElementById("dateRange").innerText = formatRange(monday);
+}
+/* ===============================
+   LOAD BUTTON FUNCTION
+   =============================== */
+
+window.loadLesson = async function () {
+
+const selected = document.getElementById("lessonDate").value;
+
+if (!selected) {
+alert("Please select a date first.");
 return;
 }
 
-currentUser=user;
+const monday = getMonday(selected);
 
-loadDraft();
+const ids = ["dateMon","dateTue","dateWed","dateThu","dateFri"];
 
+for (let i = 0; i < 5; i++) {
+
+const d = new Date(monday);
+d.setDate(monday.getDate() + i);
+
+document.getElementById(ids[i]).innerText = formatDate(d);
+
+}
+
+document.getElementById("dateRange").innerText = formatRange(monday);
+
+/* CLEAR OLD LESSON */
+clearLesson();
+
+/* GET FILTER VALUES */
+
+const grade = document.getElementById("gradeLevel").value;
+const quarter = document.getElementById("quarter").value;
+
+let learningArea = document.getElementById("learningArea").value;
+const other = document.getElementById("otherLearningArea").value;
+
+if(learningArea === "other" && other){
+learningArea = other;
+}
+
+/* BUILD LESSON KEY */
+
+const lessonKey =
+currentUser.uid + "_" +
+formatDate(monday) + "_" +
+grade + "_" +
+learningArea + "_" +
+quarter;
+
+/* LOAD FROM FIRESTORE */
+
+const snap = await getDoc(doc(db,"lessonPlans",lessonKey));
+
+if(snap.exists()){
+
+const data = snap.data();
+
+document.getElementById("timeCell").innerText = data.time || "";
+document.getElementById("proceduresTable").innerHTML = data.tableHTML || "";
+
+/* RESTORE DROPDOWN VALUES */
+
+const selects = document.querySelectorAll("#proceduresTable select");
+
+selects.forEach(select=>{
+const saved = select.getAttribute("data-selected");
+if(saved){
+select.value = saved;
+}
+});
+document.getElementById("statusBox").innerText = "Status: Auto-saving...";
+document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
+savePageDraftToLocal();
+}else{
+document.getElementById("statusBox").innerText = "Status: Saved ✔";
+document.getElementById("statusBox").innerText = "Status: Lesson Loaded";
+savePageDraftToLocal();
+}
+
+};
+  function clearLesson(){
+
+document.getElementById("timeCell").innerText = "";
+
+const cells = document.querySelectorAll("#proceduresTable td[contenteditable='true']");
+
+cells.forEach(cell=>{
+cell.innerText = "";
 });
 
-function loadDraft(){
+/* CLEAR DROPDOWNS */
 
-const draft = localStorage.getItem("deptHeadLessonDraft");
+const selects = document.querySelectorAll("#proceduresTable select");
 
-if(draft){
-document.getElementById("lessonContent").value = draft;
-}
-
-}
-
-window.saveLesson=function(){
-
-const content = document.getElementById("lessonContent").value;
-
-localStorage.setItem("deptHeadLessonDraft",content);
-
-document.getElementById("statusMsg").innerText="Draft saved.";
-
-}
-
-window.submitLesson=async function(){
-
-const content = document.getElementById("lessonContent").value;
-
-if(!content){
-alert("Lesson content is empty.");
-return;
-}
-
-try{
-
-await addDoc(collection(db,"lessonPlans"),{
-
-userId:currentUser.uid,
-content:content,
-status:"for_approval",
-submittedByRole:"department_head",
-submittedAt:serverTimestamp()
-
-});
-
-localStorage.removeItem("deptHeadLessonDraft");
-
-document.getElementById("statusMsg").innerText="Submitted to School Head.";
-
-document.getElementById("lessonContent").value="";
-
-}catch(err){
-
-console.error(err);
-alert("Submission failed.");
-
-}
-
-}
-
-window.exportLesson=function(){
-
-const content=document.getElementById("lessonContent").value;
-
-const html=`
-
-<html>
-
-<body>
-
-<h2>Department Head Lesson Plan</h2>
-
-<p>${content.replace(/\n/g,"<br>")}</p>
-
-</body>
-
-</html>
-
-`;
-
-const blob=new Blob([html],{type:"application/msword"});
-
-const url=URL.createObjectURL(blob);
-
-const a=document.createElement("a");
-
-a.href=url;
-
-a.download="Department_Head_Lesson_Plan.doc";
-
-a.click();
-
-}
-
-window.openLessonLog=function(){
-
-window.location.href="depthead-lesson-log-history.html";
-
-}
-
-window.logout=function(){
-
-signOut(auth).then(()=>{
-
-window.location.href="login.html";
-
+selects.forEach(select=>{
+select.value = "";
+select.removeAttribute("data-selected");
+select.parentElement.removeAttribute("data-time");
 });
 
 }
+async function imageToDataUrl(path){
+  try{
+    const response = await fetch(path);
+    const blob = await response.blob();
 
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }catch(error){
+    console.error("Image load failed:", path, error);
+    return "";
+  }
+}window.exportWord = async function () {
+  const district = document.getElementById("districtHeader")?.innerText || "";
+  const schoolHeader = document.getElementById("schoolHeader")?.innerText || "";
+  const schoolIdHeader = document.getElementById("schoolIdHeader")?.innerText || "";
+
+  const school = document.getElementById("school")?.innerText || "";
+  const teacher = document.getElementById("teacher")?.innerText || "";
+  const grade = document.getElementById("gradeLevel")?.value || "";
+
+  let learningArea = document.getElementById("learningArea")?.value || "";
+  const otherLearningArea = document.getElementById("otherLearningArea")?.value || "";
+  if (learningArea === "other" && otherLearningArea) {
+    learningArea = otherLearningArea;
+  }
+
+  const quarter = document.getElementById("quarter")?.value || "";
+  const dateRange = document.getElementById("dateRange")?.innerText || "";
+  const time = document.getElementById("timeCell")?.innerText || "";
+
+  const profile = window.currentProfile || {};
+  const departmentHeadName = profile.departmentHead || "________________________";
+  const schoolHeadName = profile.schoolHead || "________________________";
+
+  const proceduresTable = document.getElementById("proceduresTable");
+  const clonedTable = proceduresTable.cloneNode(true);
+
+  // Convert remark dropdowns to plain text
+const originalSelects = proceduresTable.querySelectorAll("select");
+const clonedSelects = clonedTable.querySelectorAll("select");
+
+clonedSelects.forEach((select, index) => {
+  const originalSelect = originalSelects[index];
+  const td = select.parentElement;
+
+  const text = originalSelect ? originalSelect.value : "";
+  const stamp = originalSelect ? originalSelect.parentElement.getAttribute("data-time") : "";
+
+  td.innerHTML = text
+    ? `${text}${stamp ? `<div style="font-size:9px;color:#666;margin-top:3px;">(${stamp})</div>` : ""}`
+    : "";
+});
+
+  // Convert checker comment textarea to plain text
+  const checkerComment = clonedTable.querySelector("#checkerComment");
+  if (checkerComment) {
+    const parent = checkerComment.parentElement;
+    parent.innerHTML = checkerComment.value || "";
+  }
+
+  // Load images as base64 so they appear in Word
+  const depedLogo = await imageToDataUrl("images/DepEd-logo.png.png");
+  const matatagLogo = await imageToDataUrl("images/Matatag-logo.png.png");
+
+  const exportHTML = `
+  <html xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:w="urn:schemas-microsoft-com:office:word"
+        xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+    <meta charset="utf-8">
+    <title>Daily Lesson Log</title>
+    <style>
+      @page Section1 {
+        size: 11in 8.5in;
+        mso-page-orientation: landscape;
+        margin: 0.5in;
+      }
+
+      div.Section1 {
+        page: Section1;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+        color: #000;
+      }
+
+      .header-table {
+        width: 100%;
+        border: none;
+        margin-bottom: 8px;
+      }
+
+      .header-table td {
+        border: none;
+        vertical-align: middle;
+      }
+
+      .header-center {
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .header-center h2,
+      .header-center h3,
+      .header-center div {
+        margin: 2px 0;
+      }
+
+      .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 14pt;
+        margin: 10px 0 14px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 12px;
+      }
+
+      td, th {
+        border: 1px solid #000;
+        padding: 6px;
+        vertical-align: top;
+        word-wrap: break-word;
+      }
+
+      .infoTable td:nth-child(1),
+      .infoTable td:nth-child(3) {
+        width: 18%;
+        font-weight: bold;
+      }
+
+      .infoTable td:nth-child(2),
+      .infoTable td:nth-child(4) {
+        width: 32%;
+      }
+
+      #proceduresExport td:first-child {
+        width: 26%;
+        font-weight: bold;
+        background: #f2f2f2;
+      }
+
+      .signature-table {
+        width: 100%;
+        border: none;
+        margin-top: 30px;
+      }
+
+      .signature-table td {
+        border: none;
+        width: 33.33%;
+        vertical-align: top;
+        text-align: center;
+      }
+
+      .signature-label {
+        text-align: left;
+        margin-bottom: 28px;
+      }
+
+      .signature-name {
+        font-weight: bold;
+        text-decoration: underline;
+        text-transform: uppercase;
+      }
+
+      .signature-role {
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="Section1">
+
+<table class="header-table">
+<tr>
+
+<td style="width:20%; text-align:left;">
+<img src="${depedLogo}"
+     width="123"
+     height="119"
+     style="width:3.26cm;height:3.15cm;margin-left:0.6cm;">
+</td>
+
+<td class="header-center" style="width:60%;">
+<div>Republic of the Philippines</div>
+<div><strong>Department of Education</strong></div>
+<div>${district}</div>
+<div><strong>${schoolHeader}</strong></div>
+<div>${schoolIdHeader}</div>
+</td>
+
+<td style="width:20%; text-align:right;">
+<img src="${matatagLogo}"
+     width="148"
+     height="77"
+     style="width:3.92cm;height:2.03cm;margin-right:0.6cm;">
+</td>
+
+</tr>
+</table>
+
+      <div class="title">DAILY LESSON LOG</div>
+
+      <table class="infoTable">
+        <tr>
+          <td>School</td>
+          <td>${school}</td>
+          <td>Grade Level</td>
+          <td>${grade}</td>
+        </tr>
+        <tr>
+          <td>Teacher</td>
+          <td>${teacher}</td>
+          <td>Learning Area</td>
+          <td>${learningArea}</td>
+        </tr>
+        <tr>
+          <td>Teaching Dates</td>
+          <td>${dateRange}</td>
+          <td>Quarter</td>
+          <td>${quarter}</td>
+        </tr>
+        <tr>
+          <td>Time</td>
+          <td>${time}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <table id="proceduresExport">
+        ${clonedTable.innerHTML}
+      </table>
+
+      <table class="signature-table">
+        <tr>
+          <td>
+            <div class="signature-label">Prepared by:</div>
+            <div class="signature-name">${teacher}</div>
+            <div class="signature-role">${learningArea} Teacher</div>
+          </td>
+
+          <td>
+            <div class="signature-label">Checked by:</div>
+            <div class="signature-name">${departmentHeadName}</div>
+            <div class="signature-role">${learningArea} Department Head</div>
+          </td>
+
+          <td>
+            <div class="signature-label">Noted by:</div>
+            <div class="signature-name">${schoolHeadName}</div>
+            <div class="signature-role">School Head</div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+  </body>
+  </html>`;
+
+  const safeDate = dateRange.replace(/,/g, "").replace(/\s+/g, "_");
+  const safeSubject = learningArea.replace(/\s+/g, "_");
+  const fileName = `DLL_${safeSubject}_Grade${grade}_${safeDate}.doc`;
+
+  const blob = new Blob(['\ufeff', exportHTML], {
+    type: 'application/msword'
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+  
+window.handleRemark = function(dayIndex){
+
+const selects = document.querySelectorAll("#proceduresTable select");
+const remark = selects[dayIndex].value;
+
+const now = new Date().toLocaleString();
+const remarkCell = selects[dayIndex].parentElement;
+
+/* SAVE SELECTED VALUE INTO ATTRIBUTE */
+
+selects[dayIndex].setAttribute("data-selected", remark);
+
+/* SHOW TIMESTAMP */
+
+remarkCell.setAttribute("data-time", now);
+
+/* COPY LESSON IF NEEDED */
+
+if(remark === "Not carried-out" || remark === "Class suspension"){
+copyToNextDay(dayIndex);
+}
+
+/* AUTO SAVE */
+
+saveLesson();
+
+};
+
+function copyToNextDay(dayIndex){
+
+const table = document.getElementById("proceduresTable");
+
+for(let r=0;r<table.rows.length;r++){
+
+  const row = table.rows[r];
+
+  if(row.cells.length < 6) continue;
+
+  const today = row.cells[dayIndex+1];
+  const next = row.cells[dayIndex+2];
+
+  if(!today || !next) continue;
+
+  if(today.isContentEditable){
+    next.innerText = today.innerText;
+  }
+
+}
+
+const now = new Date().toLocaleString();
+
+document.getElementById("statusBox").innerText = "Status: New lesson for this selection";
+
+}
+  if(!document.getElementById("checkerComment")){
+
+const table = document.getElementById("proceduresTable");
+
+const row1 = table.insertRow(-1);
+row1.style.background = "#d9d9d9";
+const cell1 = row1.insertCell(0);
+cell1.colSpan = 6;
+cell1.innerHTML = "<b>CHECKER'S COMMENTS / SUGGESTIONS</b>";
+
+const row2 = table.insertRow(-1);
+const cell2 = row2.insertCell(0);
+cell2.colSpan = 6;
+cell2.innerHTML = '<textarea id="checkerComment" style="width:100%;height:80px" readonly></textarea>';
+
+}
+
+window.submitLesson = async function () {
+  const selected = document.getElementById("lessonDate").value;
+
+  if (!selected) {
+    alert("Please select a date first.");
+    return;
+  }
+
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
+
+  if (learningArea === "other" && other) {
+    learningArea = other;
+  }
+
+  if (learningArea === "other" && !other) {
+    alert("Please enter the learning area.");
+    return;
+  }
+
+  const monday = getMonday(selected);
+
+  const lessonKey =
+    currentUser.uid + "_" +
+    formatDate(monday) + "_" +
+    grade + "_" +
+    learningArea + "_" +
+    quarter;
+
+  await setDoc(doc(db, "lessonPlans", lessonKey), {
+    status: "for_approval",
+    submittedAt: new Date().toLocaleString(),
+
+    schoolId: window.currentProfile?.schoolId || "",
+    assignedDepartmentHead: (window.currentProfile?.departmentHead || "").trim(),
+    teacherName: document.getElementById("teacher").innerText,
+    school: document.getElementById("school").innerText,
+    grade: grade,
+    learningArea: learningArea,
+    quarter: quarter,
+    dateRange: document.getElementById("dateRange").innerText
+  }, { merge: true });
+
+  document.getElementById("statusBox").innerText = "Status: Submitted to School Head";
+  savePageDraftToLocal();
+};
+window.goToLessonLogHistory = function(){
+  window.location.href = "lesson-log-history.html";
+};
+
+window.checkLearningArea = function(select){
+  const otherInput = document.getElementById("otherLearningArea");
+
+  if(select.value === "other"){
+    otherInput.style.display = "block";
+    otherInput.focus();
+  } else {
+    otherInput.style.display = "none";
+    otherInput.value = "";
+  }
+};
+
+  function getCurrentLearningAreaValue(){
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
+
+  if(learningArea === "other" && other){
+    return other;
+  }
+
+  return learningArea;
+}
+
+function savePageDraftToLocal(){
+  const draft = {
+    lessonDate: document.getElementById("lessonDate").value,
+    gradeLevel: document.getElementById("gradeLevel").value,
+    learningArea: document.getElementById("learningArea").value,
+    otherLearningArea: document.getElementById("otherLearningArea").value,
+    quarter: document.getElementById("quarter").value,
+    dateRange: document.getElementById("dateRange").innerText,
+    timeCell: document.getElementById("timeCell").innerText,
+    tableHTML: document.getElementById("proceduresTable").innerHTML
+  };
+
+  localStorage.setItem("deptHeadLessonDraft", JSON.stringify(draft));
+}
+  function restorePageDraftFromLocal(){
+  const saved = localStorage.getItem("deptHeadLessonDraft");
+  if(!saved) return;
+
+  const draft = JSON.parse(saved);
+
+  document.getElementById("lessonDate").value = draft.lessonDate || "";
+  document.getElementById("gradeLevel").value = draft.gradeLevel || "1";
+  document.getElementById("learningArea").value = draft.learningArea || "";
+  document.getElementById("otherLearningArea").value = draft.otherLearningArea || "";
+  document.getElementById("quarter").value = draft.quarter || "1st";
+  document.getElementById("dateRange").innerText = draft.dateRange || "";
+  document.getElementById("timeCell").innerText = draft.timeCell || "";
+
+  if(draft.learningArea === "other"){
+    document.getElementById("otherLearningArea").style.display = "block";
+  } else {
+    document.getElementById("otherLearningArea").style.display = "none";
+  }
+
+  if(draft.tableHTML){
+    document.getElementById("proceduresTable").innerHTML = draft.tableHTML;
+
+    const selects = document.querySelectorAll("#proceduresTable select");
+    selects.forEach(select=>{
+      const savedValue = select.getAttribute("data-selected");
+      if(savedValue){
+        select.value = savedValue;
+      }
+    });
+  }
+}
+  async function loadLessonByDocumentId(docId, mode = "open"){
+  try{
+    const snap = await getDoc(doc(db, "lessonPlans", docId));
+
+    if(!snap.exists()){
+      document.getElementById("statusBox").innerText = "Status: Lesson not found";
+      return;
+    }
+
+    const data = snap.data();
+
+    document.getElementById("lessonDate").value = data.date || "";
+    document.getElementById("gradeLevel").value = data.grade || "1";
+    document.getElementById("quarter").value = data.quarter || "1st";
+
+    setLearningAreaValue(data.learningArea || "");
+
+    document.getElementById("timeCell").innerText = data.time || "";
+    document.getElementById("dateRange").innerText = data.dateRange || "";
+
+    if(data.tableHTML){
+      document.getElementById("proceduresTable").innerHTML = data.tableHTML;
+    }
+
+    // Restore saved remark dropdown values
+    const selects = document.querySelectorAll("#proceduresTable select");
+    selects.forEach(select => {
+      const saved = select.getAttribute("data-selected");
+      if(saved){
+        select.value = saved;
+      }
+    });
+
+    if(mode === "reuse"){
+      // Keep content, but treat it like a new draft
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("lessonDate").value = today;
+      updateWeekDates(today);
+
+      document.getElementById("statusBox").innerText =
+        "Status: Reused from previous lesson. Review and save as a new lesson.";
+    } else {
+      if(data.date){
+        updateWeekDates(data.date);
+      }
+      document.getElementById("statusBox").innerText =
+        "Status: Previous lesson opened";
+    }
+
+    // Save what was loaded into local draft so page doesn't revert
+    if(typeof savePageDraftToLocal === "function"){
+      savePageDraftToLocal();
+    }
+
+  } catch(error){
+    console.error("Failed to load lesson by document ID:", error);
+    document.getElementById("statusBox").innerText =
+      "Status: Failed to load lesson";
+  }
+}
 </script>
 
 </body>
