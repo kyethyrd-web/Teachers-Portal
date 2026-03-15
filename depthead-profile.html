@@ -273,50 +273,46 @@ loadProfile();
 
 async function loadProfile(){
 
-const snap = await getDoc(doc(db,"users",currentUser.uid));
+  const snap = await getDoc(doc(db,"users",currentUser.uid));
 
-if(!snap.exists()) return;
+  if(!snap.exists()) return;
 
-const data = snap.data();
+  const data = snap.data();
 
-/* Personal */
-document.getElementById("name").value = data.name || "";
-document.getElementById("depedEmail").value = data.depedEmail || data.email || "";
-document.getElementById("permanentAddress").value = data.permanentAddress || "";
-document.getElementById("mobilePhone").value = data.mobilePhone || "";
+  /* Personal */
+  document.getElementById("name").value = data.name || "";
+  document.getElementById("depedEmail").value = data.depedEmail || data.email || "";
+  document.getElementById("permanentAddress").value = data.permanentAddress || "";
+  document.getElementById("mobilePhone").value = data.mobilePhone || "";
 
-/* School */
-document.getElementById("division").value = data.division || "";
-document.getElementById("district").value = data.district || "";
-document.getElementById("school").value = data.school || "";
-document.getElementById("schoolId").value = data.schoolId || "";
-document.getElementById("schoolHead").value = data.schoolHead || "";
-document.getElementById("departmentHead").value = data.departmentHead || "";
+  /* School */
+  document.getElementById("division").value = data.division || "";
+  document.getElementById("district").value = data.district || "";
+  document.getElementById("school").value = data.school || "";
+  document.getElementById("schoolId").value = data.schoolId || "";
+  document.getElementById("schoolHead").value = data.schoolHead || "";
 
-/* Government */
-document.getElementById("employeeId").value = data.employeeId || "";
-document.getElementById("prcLicense").value = data.prcLicense || "";
-document.getElementById("philhealth").value = data.philhealth || "";
-document.getElementById("tin").value = data.tin || "";
-document.getElementById("gsis").value = data.gsis || "";
-document.getElementById("pagibig").value = data.pagibig || "";
+  /* Government */
+  document.getElementById("employeeId").value = data.employeeId || "";
+  document.getElementById("prcLicense").value = data.prcLicense || "";
+  document.getElementById("philhealth").value = data.philhealth || "";
+  document.getElementById("tin").value = data.tin || "";
+  document.getElementById("gsis").value = data.gsis || "";
+  document.getElementById("pagibig").value = data.pagibig || "";
 
-/* Photo */
-if(data.photoURL){
-document.getElementById("profilePic").src = data.photoURL;
+  /* Photo */
+  if(data.photoURL){
+    document.getElementById("profilePic").src = data.photoURL;
+  }
 }
 
-}
+window.enableEdit = function(){
+  document.querySelectorAll("input").forEach(input=>{
+    if(input.id !== "photoInput") input.disabled = false;
+  });
 
-window.enableEdit=function(){
-
-document.querySelectorAll("input").forEach(input=>{
-if(input.id!=="photoInput") input.disabled=false;
-});
-
-document.getElementById("editBtn").style.display="none";
-document.getElementById("saveBtn").style.display="inline-block";
-
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline-block";
 };
 
 window.saveProfile = async function(){
@@ -340,8 +336,7 @@ window.saveProfile = async function(){
     document.getElementById("saveBtn").style.display = "none";
 
     alert("Profile saved successfully.");
-
-    loadProfile(); // reload from Firestore so you know it really saved
+    loadProfile();
 
   }catch(error){
     console.error("Save failed:", error);
@@ -349,10 +344,6 @@ window.saveProfile = async function(){
   }
 };
 
-document.getElementById("editBtn").style.display="inline-block";
-document.getElementById("saveBtn").style.display="none";
-
-};
 
 document.getElementById("profilePic").addEventListener("click",()=>{
 document.getElementById("photoInput").click();
