@@ -1,149 +1,283 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Submissions</title>
+  <title>Teacher Submissions Checklist</title>
   <style>
-    * {
-      box-sizing: border-box;
+    *{
+      box-sizing:border-box;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eef4fb;
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#eef4fb;
+      color:#222;
     }
 
-    .container {
-      display: flex;
-      min-height: 100vh;
+    .container{
+      display:flex;
+      min-height:100vh;
     }
 
-    .sidebar {
-      width: 240px;
-      background: #004aad;
-      color: white;
-      padding: 20px;
+    .sidebar{
+      width:240px;
+      background:#004aad;
+      color:white;
+      padding:20px;
+      box-shadow:2px 0 10px rgba(0,0,0,0.1);
     }
 
-    .sidebar h3 {
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 22px;
+    .sidebar h3{
+      margin-top:0;
+      margin-bottom:20px;
+      text-align:center;
+      font-size:22px;
     }
 
-    .sidebar button {
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
+    .sidebar button{
+      width:100%;
+      margin-bottom:12px;
+      padding:12px;
+      cursor:pointer;
+      border:none;
+      border-radius:8px;
+      background:rgba(255,255,255,0.15);
+      color:white;
+      font-weight:bold;
+      font-size:14px;
+      transition:0.2s;
     }
 
-    .sidebar button:hover {
-      background: rgba(255,255,255,0.28);
+    .sidebar button:hover{
+      background:rgba(255,255,255,0.28);
     }
 
-    .content {
-      flex: 1;
-      padding: 30px;
+    .content{
+      flex:1;
+      padding:25px;
     }
 
-    .page-card {
-      background: white;
-      border-radius: 14px;
-      padding: 25px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    .page-card{
+      background:white;
+      border-radius:14px;
+      padding:24px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
     }
 
-    .page-header {
-      margin-bottom: 20px;
+    .top-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
     }
 
-    .page-header h2 {
-      margin: 0;
-      color: #004aad;
+    .filters{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
-    .page-header p {
-      margin-top: 8px;
-      color: #666;
+    .filters label{
+      font-weight:bold;
+      color:#004aad;
     }
 
-    .toolbar {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+    input[type="date"], select{
+      padding:10px 12px;
+      border:1px solid #c8d7ea;
+      border-radius:8px;
+      font-size:14px;
+      background:white;
     }
 
-    .toolbar input,
-    .toolbar select {
-      padding: 10px;
-      border: 1px solid #c8d7ea;
-      border-radius: 8px;
-      font-size: 14px;
+    .action-btn{
+      background:#004aad;
+      color:white;
+      border:none;
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:14px;
     }
 
-    .toolbar input {
-      min-width: 280px;
-      flex: 1;
+    .action-btn:hover{
+      background:#00307a;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
+    .export-btn{
+      background:#0b8f3c;
     }
 
-    th, td {
-      border: 1px solid #dce7f5;
-      padding: 12px;
-      text-align: left;
-      font-size: 14px;
+    .export-btn:hover{
+      background:#086d2e;
     }
 
-    th {
-      background: #f2f7ff;
-      color: #004aad;
+    .sheet{
+      border:1px solid #d7e2f0;
+      padding:20px;
+      background:white;
     }
 
-    .status {
-      font-weight: bold;
-      text-transform: capitalize;
+    .sheet-header{
+      text-align:center;
+      margin-bottom:14px;
+      border-bottom:2px solid #666;
+      padding-bottom:10px;
     }
 
-    .status.submitted {
-      color: #0b8f3c;
+    .sheet-header-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:8px;
     }
 
-    .status.draft {
-      color: #cc8400;
+    .sheet-logo{
+      width:70px;
+      height:70px;
+      object-fit:contain;
     }
 
-    .status.returned {
-      color: #c62828;
+    .sheet-header-center{
+      flex:1;
+      text-align:center;
+      line-height:1.35;
     }
 
-    .status.checked {
-      color: #1565c0;
+    .sheet-school{
+      font-size:28px;
+      font-weight:bold;
+      color:#111;
     }
 
-    .empty {
-      text-align: center;
-      color: #666;
-      padding: 20px;
+    .sheet-sub{
+      font-size:20px;
+      font-weight:bold;
     }
 
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      color: red;
+    .sheet-department{
+      font-size:18px;
+      font-weight:bold;
+      letter-spacing:1px;
+      margin-top:4px;
+    }
+
+    .sheet-title{
+      font-size:18px;
+      font-weight:bold;
+      margin-top:10px;
+    }
+
+    .sheet-subtitle{
+      font-size:14px;
+      color:#555;
+      margin-top:6px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      margin-top:12px;
+    }
+
+    th, td{
+      border:1px solid #333;
+      padding:8px 6px;
+      font-size:13px;
+      vertical-align:middle;
+      word-wrap:break-word;
+    }
+
+    th{
+      background:#f4f7fb;
+      text-align:center;
+      color:#111;
+    }
+
+    td{
+      background:white;
+    }
+
+    .center{
+      text-align:center;
+    }
+
+    .group-row td{
+      background:#eef5ff;
+      font-weight:bold;
+      color:#004aad;
+      font-size:15px;
+    }
+
+    .tiny{
+      font-size:12px;
+    }
+
+    .timeliness{
+      text-align:center;
+      font-weight:bold;
+    }
+
+    .check-mark{
+      font-size:18px;
+      font-weight:bold;
+    }
+
+    .remarks-cell{
+      font-size:12px;
+    }
+
+    .signature-line{
+      color:#777;
+      font-size:12px;
+    }
+
+    .signature-section{
+      margin-top:40px;
+      display:flex;
+      justify-content:space-between;
+      gap:40px;
+    }
+
+    .signature-box{
+      width:45%;
+      text-align:center;
+    }
+
+    .signature-label{
+      margin-bottom:50px;
+      text-align:left;
+      font-size:16px;
+    }
+
+    .signature-name{
+      font-weight:bold;
+      text-decoration:underline;
+      text-transform:uppercase;
+      font-size:18px;
+    }
+
+    .signature-role{
+      margin-top:6px;
+      font-size:16px;
+    }
+
+    #message{
+      margin-top:15px;
+      font-weight:bold;
+      color:red;
+    }
+
+    .empty-note{
+      text-align:center;
+      padding:20px;
+      color:#666;
     }
   </style>
 </head>
@@ -164,44 +298,75 @@
   <div class="content">
     <div class="page-card">
 
-      <div class="page-header">
-        <h2>Teacher Submissions</h2>
-        <p>Monitor teacher lesson plan submissions assigned to your department.</p>
+      <div class="top-actions">
+        <div class="filters">
+          <label for="weekDate">Select any date for the week:</label>
+          <input type="date" id="weekDate">
+          <button class="action-btn" onclick="loadChecklist()">Load Checklist</button>
+        </div>
+
+        <button class="action-btn export-btn" onclick="exportChecklist()">Export</button>
       </div>
 
-      <div class="toolbar">
-        <input type="text" id="searchInput" placeholder="Search teacher, subject, grade, date..." oninput="filterSubmissions()">
+      <div class="sheet" id="checklistSheet">
+        <div class="sheet-header">
+          <div class="sheet-header-top">
+            <img src="images/DepEd-logo.png.png" class="sheet-logo" id="depedLogo">
+            <div class="sheet-header-center">
+              <div class="sheet-school" id="schoolNameHeader">SCHOOL NAME</div>
+              <div class="sheet-sub">School ID: <span id="schoolIdHeader">______</span></div>
+              <div class="sheet-sub" id="districtDivisionHeader">District / Division</div>
+            </div>
+            <img src="images/Matatag-logo.png.png" class="sheet-logo" id="matatagLogo">
+          </div>
 
-        <select id="statusFilter" onchange="filterSubmissions()">
-          <option value="">All Status</option>
-          <option value="submitted">Submitted</option>
-          <option value="draft">Draft</option>
-          <option value="returned">Returned</option>
-          <option value="checked">Checked</option>
-        </select>
+          <div class="sheet-department" id="departmentHeader">DEPARTMENT SUBMISSION CHECKLIST</div>
+          <div class="sheet-title">CHECKLIST FOR SUBMISSION OF DLP/DLL</div>
+          <div class="sheet-subtitle">
+            Week Covered: <span id="weekCoveredHeader">______</span>
+          </div>
+        </div>
+
+        <table id="checklistTable">
+          <thead>
+            <tr>
+              <th rowspan="2" style="width:20%;">TEACHER'S NAME</th>
+              <th rowspan="2" style="width:16%;">Level / Subject Handled</th>
+              <th rowspan="2" style="width:12%;">Week/Date Covered</th>
+              <th rowspan="2" style="width:10%;">Date Submitted</th>
+              <th colspan="3" style="width:16%;">Timeliness</th>
+              <th rowspan="2" style="width:13%;">Signature</th>
+              <th rowspan="2" style="width:13%;">Remarks</th>
+            </tr>
+            <tr>
+              <th class="tiny">On Time</th>
+              <th class="tiny">Late</th>
+              <th class="tiny">Not Yet</th>
+            </tr>
+          </thead>
+          <tbody id="checklistBody">
+            <tr>
+              <td colspan="9" class="empty-note">Select a date and click Load Checklist.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="signature-section">
+          <div class="signature-box">
+            <div class="signature-label">Prepared by:</div>
+            <div class="signature-name" id="preparedByName">DEPARTMENT HEAD</div>
+            <div class="signature-role" id="preparedByRole">Department Head</div>
+          </div>
+
+          <div class="signature-box">
+            <div class="signature-label">Noted by:</div>
+            <div class="signature-name" id="notedByName">SCHOOL HEAD</div>
+            <div class="signature-role">School Head</div>
+          </div>
+        </div>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Teacher</th>
-            <th>Grade</th>
-            <th>Learning Area</th>
-            <th>Quarter</th>
-            <th>Date Range</th>
-            <th>Status</th>
-            <th>Submitted At</th>
-          </tr>
-        </thead>
-        <tbody id="submissionTableBody">
-          <tr>
-            <td colspan="7" class="empty">Loading submissions...</td>
-          </tr>
-        </tbody>
-      </table>
 
       <div id="message"></div>
-
     </div>
   </div>
 </div>
@@ -226,12 +391,14 @@ const db = getFirestore(app);
 
 let currentUser;
 let currentProfile;
-let allSubmissions = [];
+let teachersList = [];
+let lessonPlansList = [];
+let preparedChecklistRows = [];
 
 function setMessage(text, color = "red"){
-  const message = document.getElementById("message");
-  message.style.color = color;
-  message.innerText = text;
+  const el = document.getElementById("message");
+  el.style.color = color;
+  el.innerText = text;
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -242,116 +409,518 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
 
-  const userSnap = await getDoc(doc(db, "users", user.uid));
-  if(!userSnap.exists()){
-    window.location.href = "login.html";
-    return;
-  }
-
-  currentProfile = userSnap.data();
-
-  if(currentProfile.role !== "department_head" && currentProfile.role !== "super_admin"){
-    alert("Access denied.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  loadTeacherSubmissions();
-});
-
-async function loadTeacherSubmissions(){
   try{
-    const snap = await getDocs(collection(db, "lessonPlans"));
-    allSubmissions = [];
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if(!userSnap.exists()){
+      window.location.href = "login.html";
+      return;
+    }
 
-    snap.forEach(docSnap => {
-      const data = docSnap.data();
+    currentProfile = userSnap.data();
 
-const lessonSchoolId = (data.schoolId || "").trim();
-const lessonDeptHead = (data.assignedDepartmentHead || "").trim().toLowerCase();
+    if(currentProfile.role !== "department_head" && currentProfile.role !== "super_admin"){
+      alert("Access denied.");
+      window.location.href = "login.html";
+      return;
+    }
 
-const currentSchoolId = (currentProfile.schoolId || "").trim();
-const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
-
-if(
-  lessonSchoolId === currentSchoolId &&
-  lessonDeptHead === currentDeptHeadName
-){
-  allSubmissions.push({
-    id: docSnap.id,
-    ...data
-  });
-}
-    });
-
-    // newest submissions first
-    allSubmissions.sort((a, b) => {
-      const aTime = a.submittedAt || "";
-      const bTime = b.submittedAt || "";
-      return bTime.localeCompare(aTime);
-    });
-
-    renderSubmissions(allSubmissions);
+    loadHeaderDetails();
+    await preloadData();
 
   }catch(error){
     console.error(error);
-    setMessage("Failed to load teacher submissions.");
+    setMessage("Failed to load page.");
   }
+});
+
+function loadHeaderDetails(){
+  document.getElementById("schoolNameHeader").innerText = currentProfile.school || "SCHOOL NAME";
+  document.getElementById("schoolIdHeader").innerText = currentProfile.schoolId || "______";
+
+  const district = currentProfile.district || "";
+  const division = currentProfile.division || "";
+  document.getElementById("districtDivisionHeader").innerText =
+    [district, division].filter(Boolean).join(", ") || "District / Division";
+
+  const deptName = (currentProfile.departmentHead || currentProfile.name || "Department").toUpperCase();
+  document.getElementById("departmentHeader").innerText = `${deptName} DEPARTMENT`;
+
+  document.getElementById("preparedByName").innerText = (currentProfile.name || "DEPARTMENT HEAD").toUpperCase();
+  document.getElementById("preparedByRole").innerText = currentProfile.positionRank || "Department Head";
+  document.getElementById("notedByName").innerText = (currentProfile.schoolHead || "SCHOOL HEAD").toUpperCase();
 }
 
-function renderSubmissions(list){
-  const tbody = document.getElementById("submissionTableBody");
+async function preloadData(){
+  const usersSnap = await getDocs(collection(db, "users"));
+  const lessonsSnap = await getDocs(collection(db, "lessonPlans"));
 
-  if(list.length === 0){
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="empty">No submissions found.</td>
-      </tr>
-    `;
+  teachersList = [];
+  lessonPlansList = [];
+
+  const currentSchoolId = (currentProfile.schoolId || "").trim();
+  const currentDeptHeadName = (currentProfile.name || "").trim().toLowerCase();
+
+  usersSnap.forEach(docSnap => {
+    const data = docSnap.data();
+    const role = (data.role || "").toLowerCase();
+    const teacherSchoolId = (data.schoolId || "").trim();
+    const teacherDeptHead = (data.departmentHead || "").trim().toLowerCase();
+
+    if(
+      role === "teacher" &&
+      teacherSchoolId === currentSchoolId &&
+      teacherDeptHead === currentDeptHeadName
+    ){
+      teachersList.push({
+        id: docSnap.id,
+        ...data
+      });
+    }
+  });
+
+  lessonsSnap.forEach(docSnap => {
+    lessonPlansList.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
+}
+
+function getMonday(dateString){
+  const d = new Date(dateString);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
+}
+
+function formatDate(date){
+  const d = new Date(date);
+  return d.toISOString().split("T")[0];
+}
+
+function formatReadableDate(date){
+  const d = new Date(date);
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function formatWeekRange(monday){
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const options = { month: "long" };
+  const month1 = monday.toLocaleString("default", options);
+  const month2 = friday.toLocaleString("default", options);
+
+  if(month1 === month2){
+    return `${month1} ${monday.getDate()}–${friday.getDate()}, ${monday.getFullYear()}`;
+  }
+
+  return `${month1} ${monday.getDate()} – ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
+}
+
+function getSubmissionForTeacherAndWeek(teacherName, weekKey){
+  const normalizedTeacher = (teacherName || "").trim().toLowerCase();
+
+  return lessonPlansList.find(item => {
+    const itemTeacher = (item.teacherName || "").trim().toLowerCase();
+    const itemWeek = (item.weekKey || "").trim();
+    const itemSchoolId = (item.schoolId || "").trim();
+    const itemDeptHead = (item.assignedDepartmentHead || "").trim().toLowerCase();
+
+    return (
+      itemTeacher === normalizedTeacher &&
+      itemWeek === weekKey &&
+      itemSchoolId === (currentProfile.schoolId || "").trim() &&
+      itemDeptHead === (currentProfile.name || "").trim().toLowerCase()
+    );
+  });
+}
+
+function determineTimeliness(submittedAt, monday){
+  if(!submittedAt) return "not_yet";
+
+  const submittedDate = new Date(submittedAt);
+  if(isNaN(submittedDate)) return "late";
+
+  // You can adjust this rule later.
+  // Current rule: submitted on or before Monday 11:59 PM = On Time
+  const cutoff = new Date(monday);
+  cutoff.setHours(23,59,59,999);
+
+  return submittedDate <= cutoff ? "on_time" : "late";
+}
+
+window.loadChecklist = function(){
+  const selectedDate = document.getElementById("weekDate").value;
+
+  if(!selectedDate){
+    alert("Please select a date first.");
     return;
   }
 
+  const monday = getMonday(selectedDate);
+  const weekKey = formatDate(monday);
+  const weekDisplay = formatWeekRange(monday);
+
+  document.getElementById("weekCoveredHeader").innerText = weekDisplay;
+
+  const jhsTeachers = [];
+  const shsTeachers = [];
+
+  teachersList.forEach(teacher => {
+    const level = (teacher.teachingLevel || "").toLowerCase();
+    if(level.includes("senior")){
+      shsTeachers.push(teacher);
+    } else {
+      jhsTeachers.push(teacher);
+    }
+  });
+
+  jhsTeachers.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+  shsTeachers.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+
+  preparedChecklistRows = [];
+  const tbody = document.getElementById("checklistBody");
   tbody.innerHTML = "";
 
-  list.forEach(item => {
-    const tr = document.createElement("tr");
+  function addGroup(title, teachers){
+    if(!teachers.length) return;
 
-    tr.innerHTML = `
-      <td>${item.teacherName || ""}</td>
-      <td>${item.grade || ""}</td>
-      <td>${item.learningArea || ""}</td>
-      <td>${item.quarter || ""}</td>
-      <td>${item.dateRange || ""}</td>
-      <td><span class="status ${item.status || ""}">${item.status || ""}</span></td>
-      <td>${item.submittedAt || "-"}</td>
+    const groupRow = document.createElement("tr");
+    groupRow.className = "group-row";
+    groupRow.innerHTML = `<td colspan="9">${title}</td>`;
+    tbody.appendChild(groupRow);
+
+    teachers.forEach((teacher, index) => {
+      const submission = getSubmissionForTeacherAndWeek(teacher.name, weekKey);
+
+      const levelText = teacher.teachingLevel || "";
+      const subjectText = teacher.subjectSpecialization || teacher.learningArea || teacher.departmentHead || "";
+      const levelSubject = [levelText, subjectText].filter(Boolean).join(" / ");
+
+      const submittedAt = submission?.submittedAt || "";
+      const dateSubmitted = submittedAt ? formatReadableDate(submittedAt) : "";
+      const timeliness = determineTimeliness(submittedAt, monday);
+
+      const rowData = {
+        teacherName: teacher.name || "",
+        levelSubject: levelSubject,
+        weekCovered: submission?.dateRange || weekDisplay,
+        dateSubmitted: dateSubmitted,
+        timeliness,
+        remarks: submission ? (submission.status || "submitted") : "Not yet submitted",
+        signature: submission ? "Submitted" : ""
+      };
+
+      preparedChecklistRows.push(rowData);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${index + 1}. ${rowData.teacherName}</td>
+        <td>${rowData.levelSubject}</td>
+        <td class="center">${rowData.weekCovered}</td>
+        <td class="center">${rowData.dateSubmitted || ""}</td>
+        <td class="timeliness">${timeliness === "on_time" ? '<span class="check-mark">✓</span>' : ''}</td>
+        <td class="timeliness">${timeliness === "late" ? '<span class="check-mark">✓</span>' : ''}</td>
+        <td class="timeliness">${timeliness === "not_yet" ? '<span class="check-mark">✓</span>' : ''}</td>
+        <td class="center signature-line">${rowData.signature}</td>
+        <td class="remarks-cell">${rowData.remarks}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  addGroup("Junior High School", jhsTeachers);
+  addGroup("Senior High School", shsTeachers);
+
+  if(!preparedChecklistRows.length){
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="empty-note">No teachers found under your department.</td>
+      </tr>
     `;
+  }
 
-    tbody.appendChild(tr);
-  });
-}
-
-window.filterSubmissions = function(){
-  const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const statusValue = document.getElementById("statusFilter").value.toLowerCase();
-
-  const filtered = allSubmissions.filter(item => {
-    const text = `
-      ${item.teacherName || ""}
-      ${item.grade || ""}
-      ${item.learningArea || ""}
-      ${item.quarter || ""}
-      ${item.dateRange || ""}
-      ${item.status || ""}
-    `.toLowerCase();
-
-    const matchesSearch = text.includes(searchValue);
-    const matchesStatus = !statusValue || (item.status || "").toLowerCase() === statusValue;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  renderSubmissions(filtered);
+  setMessage("Checklist loaded successfully.", "#0b8f3c");
 };
+
+window.exportChecklist = async function(){
+  const selectedDate = document.getElementById("weekDate").value;
+
+  if(!selectedDate){
+    alert("Please select a date first and load the checklist.");
+    return;
+  }
+
+  if(!preparedChecklistRows.length){
+    alert("No checklist data to export.");
+    return;
+  }
+
+  const depedLogo = await imageToDataUrl("images/DepEd-logo.png.png");
+  const matatagLogo = await imageToDataUrl("images/Matatag-logo.png.png");
+
+  const schoolName = document.getElementById("schoolNameHeader").innerText;
+  const schoolId = document.getElementById("schoolIdHeader").innerText;
+  const districtDivision = document.getElementById("districtDivisionHeader").innerText;
+  const departmentTitle = document.getElementById("departmentHeader").innerText;
+  const weekCovered = document.getElementById("weekCoveredHeader").innerText;
+  const preparedBy = document.getElementById("preparedByName").innerText;
+  const preparedByRole = document.getElementById("preparedByRole").innerText;
+  const notedBy = document.getElementById("notedByName").innerText;
+
+  function buildRowsForExport(){
+    let html = "";
+    let currentGroup = "";
+
+    preparedChecklistRows.forEach((row, index) => {
+      const lower = (row.levelSubject || "").toLowerCase();
+      const group = lower.includes("senior") ? "Senior High School" : "Junior High School";
+
+      if(group !== currentGroup){
+        currentGroup = group;
+        html += `
+          <tr style="background:#eef5ff;font-weight:bold;">
+            <td colspan="9">${group}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+        <tr>
+          <td>${index + 1}. ${row.teacherName}</td>
+          <td>${row.levelSubject}</td>
+          <td style="text-align:center;">${row.weekCovered}</td>
+          <td style="text-align:center;">${row.dateSubmitted || ""}</td>
+          <td style="text-align:center;">${row.timeliness === "on_time" ? "✓" : ""}</td>
+          <td style="text-align:center;">${row.timeliness === "late" ? "✓" : ""}</td>
+          <td style="text-align:center;">${row.timeliness === "not_yet" ? "✓" : ""}</td>
+          <td style="text-align:center;">${row.signature}</td>
+          <td>${row.remarks}</td>
+        </tr>
+      `;
+    });
+
+    return html;
+  }
+
+  const exportHTML = `
+  <html xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:w="urn:schemas-microsoft-com:office:word"
+        xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+    <meta charset="utf-8">
+    <title>Teacher Submission Checklist</title>
+    <style>
+      @page Section1 {
+        size: 11in 8.5in;
+        mso-page-orientation: landscape;
+        margin: 0.5in;
+      }
+
+      div.Section1 {
+        page: Section1;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+        color: #000;
+      }
+
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #666;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+      }
+
+      .header-table {
+        width: 100%;
+        border: none;
+        margin-bottom: 8px;
+      }
+
+      .header-table td {
+        border: none;
+        vertical-align: middle;
+      }
+
+      .school-name {
+        font-size: 18pt;
+        font-weight: bold;
+      }
+
+      .sub {
+        font-size: 12pt;
+        font-weight: bold;
+      }
+
+      .dept {
+        font-size: 13pt;
+        font-weight: bold;
+        margin-top: 4px;
+      }
+
+      .title {
+        font-size: 14pt;
+        font-weight: bold;
+        margin-top: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      th, td {
+        border: 1px solid #000;
+        padding: 6px;
+        font-size: 10pt;
+        vertical-align: middle;
+        word-wrap: break-word;
+      }
+
+      th {
+        background: #f2f7ff;
+        text-align: center;
+      }
+
+      .signature-section {
+        margin-top: 35px;
+        width: 100%;
+      }
+
+      .signature-table {
+        width: 100%;
+        border: none;
+      }
+
+      .signature-table td {
+        border: none;
+        width: 50%;
+        text-align: center;
+        vertical-align: top;
+      }
+
+      .sig-label {
+        text-align: left;
+        margin-bottom: 50px;
+      }
+
+      .sig-name {
+        font-weight: bold;
+        text-decoration: underline;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="Section1">
+
+      <div class="header">
+        <table class="header-table">
+          <tr>
+            <td style="width:15%; text-align:left;">
+              ${depedLogo ? `<img src="${depedLogo}" style="width:70px;height:70px;">` : ""}
+            </td>
+            <td style="width:70%; text-align:center;">
+              <div class="school-name">${schoolName}</div>
+              <div class="sub">School ID: ${schoolId}</div>
+              <div class="sub">${districtDivision}</div>
+            </td>
+            <td style="width:15%; text-align:right;">
+              ${matatagLogo ? `<img src="${matatagLogo}" style="width:70px;height:70px;">` : ""}
+            </td>
+          </tr>
+        </table>
+
+        <div class="dept">${departmentTitle}</div>
+        <div class="title">CHECKLIST FOR SUBMISSION OF DLP/DLL</div>
+        <div>Week Covered: ${weekCovered}</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:20%;">TEACHER'S NAME</th>
+            <th rowspan="2" style="width:16%;">Level / Subject Handled</th>
+            <th rowspan="2" style="width:12%;">Week/Date Covered</th>
+            <th rowspan="2" style="width:10%;">Date Submitted</th>
+            <th colspan="3" style="width:16%;">Timeliness</th>
+            <th rowspan="2" style="width:13%;">Signature</th>
+            <th rowspan="2" style="width:13%;">Remarks</th>
+          </tr>
+          <tr>
+            <th>On Time</th>
+            <th>Late</th>
+            <th>Not Yet</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${buildRowsForExport()}
+        </tbody>
+      </table>
+
+      <div class="signature-section">
+        <table class="signature-table">
+          <tr>
+            <td>
+              <div class="sig-label">Prepared by:</div>
+              <div class="sig-name">${preparedBy}</div>
+              <div>${preparedByRole}</div>
+            </td>
+            <td>
+              <div class="sig-label">Noted by:</div>
+              <div class="sig-name">${notedBy}</div>
+              <div>School Head</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+  </body>
+  </html>`;
+
+  const safeWeek = weekCovered.replace(/,/g, "").replace(/\s+/g, "_");
+  const fileName = `Teacher_Submission_Checklist_${safeWeek}.doc`;
+
+  const blob = new Blob(['\ufeff', exportHTML], {
+    type: 'application/msword'
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+async function imageToDataUrl(path){
+  try{
+    const response = await fetch(path);
+    const blob = await response.blob();
+
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }catch(error){
+    console.error("Image load failed:", path, error);
+    return "";
+  }
+}
 
 window.logout = function(){
   signOut(auth).then(() => {
