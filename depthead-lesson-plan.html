@@ -1343,10 +1343,10 @@ function savePageDraftToLocal(){
     tableHTML: document.getElementById("proceduresTable").innerHTML
   };
 
-  localStorage.setItem("currentLessonDraft", JSON.stringify(draft));
+  localStorage.setItem("deptHeadLessonDraft", JSON.stringify(draft));
 }
-  function restorePageDraftFromLocal(){
-  const saved = localStorage.getItem("currentLessonDraft");
+function restorePageDraftFromLocal(){
+  const saved = localStorage.getItem("deptHeadLessonDraft");
   if(!saved) return;
 
   const draft = JSON.parse(saved);
