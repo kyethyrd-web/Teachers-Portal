@@ -300,8 +300,24 @@
 
       <div class="top-actions">
         <div class="filters">
+          <label for="quarterSelect">Quarter:</label>
+          <select id="quarterSelect">
+            <option value="1st">1st Quarter</option>
+            <option value="2nd">2nd Quarter</option>
+            <option value="3rd">3rd Quarter</option>
+            <option value="4th">4th Quarter</option>
+          </select>
+
+          <label for="teachingLevelFilter">Teaching Level:</label>
+          <select id="teachingLevelFilter">
+            <option value="">All Levels</option>
+            <option value="Junior High School">Junior High School</option>
+            <option value="Senior High School">Senior High School</option>
+          </select>
+
           <label for="weekDate">Select any date for the week:</label>
           <input type="date" id="weekDate">
+
           <button class="action-btn" onclick="loadChecklist()">Load Checklist</button>
         </div>
 
@@ -322,6 +338,9 @@
 
           <div class="sheet-department" id="departmentHeader">DEPARTMENT SUBMISSION CHECKLIST</div>
           <div class="sheet-title">CHECKLIST FOR SUBMISSION OF DLP/DLL</div>
+          <div class="sheet-subtitle">
+            Quarter: <span id="quarterHeader">______</span>
+          </div>
           <div class="sheet-subtitle">
             Week Covered: <span id="weekCoveredHeader">______</span>
           </div>
@@ -346,7 +365,7 @@
           </thead>
           <tbody id="checklistBody">
             <tr>
-              <td colspan="9" class="empty-note">Select a date and click Load Checklist.</td>
+              <td colspan="9" class="empty-note">Select quarter, teaching level, and a date, then click Load Checklist.</td>
             </tr>
           </tbody>
         </table>
@@ -442,12 +461,17 @@ function loadHeaderDetails(){
   document.getElementById("districtDivisionHeader").innerText =
     [district, division].filter(Boolean).join(", ") || "District / Division";
 
-  const deptName = (currentProfile.departmentHead || currentProfile.name || "Department").toUpperCase();
-  document.getElementById("departmentHeader").innerText = `${deptName} DEPARTMENT`;
+  document.getElementById("departmentHeader").innerText =
+    (currentProfile.departmentName || "DEPARTMENT").toUpperCase();
 
-  document.getElementById("preparedByName").innerText = (currentProfile.name || "DEPARTMENT HEAD").toUpperCase();
-  document.getElementById("preparedByRole").innerText = currentProfile.positionRank || "Department Head";
-  document.getElementById("notedByName").innerText = (currentProfile.schoolHead || "SCHOOL HEAD").toUpperCase();
+  document.getElementById("preparedByName").innerText =
+    (currentProfile.name || "DEPARTMENT HEAD").toUpperCase();
+
+  document.getElementById("preparedByRole").innerText =
+    currentProfile.positionRank || "Department Head";
+
+  document.getElementById("notedByName").innerText =
+    (currentProfile.schoolHead || "SCHOOL HEAD").toUpperCase();
 }
 
 async function preloadData(){
@@ -522,7 +546,7 @@ function formatWeekRange(monday){
   return `${month1} ${monday.getDate()} – ${month2} ${friday.getDate()}, ${monday.getFullYear()}`;
 }
 
-function getSubmissionForTeacherAndWeek(teacherName, weekKey){
+function getSubmissionForTeacherAndWeek(teacherName, weekKey, quarter){
   const normalizedTeacher = (teacherName || "").trim().toLowerCase();
 
   return lessonPlansList.find(item => {
@@ -530,10 +554,12 @@ function getSubmissionForTeacherAndWeek(teacherName, weekKey){
     const itemWeek = (item.weekKey || "").trim();
     const itemSchoolId = (item.schoolId || "").trim();
     const itemDeptHead = (item.assignedDepartmentHead || "").trim().toLowerCase();
+    const itemQuarter = (item.quarter || "").trim();
 
     return (
       itemTeacher === normalizedTeacher &&
       itemWeek === weekKey &&
+      itemQuarter === quarter &&
       itemSchoolId === (currentProfile.schoolId || "").trim() &&
       itemDeptHead === (currentProfile.name || "").trim().toLowerCase()
     );
@@ -546,8 +572,6 @@ function determineTimeliness(submittedAt, monday){
   const submittedDate = new Date(submittedAt);
   if(isNaN(submittedDate)) return "late";
 
-  // You can adjust this rule later.
-  // Current rule: submitted on or before Monday 11:59 PM = On Time
   const cutoff = new Date(monday);
   cutoff.setHours(23,59,59,999);
 
@@ -556,6 +580,8 @@ function determineTimeliness(submittedAt, monday){
 
 window.loadChecklist = function(){
   const selectedDate = document.getElementById("weekDate").value;
+  const selectedQuarter = document.getElementById("quarterSelect").value;
+  const selectedTeachingLevel = document.getElementById("teachingLevelFilter").value;
 
   if(!selectedDate){
     alert("Please select a date first.");
@@ -566,14 +592,20 @@ window.loadChecklist = function(){
   const weekKey = formatDate(monday);
   const weekDisplay = formatWeekRange(monday);
 
+  document.getElementById("quarterHeader").innerText = selectedQuarter || "______";
   document.getElementById("weekCoveredHeader").innerText = weekDisplay;
 
   const jhsTeachers = [];
   const shsTeachers = [];
 
   teachersList.forEach(teacher => {
-    const level = (teacher.teachingLevel || "").toLowerCase();
-    if(level.includes("senior")){
+    const level = teacher.teachingLevel || "";
+
+    if(selectedTeachingLevel && level !== selectedTeachingLevel){
+      return;
+    }
+
+    if(level.toLowerCase().includes("senior")){
       shsTeachers.push(teacher);
     } else {
       jhsTeachers.push(teacher);
@@ -596,10 +628,10 @@ window.loadChecklist = function(){
     tbody.appendChild(groupRow);
 
     teachers.forEach((teacher, index) => {
-      const submission = getSubmissionForTeacherAndWeek(teacher.name, weekKey);
+      const submission = getSubmissionForTeacherAndWeek(teacher.name, weekKey, selectedQuarter);
 
       const levelText = teacher.teachingLevel || "";
-      const subjectText = teacher.subjectSpecialization || teacher.learningArea || teacher.departmentHead || "";
+      const subjectText = teacher.subjectSpecialization || teacher.learningArea || teacher.positionRank || "";
       const levelSubject = [levelText, subjectText].filter(Boolean).join(" / ");
 
       const submittedAt = submission?.submittedAt || "";
@@ -613,7 +645,8 @@ window.loadChecklist = function(){
         dateSubmitted: dateSubmitted,
         timeliness,
         remarks: submission ? (submission.status || "submitted") : "Not yet submitted",
-        signature: submission ? "Submitted" : ""
+        signature: submission ? "Submitted" : "",
+        group: title
       };
 
       preparedChecklistRows.push(rowData);
@@ -640,7 +673,7 @@ window.loadChecklist = function(){
   if(!preparedChecklistRows.length){
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" class="empty-note">No teachers found under your department.</td>
+        <td colspan="9" class="empty-note">No teachers found for the selected teaching level under your department.</td>
       </tr>
     `;
   }
@@ -668,6 +701,7 @@ window.exportChecklist = async function(){
   const schoolId = document.getElementById("schoolIdHeader").innerText;
   const districtDivision = document.getElementById("districtDivisionHeader").innerText;
   const departmentTitle = document.getElementById("departmentHeader").innerText;
+  const quarter = document.getElementById("quarterHeader").innerText;
   const weekCovered = document.getElementById("weekCoveredHeader").innerText;
   const preparedBy = document.getElementById("preparedByName").innerText;
   const preparedByRole = document.getElementById("preparedByRole").innerText;
@@ -678,14 +712,11 @@ window.exportChecklist = async function(){
     let currentGroup = "";
 
     preparedChecklistRows.forEach((row, index) => {
-      const lower = (row.levelSubject || "").toLowerCase();
-      const group = lower.includes("senior") ? "Senior High School" : "Junior High School";
-
-      if(group !== currentGroup){
-        currentGroup = group;
+      if(row.group !== currentGroup){
+        currentGroup = row.group;
         html += `
           <tr style="background:#eef5ff;font-weight:bold;">
-            <td colspan="9">${group}</td>
+            <td colspan="9">${currentGroup}</td>
           </tr>
         `;
       }
@@ -842,6 +873,7 @@ window.exportChecklist = async function(){
 
         <div class="dept">${departmentTitle}</div>
         <div class="title">CHECKLIST FOR SUBMISSION OF DLP/DLL</div>
+        <div>Quarter: ${quarter}</div>
         <div>Week Covered: ${weekCovered}</div>
       </div>
 
