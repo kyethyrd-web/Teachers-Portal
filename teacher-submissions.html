@@ -693,41 +693,66 @@
       });
     }
 
-    function getSubmissionForTeacherAndWeek(teacherName, weekKey, quarter) {
-      const normalizedTeacher = normalizeText(teacherName);
-      const currentSchoolId = (currentProfile.schoolId || "").trim();
-      const currentDeptHeadName = normalizeText(currentProfile.name);
+function isDateWithinSelectedWeek(dateValue, monday) {
+  if (!dateValue) return false;
 
-      const validStatuses = ["submitted", "checked", "returned", "for_approval", "approved"];
+  const d = new Date(dateValue);
+  if (isNaN(d.getTime())) return false;
 
-      const matches = lessonPlansList.filter((item) => {
-        const itemTeacher = normalizeText(item.teacherName);
-        const itemWeek = (item.weekKey || "").trim();
-        const itemQuarter = (item.quarter || "").trim();
-        const itemSchoolId = (item.schoolId || "").trim();
-        const itemDeptHead = normalizeText(item.assignedDepartmentHead);
-        const itemStatus = normalizeText(item.status);
+  const weekStart = new Date(monday);
+  weekStart.setHours(0, 0, 0, 0);
 
-        return (
-          itemTeacher === normalizedTeacher &&
-          itemWeek === weekKey &&
-          itemQuarter === quarter &&
-          itemSchoolId === currentSchoolId &&
-          itemDeptHead === currentDeptHeadName &&
-          validStatuses.includes(itemStatus)
-        );
-      });
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  friday.setHours(23, 59, 59, 999);
 
-      if (!matches.length) return null;
+  return d >= weekStart && d <= friday;
+}
 
-      matches.sort((a, b) => {
-        const aTime = new Date(a.submittedAt || a.createdAt || 0).getTime();
-        const bTime = new Date(b.submittedAt || b.createdAt || 0).getTime();
-        return bTime - aTime;
-      });
+function getSubmissionForTeacherAndWeek(teacherName, weekKey, quarter, monday, weekDisplay) {
+  const normalizedTeacher = normalizeText(teacherName);
+  const currentSchoolId = (currentProfile.schoolId || "").trim();
+  const currentDeptHeadName = normalizeText(currentProfile.name);
 
-      return matches[0];
-    }
+  const validStatuses = ["submitted", "checked", "returned", "for_approval", "approved"];
+
+  const matches = lessonPlansList.filter((item) => {
+    const itemTeacher = normalizeText(item.teacherName);
+    const itemQuarter = (item.quarter || "").trim();
+    const itemSchoolId = (item.schoolId || "").trim();
+    const itemDeptHead = normalizeText(item.assignedDepartmentHead);
+    const itemStatus = normalizeText(item.status);
+
+    const sameOwner =
+      itemTeacher === normalizedTeacher &&
+      itemQuarter === quarter &&
+      itemSchoolId === currentSchoolId &&
+      itemDeptHead === currentDeptHeadName &&
+      validStatuses.includes(itemStatus);
+
+    if (!sameOwner) return false;
+
+    const itemWeekKey = (item.weekKey || "").trim();
+    const itemDateRange = (item.dateRange || "").trim();
+    const itemDate = item.date || "";
+
+    return (
+      itemWeekKey === weekKey ||
+      itemDateRange === weekDisplay ||
+      isDateWithinSelectedWeek(itemDate, monday)
+    );
+  });
+
+  if (!matches.length) return null;
+
+  matches.sort((a, b) => {
+    const aTime = new Date(a.submittedAt || a.createdAt || 0).getTime();
+    const bTime = new Date(b.submittedAt || b.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+  return matches[0];
+}
 
     function getLatestLessonForTeacher(teacherName) {
       const normalizedTeacher = normalizeText(teacherName);
@@ -823,7 +848,13 @@
       tbody.appendChild(groupRow);
 
       teachers.forEach((teacher, index) => {
-        const submission = getSubmissionForTeacherAndWeek(teacher.name, weekKey, quarter);
+        const submission = getSubmissionForTeacherAndWeek(
+  teacher.name,
+  weekKey,
+  quarter,
+  monday,
+  weekDisplay
+);
         const latestLesson = getLatestLessonForTeacher(teacher.name);
         const levelSubject = buildLevelSubjectText(submission, latestLesson);
 
