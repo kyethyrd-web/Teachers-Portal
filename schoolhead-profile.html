@@ -309,25 +309,36 @@ document.getElementById("profilePic").src=data.photoURL;
 
 }
 
-window.enableEdit=function(){
+window.enableEdit = function () {
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") field.disabled = false;
+  });
 
-document.querySelectorAll("input").forEach(field=>{
-if(field.id!=="photoInput")field.disabled=false;
-});
-
-document.getElementById("editBtn").style.display="none";
-document.getElementById("saveBtn").style.display="inline-block";
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline-block";
 };
 
-window.saveProfile=async function(){
+window.saveProfile = async function () {
+  const data = {};
 
-const data={};
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") {
+      data[field.id] = field.value.trim();
+    }
+  });
 
-document.querySelectorAll("input").forEach(field=>{
-if(field.id!=="photoInput"){
-data[field.id]=field.value.trim();
-}
-});
+  await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
+
+  document.querySelectorAll("input, select").forEach(field => {
+    if (field.id !== "photoInput") field.disabled = true;
+  });
+
+  document.getElementById("editBtn").style.display = "inline-block";
+  document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("saveStatus").innerText = "Profile saved successfully!";
+
+  loadProfile();
+};
 
 await setDoc(doc(db,"users",currentUser.uid),data,{merge:true});
 
