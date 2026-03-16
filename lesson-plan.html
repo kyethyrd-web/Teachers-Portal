@@ -1298,44 +1298,44 @@ window.submitLesson = async function () {
   }
 
   const monday = getMonday(selected);
+  const weekKey = formatDate(monday);
 
   const lessonKey =
     currentUser.uid + "_" +
-    formatDate(monday) + "_" +
+    weekKey + "_" +
     grade + "_" +
     learningArea + "_" +
     quarter;
 
   await setDoc(doc(db, "lessonPlans", lessonKey), {
-    status: "submitted",
-    submittedAt: new Date().toLocaleString(),
-
-    schoolId: window.currentProfile?.schoolId || "",
-    assignedDepartmentHead: (window.currentProfile?.departmentHead || "").trim(),
+    userId: currentUser.uid,
     teacherName: document.getElementById("teacher").innerText,
     school: document.getElementById("school").innerText,
+    schoolId: window.currentProfile?.schoolId || "",
+    date: selected,
+    weekKey: weekKey,
     grade: grade,
     learningArea: learningArea,
     quarter: quarter,
-    dateRange: document.getElementById("dateRange").innerText
+    dateRange: document.getElementById("dateRange").innerText,
+    time: document.getElementById("timeCell").innerText,
+    tableHTML: document.getElementById("proceduresTable").innerHTML,
+
+    status: "submitted",
+    submittedAt: new Date().toISOString(),
+
+    assignedDepartmentHead: (window.currentProfile?.departmentHead || "").trim(),
+    checkedAt: "",
+    approvedAt: "",
+    checkerComment: "",
+    checkedBy: "",
+    approvedBy: ""
   }, { merge: true });
 
   document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
-  savePageDraftToLocal();
-};
-window.goToLessonLogHistory = function(){
-  window.location.href = "lesson-log-history.html";
-};
 
-window.checkLearningArea = function(select){
-  const otherInput = document.getElementById("otherLearningArea");
-
-  if(select.value === "other"){
-    otherInput.style.display = "block";
-    otherInput.focus();
-  } else {
-    otherInput.style.display = "none";
-    otherInput.value = "";
+  if (typeof clearCurrentUserDraft === "function") {
+    clearCurrentUserDraft();
   }
 };
 
