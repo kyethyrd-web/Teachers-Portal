@@ -296,20 +296,14 @@
       font-weight: 700;
     }
 
-    .timeliness {
+    .status-cell {
       text-align: center;
       font-weight: 800;
-      font-size: 16px;
     }
 
     .remarks-cell {
       font-size: 12px;
-    }
-
-    .signature-line {
-      color: #6b7280;
-      font-size: 12px;
-      text-align: center;
+      line-height: 1.4;
     }
 
     .empty-note {
@@ -496,7 +490,7 @@
                 <th rowspan="2" style="width: 13%;">WEEK / DATE COVERED</th>
                 <th rowspan="2" style="width: 11%;">DATE SUBMITTED</th>
                 <th colspan="3" style="width: 15%;">TIMELINESS</th>
-                <th rowspan="2" style="width: 11%;">SIGNATURE</th>
+                <th rowspan="2" style="width: 11%;">STATUS</th>
                 <th rowspan="2" style="width: 13%;">REMARKS</th>
               </tr>
               <tr>
@@ -521,6 +515,11 @@
               <div class="signature-role" id="preparedByRole">School Head</div>
             </div>
 
+            <div class="signature-box">
+              <div class="signature-label">Noted by:</div>
+              <div class="signature-name" id="notedByName">SCHOOL HEAD</div>
+              <div class="signature-role">School Head</div>
+            </div>
           </div>
         </div>
 
@@ -578,6 +577,18 @@
       });
     }
 
+    function formatReadableDateTime(dateValue) {
+      const d = new Date(dateValue);
+      if (isNaN(d.getTime())) return "";
+      return d.toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
     function getMonday(dateString) {
       const d = new Date(dateString);
       const day = d.getDay();
@@ -617,14 +628,8 @@
       friday.setDate(monday.getDate() + 4);
       friday.setHours(23, 59, 59, 999);
 
-      if (submittedDate >= weekStart && submittedDate <= friday) {
-        return "on_time";
-      }
-
-      if (submittedDate > friday) {
-        return "late";
-      }
-
+      if (submittedDate >= weekStart && submittedDate <= friday) return "on_time";
+      if (submittedDate > friday) return "late";
       return "on_time";
     }
 
@@ -656,10 +661,7 @@
         const role = normalizeText(data.role);
         const teacherSchoolId = (data.schoolId || "").trim();
 
-        if (
-          role === "teacher" &&
-          teacherSchoolId === currentSchoolId
-        ) {
+        if (role === "teacher" && teacherSchoolId === currentSchoolId) {
           teachersList.push({
             id: docSnap.id,
             ...data
@@ -725,8 +727,8 @@
       if (!matches.length) return null;
 
       matches.sort((a, b) => {
-        const aTime = new Date(a.submittedAt || a.createdAt || 0).getTime();
-        const bTime = new Date(b.submittedAt || b.createdAt || 0).getTime();
+        const aTime = new Date(a.approvedAt || a.checkedAt || a.submittedAt || a.createdAt || 0).getTime();
+        const bTime = new Date(b.approvedAt || b.checkedAt || b.submittedAt || b.createdAt || 0).getTime();
         return bTime - aTime;
       });
 
@@ -750,8 +752,8 @@
       if (!matches.length) return null;
 
       matches.sort((a, b) => {
-        const aTime = new Date(a.submittedAt || a.checkedAt || a.createdAt || 0).getTime();
-        const bTime = new Date(b.submittedAt || b.checkedAt || b.createdAt || 0).getTime();
+        const aTime = new Date(a.approvedAt || a.checkedAt || a.submittedAt || a.createdAt || 0).getTime();
+        const bTime = new Date(b.approvedAt || b.checkedAt || b.submittedAt || b.createdAt || 0).getTime();
         return bTime - aTime;
       });
 
@@ -768,29 +770,45 @@
       if (learningArea && grade) return `${learningArea} ${grade}`;
       if (learningArea) return learningArea;
       if (grade) return grade;
-
       return "—";
+    }
+
+    function getStatusText(submission) {
+      if (!submission) return "Not Yet";
+
+      const status = normalizeText(submission.status);
+
+      if (status === "submitted") return "Submitted";
+      if (status === "checked" || status === "for_approval" || status === "returned") return "Checked";
+      if (status === "approved") return "Approved";
+
+      return "Not Yet";
     }
 
     function getRemarksText(submission) {
       if (!submission) return "Not yet submitted";
 
-      const status = (submission.status || "").trim();
+      const status = normalizeText(submission.status);
 
-      switch (status) {
-        case "submitted":
-          return "Submitted and waiting for review";
-        case "checked":
-          return "Checked by Department Head";
-        case "returned":
-          return "Returned by Department Head";
-        case "for_approval":
-          return "Submitted for School Head approval";
-        case "approved":
-          return "Approved";
-        default:
-          return status || "Submitted";
+      if (status === "approved") {
+        const name = submission.approvedBy || currentProfile.name || "School Head";
+        const stamp = formatReadableDateTime(submission.approvedAt || submission.checkedAt || submission.submittedAt);
+        return `Approved by ${name}${stamp ? " — " + stamp : ""}`;
       }
+
+      if (status === "checked" || status === "for_approval" || status === "returned") {
+        const name = submission.checkedBy || submission.assignedDepartmentHead || "Department Head";
+        const stamp = formatReadableDateTime(submission.checkedAt || submission.submittedAt);
+        return `Checked by ${name}${stamp ? " — " + stamp : ""}`;
+      }
+
+      if (status === "submitted") {
+        const name = submission.assignedDepartmentHead || "Department Head";
+        const stamp = formatReadableDateTime(submission.submittedAt);
+        return `Submitted to ${name}${stamp ? " — " + stamp : ""}`;
+      }
+
+      return "Not yet submitted";
     }
 
     function splitTeachersByLevel(teachers, selectedTeachingLevel) {
@@ -838,6 +856,8 @@
         const submittedAt = submission?.submittedAt || "";
         const dateSubmitted = submittedAt ? formatReadableDate(submittedAt) : "";
         const timeliness = determineTimeliness(submission, monday);
+        const statusText = getStatusText(submission);
+        const remarksText = getRemarksText(submission);
 
         const rowData = {
           teacherName: teacher.name || "",
@@ -845,8 +865,8 @@
           weekCovered: submission?.dateRange || weekDisplay,
           dateSubmitted,
           timeliness,
-          signature: submission ? "Submitted" : "",
-          remarks: getRemarksText(submission),
+          statusText,
+          remarks: remarksText,
           group: groupTitle
         };
 
@@ -858,10 +878,10 @@
           <td>${rowData.levelSubject}</td>
           <td class="center">${rowData.weekCovered}</td>
           <td class="center">${rowData.dateSubmitted}</td>
-          <td class="timeliness">${rowData.timeliness === "on_time" ? "✓" : ""}</td>
-          <td class="timeliness">${rowData.timeliness === "late" ? "✓" : ""}</td>
-          <td class="timeliness">${rowData.timeliness === "not_yet" ? "✓" : ""}</td>
-          <td class="signature-line">${rowData.signature}</td>
+          <td class="center">${rowData.timeliness === "on_time" ? "✓" : ""}</td>
+          <td class="center">${rowData.timeliness === "late" ? "✓" : ""}</td>
+          <td class="center">${rowData.timeliness === "not_yet" ? "✓" : ""}</td>
+          <td class="status-cell">${rowData.statusText}</td>
           <td class="remarks-cell">${rowData.remarks}</td>
         `;
         tbody.appendChild(tr);
@@ -987,7 +1007,7 @@
             <td style="text-align:center;">${row.timeliness === "on_time" ? "✓" : ""}</td>
             <td style="text-align:center;">${row.timeliness === "late" ? "✓" : ""}</td>
             <td style="text-align:center;">${row.timeliness === "not_yet" ? "✓" : ""}</td>
-            <td style="text-align:center;">${row.signature}</td>
+            <td style="text-align:center;">${row.statusText}</td>
             <td>${row.remarks}</td>
           </tr>
         `;
@@ -1185,7 +1205,7 @@
                 <th rowspan="2" style="width:13%;">WEEK / DATE COVERED</th>
                 <th rowspan="2" style="width:11%;">DATE SUBMITTED</th>
                 <th colspan="3" style="width:15%;">TIMELINESS</th>
-                <th rowspan="2" style="width:11%;">SIGNATURE</th>
+                <th rowspan="2" style="width:11%;">STATUS</th>
                 <th rowspan="2" style="width:13%;">REMARKS</th>
               </tr>
               <tr>
@@ -1208,7 +1228,9 @@
                   <div>${preparedByRole}</div>
                 </td>
                 <td>
-
+                  <div class="sig-label">Noted by:</div>
+                  <div class="sig-name">${notedBy}</div>
+                  <div>School Head</div>
                 </td>
               </tr>
             </table>
