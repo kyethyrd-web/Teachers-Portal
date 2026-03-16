@@ -1317,7 +1317,7 @@ window.submitLesson = async function () {
     grade: grade,
     learningArea: learningArea,
     quarter: quarter,
-    dateRange: document.getElementById("dateRange").innerText,
+    dateRange: document.getElementById("dateRange").innerText || formatRange(monday),
     time: document.getElementById("timeCell").innerText,
     tableHTML: document.getElementById("proceduresTable").innerHTML,
 
