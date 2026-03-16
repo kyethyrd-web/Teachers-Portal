@@ -901,6 +901,8 @@ function getSubmissionForTeacherAndWeek(teacherName, weekKey, quarter, monday, w
         return;
       }
 
+      saveChecklistState();
+
       const monday = getMonday(selectedDate);
       const weekKey = formatDate(monday);
       const weekDisplay = formatWeekRange(monday);
@@ -1254,11 +1256,57 @@ function getSubmissionForTeacherAndWeek(teacherName, weekKey, quarter, monday, w
 
         loadHeaderDetails();
         await preloadData();
+
+        const restored = restoreChecklistState();
+if (restored) {
+  loadChecklist();
+}
       } catch (error) {
         console.error(error);
         setMessage("Failed to load page.", "red");
       }
     });
+
+    function getChecklistStateKey() {
+  return `teacherSubmissionState_${currentUser.uid}`;
+}
+
+function saveChecklistState() {
+  if (!currentUser) return;
+
+  const state = {
+    quarter: document.getElementById("quarterSelect").value,
+    teachingLevel: document.getElementById("teachingLevelFilter").value,
+    weekDate: document.getElementById("weekDate").value
+  };
+
+  localStorage.setItem(getChecklistStateKey(), JSON.stringify(state));
+}
+
+function restoreChecklistState() {
+  if (!currentUser) return false;
+
+  const saved = localStorage.getItem(getChecklistStateKey());
+  if (!saved) return false;
+
+  try {
+    const state = JSON.parse(saved);
+
+    document.getElementById("quarterSelect").value = state.quarter || "1st";
+    document.getElementById("teachingLevelFilter").value = state.teachingLevel || "";
+    document.getElementById("weekDate").value = state.weekDate || "";
+
+    return !!state.weekDate;
+  } catch (error) {
+    console.error("Failed to restore checklist state:", error);
+    return false;
+  }
+}
+
+function clearChecklistState() {
+  if (!currentUser) return;
+  localStorage.removeItem(getChecklistStateKey());
+}
   </script>
 </body>
 </html>
