@@ -1323,7 +1323,7 @@ window.submitLesson = async function () {
     quarter: quarter,
     dateRange: document.getElementById("dateRange").innerText || formatRange(monday),
     time: document.getElementById("timeCell").innerText,
-    tableHTML: document.getElementById("proceduresTable").innerHTML,
+    tableHTML: document.getElementById("proceduresTable").outerHTML,
 
     status: "submitted",
     submittedAt: new Date().toISOString(),
