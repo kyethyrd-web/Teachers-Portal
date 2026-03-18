@@ -346,10 +346,35 @@ if (currentLesson.tableHTML) {
   // 1. Restore saved dropdown values
   const selects = document.querySelectorAll("#lessonTableContainer select");
   selects.forEach(select => {
-    const savedValue = select.getAttribute("data-selected");
-    if (savedValue) {
-      select.value = savedValue;
-    }
+const savedValue = select.getAttribute("data-selected");
+const savedTime = select.getAttribute("data-timestamp");
+
+if (savedValue) {
+  select.value = savedValue;
+
+  if (savedTime) {
+    const d = new Date(savedTime);
+    const formatted = d.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+
+    // Append timestamp to visible text
+    const display = `${savedValue} (${formatted})`;
+
+    // Replace dropdown with plain text
+    const span = document.createElement("span");
+    span.textContent = display;
+    span.style.fontWeight = "600";
+
+    select.replaceWith(span);
+  } else {
+    select.disabled = true;
+  }
+}
     select.disabled = true;
     select.style.pointerEvents = "none";
     select.style.background = "#f1f5f9";
