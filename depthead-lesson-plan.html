@@ -739,7 +739,7 @@ const data = {
   quarter: quarter,
   dateRange: document.getElementById("dateRange").innerText,
   time: document.getElementById("timeCell").innerText,
-  tableHTML: document.getElementById("proceduresTable").outerHTML,
+  tableHTML: document.getElementById("proceduresTable").innerHTML,
   status: "draft",
   createdAt: new Date(),
   submittedAt: "",
@@ -1203,41 +1203,17 @@ window.handleRemark = async function(select, dayIndex) {
   const timestampIso = now.toISOString();
   const timestampDisplay = now.toLocaleString();
 
-  // Save selected value and timestamp on the select itself
   select.setAttribute("data-selected", remark);
   select.setAttribute("data-timestamp", timestampIso);
 
-  // Also save visible timestamp on the parent cell for teacher-side display/export
   const remarkCell = select.parentElement;
   remarkCell.setAttribute("data-time", timestampDisplay);
 
-  // Copy lesson forward when needed
   if (remark === "Not carried-out" || remark === "Class suspension") {
     copyToNextDay(dayIndex);
   }
 
-  // Save immediately so the timestamp is stored in Firestore
   await saveLesson();
-};
-
-/* SAVE SELECTED VALUE INTO ATTRIBUTE */
-
-selects[dayIndex].setAttribute("data-selected", remark);
-
-/* SHOW TIMESTAMP */
-
-remarkCell.setAttribute("data-time", now);
-
-/* COPY LESSON IF NEEDED */
-
-if(remark === "Not carried-out" || remark === "Class suspension"){
-copyToNextDay(dayIndex);
-}
-
-/* AUTO SAVE */
-
-saveLesson();
-
 };
 
 function copyToNextDay(dayIndex){
@@ -1368,7 +1344,7 @@ function savePageDraftToLocal(){
     quarter: document.getElementById("quarter").value,
     dateRange: document.getElementById("dateRange").innerText,
     timeCell: document.getElementById("timeCell").innerText,
-    tableHTML: document.getElementById("proceduresTable").outerHTML,
+    tableHTML: document.getElementById("proceduresTable").innerHTML,
   };
 
   localStorage.setItem("deptHeadLessonDraft", JSON.stringify(draft));
