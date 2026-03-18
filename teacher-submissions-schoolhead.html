@@ -633,14 +633,13 @@
       return district ? `District of ${district}` : "District of ______";
     }
 
-    function loadHeaderDetails() {
-      document.getElementById("districtHeader").innerText = getDistrictDisplay(currentProfile);
-      document.getElementById("schoolNameHeader").innerText = currentProfile.school || "SCHOOL NAME";
-      document.getElementById("schoolIdHeader").innerText = currentProfile.schoolId || "______";
-      document.getElementById("preparedByName").innerText = (currentProfile.name || "SCHOOL HEAD").toUpperCase();
-      document.getElementById("preparedByRole").innerText = currentProfile.positionRank || "School Head";
-      document.getElementById("notedByName").innerText = (currentProfile.name || "SCHOOL HEAD").toUpperCase();
-    }
+function loadHeaderDetails() {
+  document.getElementById("districtHeader").innerText = getDistrictDisplay(currentProfile);
+  document.getElementById("schoolNameHeader").innerText = currentProfile.school || "SCHOOL NAME";
+  document.getElementById("schoolIdHeader").innerText = currentProfile.schoolId || "______";
+  document.getElementById("preparedByName").innerText = (currentProfile.name || "SCHOOL HEAD").toUpperCase();
+  document.getElementById("preparedByRole").innerText = currentProfile.positionRank || "School Head";
+}
 
     async function preloadData() {
       const usersSnap = await getDocs(collection(db, "users"));
@@ -1035,7 +1034,6 @@
       const weekCovered = document.getElementById("weekCoveredHeader").innerText;
       const preparedBy = document.getElementById("preparedByName").innerText;
       const preparedByRole = document.getElementById("preparedByRole").innerText;
-      const notedBy = document.getElementById("notedByName").innerText;
 
       const exportHTML = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -1214,19 +1212,17 @@
             </tbody>
           </table>
 
-          <div class="signature-section">
-            <table class="signature-table">
-              <tr>
-                <td>
-                  <div class="sig-label">Prepared by:</div>
-                  <div class="sig-name">${preparedBy}</div>
-                  <div>${preparedByRole}</div>
-                </td>
-                <td>
-
-              </tr>
-            </table>
-          </div>
+<div class="signature-section">
+  <table class="signature-table">
+    <tr>
+      <td>
+        <div class="sig-label">Prepared by:</div>
+        <div class="sig-name">${preparedBy}</div>
+        <div>${preparedByRole}</div>
+      </td>
+    </tr>
+  </table>
+</div>
         </div>
       </body>
       </html>
