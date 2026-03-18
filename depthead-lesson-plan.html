@@ -1197,17 +1197,28 @@ clonedSelects.forEach((select, index) => {
   URL.revokeObjectURL(url);
 };
   
-function handleRemark(select, dayIndex) {
+window.handleRemark = async function(select, dayIndex) {
   const remark = select.value;
-
-  // Create timestamp
   const now = new Date();
-  const timestamp = now.toISOString();
+  const timestampIso = now.toISOString();
+  const timestampDisplay = now.toLocaleString();
 
-  // Save both remark + timestamp
+  // Save selected value and timestamp on the select itself
   select.setAttribute("data-selected", remark);
-  select.setAttribute("data-timestamp", timestamp);
-}
+  select.setAttribute("data-timestamp", timestampIso);
+
+  // Also save visible timestamp on the parent cell for teacher-side display/export
+  const remarkCell = select.parentElement;
+  remarkCell.setAttribute("data-time", timestampDisplay);
+
+  // Copy lesson forward when needed
+  if (remark === "Not carried-out" || remark === "Class suspension") {
+    copyToNextDay(dayIndex);
+  }
+
+  // Save immediately so the timestamp is stored in Firestore
+  await saveLesson();
+};
 
 /* SAVE SELECTED VALUE INTO ATTRIBUTE */
 
