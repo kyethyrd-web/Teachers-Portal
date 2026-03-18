@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Review DLL</title>
+  <link rel="icon" type="image/png" href="images/deped-favicon.png" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef4fb;
+      color: #1f2937;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #004aad 0%, #00357b 100%);
+      color: white;
+      padding: 22px 18px;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.12);
+    }
+
+    .sidebar h3 {
+      margin: 0 0 22px;
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.14);
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background: rgba(255,255,255,0.26);
+      transform: translateY(-1px);
+    }
+
+    .content {
+      flex: 1;
+      padding: 24px;
+    }
+
+    .page-card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    }
+
+    .page-title {
+      margin: 0 0 16px;
+      font-size: 28px;
+      color: #004aad;
+      font-weight: 800;
+    }
+
+    .top-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .action-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      transition: 0.2s ease;
+    }
+
+    .back-btn {
+      background: #64748b;
+    }
+
+    .back-btn:hover {
+      background: #475569;
+    }
+
+    .approve-btn {
+      background: #0b8f3c;
+    }
+
+    .approve-btn:hover {
+      background: #086d2e;
+    }
+
+    .return-btn {
+      background: #c62828;
+    }
+
+    .return-btn:hover {
+      background: #991b1b;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .info-box {
+      background: #f8fbff;
+      border: 1px solid #d7e5f5;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-box label {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .info-box div {
+      font-size: 15px;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .section-title {
+      margin: 20px 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #004aad;
+    }
+
+    .lesson-table-wrap {
+      overflow-x: auto;
+      border: 1px solid #d6e2f0;
+      border-radius: 12px;
+      background: white;
+      padding: 10px;
+    }
+
+    #lessonTableContainer table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    #lessonTableContainer td,
+    #lessonTableContainer th {
+      border: 1px solid #334155;
+      padding: 6px;
+      font-size: 13px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #cdd9ea;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #004aad;
+      box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.10);
+    }
+
+    .readonly-comment {
+      background: #f8fafc;
+      border: 1px solid #d8e3ef;
+      border-radius: 10px;
+      padding: 12px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      min-height: 60px;
+    }
+
+    #message {
+      margin-top: 16px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="sidebar">
+    <h3>School Head Portal</h3>
+    <button onclick="location.href='approver-dashboard.html'">Dashboard</button>
+    <button onclick="location.href='schoolhead-profile.html'">My Profile</button>
+    <button onclick="location.href='teacher-submissions-schoolhead.html'">Teacher Submission</button>
+    <button onclick="location.href='schoolhead-review-list.html'">Approve DLL</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="content">
+    <div class="page-card">
+      <h1 class="page-title">Review DLL</h1>
+
+      <div class="top-buttons">
+        <button class="action-btn back-btn" onclick="goBack()">Back to Approve DLL Queue</button>
+        <button class="action-btn approve-btn" onclick="approveDLL()">Approve</button>
+        <button class="action-btn return-btn" onclick="returnToDeptHead()">Return to Department Head</button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box"><label>Teacher</label><div id="teacherName">—</div></div>
+        <div class="info-box"><label>School</label><div id="schoolName">—</div></div>
+        <div class="info-box"><label>Grade</label><div id="gradeLevel">—</div></div>
+        <div class="info-box"><label>Learning Area</label><div id="learningArea">—</div></div>
+        <div class="info-box"><label>Quarter</label><div id="quarter">—</div></div>
+        <div class="info-box"><label>Date Range</label><div id="dateRange">—</div></div>
+        <div class="info-box"><label>Time</label><div id="timeText">—</div></div>
+        <div class="info-box"><label>Submitted At</label><div id="submittedAt">—</div></div>
+        <div class="info-box"><label>Checked By</label><div id="checkedBy">—</div></div>
+      </div>
+
+      <div class="section-title">Lesson Plan Content</div>
+      <div class="lesson-table-wrap">
+        <div id="lessonTableContainer">Loading...</div>
+      </div>
+
+      <div class="section-title">Department Head Comments</div>
+      <div id="checkerCommentView" class="readonly-comment">No comments provided.</div>
+
+      <div class="section-title">School Head Comments</div>
+      <textarea id="approverComment" placeholder="Enter School Head comments or final remarks here..."></textarea>
+
+      <div id="message"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDmb0oDlQVfEhcqx6OPgmWwump0b0R09xs",
+    authDomain: "teachers-portal-98254.firebaseapp.com",
+    projectId: "teachers-portal-98254",
+    storageBucket: "teachers-portal-98254.firebasestorage.app",
+    messagingSenderId: "479254583768",
+    appId: "1:479254583768:web:b8dcf9da3a5616d5b37aad"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const docId = urlParams.get("docId");
+
+  let currentUser = null;
+  let currentProfile = null;
+  let currentLesson = null;
+
+  function setMessage(text, color = "red") {
+    const el = document.getElementById("message");
+    el.innerText = text;
+    el.style.color = color;
+  }
+
+  function formatReadableDateTime(dateValue) {
+    if (!dateValue) return "—";
+    const d = new Date(dateValue);
+    if (isNaN(d.getTime())) return dateValue;
+
+    return d.toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  async function loadLesson() {
+    if (!docId) {
+      setMessage("No DLL document selected.");
+      return;
+    }
+
+    const snap = await getDoc(doc(db, "lessonPlans", docId));
+
+    if (!snap.exists()) {
+      setMessage("DLL not found.");
+      return;
+    }
+
+    currentLesson = snap.data();
+
+    document.getElementById("teacherName").innerText = currentLesson.teacherName || "—";
+    document.getElementById("schoolName").innerText = currentLesson.school || "—";
+    document.getElementById("gradeLevel").innerText = currentLesson.grade || "—";
+    document.getElementById("learningArea").innerText = currentLesson.learningArea || "—";
+    document.getElementById("quarter").innerText = currentLesson.quarter || "—";
+    document.getElementById("dateRange").innerText = currentLesson.dateRange || "—";
+    document.getElementById("timeText").innerText = currentLesson.time || "—";
+    document.getElementById("submittedAt").innerText = formatReadableDateTime(currentLesson.submittedAt);
+    document.getElementById("checkedBy").innerText =
+      currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
+
+    document.getElementById("lessonTableContainer").innerHTML =
+      currentLesson.tableHTML || "<p>No lesson content found.</p>";
+
+    document.getElementById("checkerCommentView").innerText =
+      currentLesson.checkerComment || "No comments provided.";
+
+    document.getElementById("approverComment").value =
+      currentLesson.approverComment || "";
+  }
+
+  window.approveDLL = async function () {
+    if (!docId || !currentLesson) return;
+
+    try {
+      await updateDoc(doc(db, "lessonPlans", docId), {
+        status: "approved",
+        approvedAt: new Date().toISOString(),
+        approvedBy: currentProfile.name || "School Head",
+        approverComment: document.getElementById("approverComment").value.trim()
+      });
+
+      setMessage("DLL approved successfully.", "#0b8f3c");
+      await loadLesson();
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to approve DLL.");
+    }
+  };
+
+  window.returnToDeptHead = async function () {
+    if (!docId || !currentLesson) return;
+
+    try {
+      await updateDoc(doc(db, "lessonPlans", docId), {
+        status: "checked",
+        approverComment: document.getElementById("approverComment").value.trim()
+      });
+
+      setMessage("DLL returned to Department Head.", "#c62828");
+      await loadLesson();
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to return DLL.");
+    }
+  };
+
+  window.goBack = function () {
+    window.location.href = "schoolhead-review-list.html";
+  };
+
+  window.logout = function () {
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    });
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    currentUser = user;
+
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+
+      if (!userSnap.exists()) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentProfile = userSnap.data();
+
+      if (currentProfile.role !== "school_head" && currentProfile.role !== "super_admin") {
+        alert("Access denied.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      await loadLesson();
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to load review page.");
+    }
+  });
+</script>
+
+</body>
+</html>
