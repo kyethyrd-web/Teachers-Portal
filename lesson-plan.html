@@ -1203,13 +1203,17 @@ clonedSelects.forEach((select, index) => {
   URL.revokeObjectURL(url);
 };
   
-window.handleRemark = function(dayIndex){
+function handleRemark(select, dayIndex) {
+  const remark = select.value;
 
-const selects = document.querySelectorAll("#proceduresTable select");
-const remark = selects[dayIndex].value;
+  // Create timestamp
+  const now = new Date();
+  const timestamp = now.toISOString();
 
-const now = new Date().toLocaleString();
-const remarkCell = selects[dayIndex].parentElement;
+  // Save both remark + timestamp
+  select.setAttribute("data-selected", remark);
+  select.setAttribute("data-timestamp", timestamp);
+}
 
 /* SAVE SELECTED VALUE INTO ATTRIBUTE */
 
