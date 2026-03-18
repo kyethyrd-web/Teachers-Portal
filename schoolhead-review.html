@@ -339,8 +339,10 @@
     document.getElementById("checkedBy").innerText =
       currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
 
-    document.getElementById("lessonTableContainer").innerHTML =
-      currentLesson.tableHTML || "<p>No lesson content found.</p>";
+document.getElementById("lessonTableContainer").innerHTML =
+  currentLesson.tableHTML
+    ? `<table style="width:100%; border-collapse:collapse; table-layout:fixed;">${currentLesson.tableHTML}</table>`
+    : "<p>No lesson content found.</p>";
 
     document.getElementById("checkerCommentView").innerText =
       currentLesson.checkerComment || "No comments provided.";
