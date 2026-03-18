@@ -339,10 +339,39 @@
     document.getElementById("checkedBy").innerText =
       currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
 
-document.getElementById("lessonTableContainer").innerHTML =
-  currentLesson.tableHTML
-    ? `<table style="width:100%; border-collapse:collapse; table-layout:fixed;">${currentLesson.tableHTML}</table>`
-    : "<p>No lesson content found.</p>";
+if (currentLesson.tableHTML) {
+  document.getElementById("lessonTableContainer").innerHTML =
+    `<table style="width:100%; border-collapse:collapse; table-layout:fixed;">${currentLesson.tableHTML}</table>`;
+
+  // 1. Restore saved dropdown values
+  const selects = document.querySelectorAll("#lessonTableContainer select");
+  selects.forEach(select => {
+    const savedValue = select.getAttribute("data-selected");
+    if (savedValue) {
+      select.value = savedValue;
+    }
+    select.disabled = true;
+    select.style.pointerEvents = "none";
+    select.style.background = "#f1f5f9";
+  });
+
+  // 2. Make all editable cells readonly
+  const editableCells = document.querySelectorAll("#lessonTableContainer [contenteditable='true']");
+  editableCells.forEach(cell => {
+    cell.setAttribute("contenteditable", "false");
+    cell.style.background = "#ffffff";
+  });
+
+  // 3. Lock textarea fields inside the saved table
+  const textareas = document.querySelectorAll("#lessonTableContainer textarea");
+  textareas.forEach(textarea => {
+    textarea.setAttribute("readonly", "true");
+    textarea.style.pointerEvents = "none";
+    textarea.style.background = "#f8fafc";
+  });
+} else {
+  document.getElementById("lessonTableContainer").innerHTML = "<p>No lesson content found.</p>";
+}
 
     document.getElementById("checkerCommentView").innerText =
       currentLesson.checkerComment || "No comments provided.";
