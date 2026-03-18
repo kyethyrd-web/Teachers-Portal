@@ -340,9 +340,8 @@
       currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
 
 if (currentLesson.tableHTML) {
-  document.getElementById("lessonTableContainer").innerHTML =
-    `<table style="width:100%; border-collapse:collapse; table-layout:fixed;">${currentLesson.tableHTML}</table>`;
-
+  document.getElementById("lessonTableContainer").innerHTML = currentLesson.tableHTML;
+  
   // 1. Restore saved dropdown values
   const selects = document.querySelectorAll("#lessonTableContainer select");
   selects.forEach(select => {
