@@ -320,8 +320,7 @@
   }
 
   function formatReadableDateTime(dateValue){
-    if(!dateValue) return "—";
-
+    if(!dateValue) return "";
     const d = new Date(dateValue);
     if(isNaN(d.getTime())) return dateValue;
 
@@ -342,21 +341,24 @@
       return;
     }
 
-    container.innerHTML = `
-      <table id="reviewLessonTable" style="width:100%; border-collapse:collapse; table-layout:fixed;">
-        ${tableHTML}
-      </table>
-    `;
+    // Handle both old and new saved formats
+    if(tableHTML.trim().toLowerCase().startsWith("<table")){
+      container.innerHTML = tableHTML;
+    } else {
+      container.innerHTML = `
+        <table id="reviewLessonTable" style="width:100%; border-collapse:collapse; table-layout:fixed;">
+          ${tableHTML}
+        </table>
+      `;
+    }
 
-    // Restore remark values and replace selects with readonly display
     const selects = container.querySelectorAll("select");
     selects.forEach(select => {
-      const savedValue = select.getAttribute("data-selected");
-      const savedTime = select.getAttribute("data-timestamp");
-
-      if(savedValue){
-        select.value = savedValue;
-      }
+      const savedValue = select.getAttribute("data-selected") || select.value || "";
+      const savedTime =
+        select.getAttribute("data-timestamp") ||
+        select.parentElement.getAttribute("data-time") ||
+        "";
 
       const wrapper = document.createElement("div");
       wrapper.className = "remark-display";
@@ -376,14 +378,12 @@
       select.replaceWith(wrapper);
     });
 
-    // Lock contenteditable cells
     const editableCells = container.querySelectorAll("[contenteditable='true']");
     editableCells.forEach(cell => {
       cell.setAttribute("contenteditable", "false");
       cell.style.background = "#ffffff";
     });
 
-    // Lock textareas inside the saved table
     const textareas = container.querySelectorAll("textarea");
     textareas.forEach(textarea => {
       textarea.setAttribute("readonly", "true");
@@ -414,7 +414,7 @@
     document.getElementById("quarter").innerText = currentLesson.quarter || "—";
     document.getElementById("dateRange").innerText = currentLesson.dateRange || "—";
     document.getElementById("timeText").innerText = currentLesson.time || "—";
-    document.getElementById("submittedAt").innerText = formatReadableDateTime(currentLesson.submittedAt);
+    document.getElementById("submittedAt").innerText = formatReadableDateTime(currentLesson.submittedAt) || "—";
     document.getElementById("checkedBy").innerText =
       currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
 
