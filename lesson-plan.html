@@ -741,39 +741,116 @@ function clearLesson(){
   }
 }
 
-window.handleRemark = async function(select, dayIndex){
+window.handleRemark = async function(select, dayIndex) {
   const remark = select.value;
+  const remarkCell = select.parentElement;
+
+  if (!remark) {
+    select.removeAttribute("data-selected");
+    select.removeAttribute("data-timestamp");
+    remarkCell.removeAttribute("data-time");
+    await saveLesson();
+    return;
+  }
+
   const now = new Date();
   const timestampIso = now.toISOString();
-  const timestampDisplay = now.toLocaleString();
+  const timestampDisplay = now.toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit"
+  });
 
+  // Save value and timestamp on the select
   select.setAttribute("data-selected", remark);
   select.setAttribute("data-timestamp", timestampIso);
-  select.parentElement.setAttribute("data-time", timestampDisplay);
 
-  if(remark === "Not carried-out" || remark === "Class suspension"){
+  // Save visible timestamp on parent TD so CSS can show it
+  remarkCell.setAttribute("data-time", timestampDisplay);
+
+  // Copy lesson forward only when possible
+  if (remark === "Not carried-out" || remark === "Class suspension") {
     copyToNextDay(dayIndex);
   }
 
   await saveLesson();
 };
 
-function copyToNextDay(dayIndex){
+function copyToNextDay(dayIndex) {
+  // Friday cannot copy to next day
+  if (dayIndex >= 4) {
+    document.getElementById("statusBox").innerText =
+      "Status: No next day available for copying.";
+    return;
+  }
+
   const table = document.getElementById("proceduresTable");
+  const sourceColumn = dayIndex + 1; // Monday=1 ... Friday=5
+  const targetColumn = dayIndex + 2;
 
-  for(let r = 0; r < table.rows.length; r++){
+  for (let r = 0; r < table.rows.length; r++) {
     const row = table.rows[r];
-    if(row.cells.length < 6) continue;
 
-    const today = row.cells[dayIndex + 1];
-    const next = row.cells[dayIndex + 2];
+    if (row.cells.length < 6) continue;
+    if (!row.cells[sourceColumn] || !row.cells[targetColumn]) continue;
 
-    if(!today || !next) continue;
+    const sourceCell = row.cells[sourceColumn];
+    const targetCell = row.cells[targetColumn];
 
-    if(today.isContentEditable){
-      next.innerText = today.innerText;
+    // Skip day header row
+    if (r === 0) continue;
+
+    // Copy date row only if needed? usually no
+    if (r === 1) continue;
+
+    // Skip remarks row because it has dropdowns
+    const firstCellText = (row.cells[0]?.innerText || "").trim().toUpperCase();
+    if (firstCellText === "V. REMARKS") continue;
+
+    // Skip checker comments row
+    if (firstCellText.includes("CHECKER'S COMMENTS")) continue;
+
+    // Copy only editable lesson cells
+    if (sourceCell.getAttribute("contenteditable") === "true") {
+      targetCell.innerHTML = sourceCell.innerHTML;
     }
   }
+
+  document.getElementById("statusBox").innerText =
+    "Status: Lesson copied to next day.";
+}
+
+function restoreSavedRemarkSelections() {
+  const selects = document.querySelectorAll("#proceduresTable select");
+
+  selects.forEach(select => {
+    const savedValue = select.getAttribute("data-selected");
+    const savedTimestamp = select.getAttribute("data-timestamp");
+    const parentTd = select.parentElement;
+
+    if (savedValue) {
+      select.value = savedValue;
+    }
+
+    if (savedTimestamp) {
+      const d = new Date(savedTimestamp);
+      if (!isNaN(d.getTime())) {
+        const display = d.toLocaleString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        parentTd.setAttribute("data-time", display);
+      }
+    }
+  });
+}
 
   document.getElementById("statusBox").innerText = "Status: New lesson for this selection";
 }
