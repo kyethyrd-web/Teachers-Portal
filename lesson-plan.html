@@ -6,8 +6,8 @@
 
   <style>
     body{
-      font-family:Arial, sans-serif;
-      margin:20px;
+      font-family: Arial, sans-serif;
+      margin: 20px;
       background:#f5f7fb;
     }
 
@@ -117,12 +117,6 @@
     select, input[type="text"]{
       width:100%;
       padding:4px;
-    }
-
-    .infoTable{
-      width:100%;
-      border-collapse:collapse;
-      table-layout:fixed;
     }
 
     .infoTable td:nth-child(1),
@@ -748,4 +742,436 @@ function clearLesson(){
 }
 
 window.handleRemark = async function(select, dayIndex){
- 
+  const remark = select.value;
+  const now = new Date();
+  const timestampIso = now.toISOString();
+  const timestampDisplay = now.toLocaleString();
+
+  select.setAttribute("data-selected", remark);
+  select.setAttribute("data-timestamp", timestampIso);
+  select.parentElement.setAttribute("data-time", timestampDisplay);
+
+  if(remark === "Not carried-out" || remark === "Class suspension"){
+    copyToNextDay(dayIndex);
+  }
+
+  await saveLesson();
+};
+
+function copyToNextDay(dayIndex){
+  const table = document.getElementById("proceduresTable");
+
+  for(let r = 0; r < table.rows.length; r++){
+    const row = table.rows[r];
+    if(row.cells.length < 6) continue;
+
+    const today = row.cells[dayIndex + 1];
+    const next = row.cells[dayIndex + 2];
+
+    if(!today || !next) continue;
+
+    if(today.isContentEditable){
+      next.innerText = today.innerText;
+    }
+  }
+
+  document.getElementById("statusBox").innerText = "Status: New lesson for this selection";
+}
+
+function getCurrentLearningAreaValue(){
+  let learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
+
+  if(learningArea === "other" && other){
+    return other;
+  }
+
+  return learningArea;
+}
+
+async function readLessonData(statusValue = "draft"){
+  const selected = document.getElementById("lessonDate").value;
+  if(!selected){
+    alert("Please select a date first.");
+    return null;
+  }
+
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+  const learningArea = getCurrentLearningAreaValue();
+
+  if(!learningArea){
+    alert("Please select or enter the learning area.");
+    return null;
+  }
+
+  const monday = getMonday(selected);
+  const weekKey = formatDate(monday);
+
+  return {
+    lessonKey: `${currentUser.uid}_${weekKey}_${grade}_${learningArea}_${quarter}`,
+    payload: {
+      userId: currentUser.uid,
+      teacherName: document.getElementById("teacher").innerText,
+      school: document.getElementById("school").innerText,
+      schoolId: window.currentProfile?.schoolId || "",
+      date: selected,
+      weekKey: weekKey,
+      grade: grade,
+      learningArea: learningArea,
+      quarter: quarter,
+      dateRange: document.getElementById("dateRange").innerText || formatRange(monday),
+      time: document.getElementById("timeCell").innerText,
+      tableHTML: document.getElementById("proceduresTable").innerHTML,
+      status: statusValue,
+      assignedDepartmentHead: (window.currentProfile?.departmentHead || "").trim()
+    }
+  };
+}
+
+window.saveLesson = async function(){
+  const result = await readLessonData("draft");
+  if(!result) return;
+
+  const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
+  const oldData = oldSnap.exists() ? oldSnap.data() : {};
+
+  const data = {
+    ...oldData,
+    ...result.payload,
+    createdAt: oldData.createdAt || new Date().toISOString(),
+    submittedAt: oldData.submittedAt || "",
+    checkedAt: oldData.checkedAt || "",
+    approvedAt: oldData.approvedAt || "",
+    checkerComment: oldData.checkerComment || "",
+    checkedBy: oldData.checkedBy || "",
+    approvedBy: oldData.approvedBy || "",
+    approverComment: oldData.approverComment || ""
+  };
+
+  await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
+  document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
+  savePageDraftToLocal();
+};
+
+window.submitLesson = async function(){
+  const result = await readLessonData("submitted");
+  if(!result) return;
+
+  const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
+  const oldData = oldSnap.exists() ? oldSnap.data() : {};
+
+  const data = {
+    ...oldData,
+    ...result.payload,
+    createdAt: oldData.createdAt || new Date().toISOString(),
+    submittedAt: new Date().toISOString(),
+    checkedAt: "",
+    approvedAt: "",
+    checkerComment: oldData.checkerComment || "",
+    checkedBy: "",
+    approvedBy: "",
+    approverComment: ""
+  };
+
+  await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
+  document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
+  clearCurrentUserDraft();
+};
+
+window.loadLesson = async function(){
+  const selected = document.getElementById("lessonDate").value;
+  if(!selected){
+    alert("Please select a date first.");
+    return;
+  }
+
+  const monday = getMonday(selected);
+  updateWeekDates(selected);
+  clearLesson();
+
+  const grade = document.getElementById("gradeLevel").value;
+  const quarter = document.getElementById("quarter").value;
+  const learningArea = getCurrentLearningAreaValue();
+
+  if(!learningArea){
+    document.getElementById("statusBox").innerText = "Status: Select learning area first";
+    return;
+  }
+
+  const lessonKey = `${currentUser.uid}_${formatDate(monday)}_${grade}_${learningArea}_${quarter}`;
+  const snap = await getDoc(doc(db, "lessonPlans", lessonKey));
+
+  if(snap.exists()){
+    const data = snap.data();
+    document.getElementById("timeCell").innerText = data.time || "";
+
+    if(data.tableHTML){
+      document.getElementById("proceduresTable").innerHTML = data.tableHTML;
+      restoreSavedRemarkSelections();
+    }
+
+    document.getElementById("statusBox").innerText = "Status: Lesson Loaded";
+    savePageDraftToLocal();
+  } else {
+    document.getElementById("statusBox").innerText = "Status: Ready for new lesson";
+    savePageDraftToLocal();
+  }
+};
+
+async function loadLessonByDocumentId(docId, mode = "open"){
+  try{
+    const snap = await getDoc(doc(db, "lessonPlans", docId));
+
+    if(!snap.exists()){
+      document.getElementById("statusBox").innerText = "Status: Lesson not found";
+      return;
+    }
+
+    const data = snap.data();
+
+    if(data.userId !== currentUser.uid){
+      alert("You are not allowed to open this lesson.");
+      document.getElementById("statusBox").innerText = "Status: Access denied";
+      window.location.href = "lesson-log-history.html";
+      return;
+    }
+
+    document.getElementById("lessonDate").value = data.date || "";
+    document.getElementById("gradeLevel").value = data.grade || "1";
+    document.getElementById("quarter").value = data.quarter || "1st";
+    setLearningAreaValue(data.learningArea || "");
+    document.getElementById("timeCell").innerText = data.time || "";
+    document.getElementById("dateRange").innerText = data.dateRange || "";
+
+    if(data.tableHTML){
+      document.getElementById("proceduresTable").innerHTML = data.tableHTML;
+      restoreSavedRemarkSelections();
+    }
+
+    if(mode === "reuse"){
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("lessonDate").value = today;
+      updateWeekDates(today);
+      document.getElementById("statusBox").innerText = "Status: Reused from previous lesson. Review and save as a new lesson.";
+    } else {
+      if(data.date){
+        updateWeekDates(data.date);
+      }
+      document.getElementById("statusBox").innerText = "Status: Previous lesson opened";
+    }
+
+    savePageDraftToLocal();
+  } catch(error){
+    console.error("Failed to load lesson by document ID:", error);
+    document.getElementById("statusBox").innerText = "Status: Failed to load lesson";
+  }
+}
+
+async function imageToDataUrl(path){
+  try{
+    const response = await fetch(path);
+    const blob = await response.blob();
+
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch(error){
+    console.error("Image load failed:", path, error);
+    return "";
+  }
+}
+
+window.exportWord = async function(){
+  const district = document.getElementById("districtHeader")?.innerText || "";
+  const schoolHeader = document.getElementById("schoolHeader")?.innerText || "";
+  const schoolIdHeader = document.getElementById("schoolIdHeader")?.innerText || "";
+
+  const school = document.getElementById("school")?.innerText || "";
+  const teacher = document.getElementById("teacher")?.innerText || "";
+  const grade = document.getElementById("gradeLevel")?.value || "";
+  const learningArea = getCurrentLearningAreaValue() || "";
+  const quarter = document.getElementById("quarter")?.value || "";
+  const dateRange = document.getElementById("dateRange")?.innerText || "";
+  const time = document.getElementById("timeCell")?.innerText || "";
+
+  const profile = window.currentProfile || {};
+  const departmentHeadName = profile.departmentHead || "________________________";
+  const schoolHeadName = profile.schoolHead || "________________________";
+
+  const proceduresTable = document.getElementById("proceduresTable");
+  const clonedTable = proceduresTable.cloneNode(true);
+
+  const originalSelects = proceduresTable.querySelectorAll("select");
+  const clonedSelects = clonedTable.querySelectorAll("select");
+
+  clonedSelects.forEach((select, index) => {
+    const originalSelect = originalSelects[index];
+    const td = select.parentElement;
+    const text = originalSelect ? (originalSelect.getAttribute("data-selected") || originalSelect.value) : "";
+    const stamp = originalSelect
+      ? (originalSelect.getAttribute("data-timestamp")
+          ? new Date(originalSelect.getAttribute("data-timestamp")).toLocaleString()
+          : originalSelect.parentElement.getAttribute("data-time"))
+      : "";
+
+    td.innerHTML = text
+      ? `${text}${stamp ? `<div style="font-size:9px;color:#666;margin-top:3px;">(${stamp})</div>` : ""}`
+      : "";
+  });
+
+  const checkerComment = clonedTable.querySelector("#checkerComment");
+  if(checkerComment){
+    checkerComment.parentElement.innerHTML = checkerComment.value || "";
+  }
+
+  const depedLogo = await imageToDataUrl("images/DepEd-logo.png.png");
+  const matatagLogo = await imageToDataUrl("images/Matatag-logo.png.png");
+
+  const exportHTML = `
+  <html xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:w="urn:schemas-microsoft-com:office:word"
+        xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+    <meta charset="utf-8">
+    <title>Daily Lesson Log</title>
+    <style>
+      @page Section1 {
+        size: 11in 8.5in;
+        mso-page-orientation: landscape;
+        margin: 0.5in;
+      }
+      div.Section1 { page: Section1; }
+      body { font-family: Arial, sans-serif; font-size: 11pt; color: #000; }
+      .header-table { width: 100%; border: none; margin-bottom: 8px; }
+      .header-table td { border: none; vertical-align: middle; }
+      .header-center { text-align: center; line-height: 1.3; }
+      .header-center div { margin: 2px 0; }
+      .title { text-align: center; font-weight: bold; font-size: 14pt; margin: 10px 0 14px 0; }
+      table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 12px; }
+      td, th { border: 1px solid #000; padding: 6px; vertical-align: top; word-wrap: break-word; }
+      .infoTable td:nth-child(1), .infoTable td:nth-child(3) { width: 18%; font-weight: bold; }
+      .infoTable td:nth-child(2), .infoTable td:nth-child(4) { width: 32%; }
+      #proceduresExport td:first-child { width: 26%; font-weight: bold; background: #f2f2f2; }
+      .signature-table { width: 100%; border: none; margin-top: 30px; }
+      .signature-table td { border: none; width: 33.33%; vertical-align: top; text-align: center; }
+      .signature-label { text-align: left; margin-bottom: 28px; }
+      .signature-name { font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+      .signature-role { margin-top: 4px; }
+    </style>
+  </head>
+  <body>
+    <div class="Section1">
+      <table class="header-table">
+        <tr>
+          <td style="width:20%; text-align:left;">
+            <img src="${depedLogo}" width="123" height="119" style="width:3.26cm;height:3.15cm;margin-left:0.6cm;">
+          </td>
+          <td class="header-center" style="width:60%;">
+            <div>Republic of the Philippines</div>
+            <div><strong>Department of Education</strong></div>
+            <div>${district}</div>
+            <div><strong>${schoolHeader}</strong></div>
+            <div>${schoolIdHeader}</div>
+          </td>
+          <td style="width:20%; text-align:right;">
+            <img src="${matatagLogo}" width="148" height="77" style="width:3.92cm;height:2.03cm;margin-right:0.6cm;">
+          </td>
+        </tr>
+      </table>
+
+      <div class="title">DAILY LESSON LOG</div>
+
+      <table class="infoTable">
+        <tr><td>School</td><td>${school}</td><td>Grade Level</td><td>${grade}</td></tr>
+        <tr><td>Teacher</td><td>${teacher}</td><td>Learning Area</td><td>${learningArea}</td></tr>
+        <tr><td>Teaching Dates</td><td>${dateRange}</td><td>Quarter</td><td>${quarter}</td></tr>
+        <tr><td>Time</td><td>${time}</td><td></td><td></td></tr>
+      </table>
+
+      <table id="proceduresExport">
+        ${clonedTable.innerHTML}
+      </table>
+
+      <table class="signature-table">
+        <tr>
+          <td>
+            <div class="signature-label">Prepared by:</div>
+            <div class="signature-name">${teacher}</div>
+            <div class="signature-role">${learningArea} Teacher</div>
+          </td>
+          <td>
+            <div class="signature-label">Checked by:</div>
+            <div class="signature-name">${departmentHeadName}</div>
+            <div class="signature-role">${learningArea} Department Head</div>
+          </td>
+          <td>
+            <div class="signature-label">Noted by:</div>
+            <div class="signature-name">${schoolHeadName}</div>
+            <div class="signature-role">School Head</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+  </html>`;
+
+  const safeDate = dateRange.replace(/,/g, "").replace(/\s+/g, "_");
+  const safeSubject = learningArea.replace(/\s+/g, "_");
+  const fileName = `DLL_${safeSubject}_Grade${grade}_${safeDate}.doc`;
+
+  const blob = new Blob(['\ufeff', exportHTML], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+window.goToLessonLogHistory = function(){
+  window.location.href = "lesson-log-history.html";
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if(!snap.exists()){
+    window.location.href = "login.html";
+    return;
+  }
+
+  const data = snap.data();
+  window.currentProfile = data;
+
+  document.getElementById("school").innerText = data.school || "";
+  document.getElementById("teacher").innerText = data.name || "";
+  document.getElementById("districtHeader").innerText = "District of " + (data.district || "______");
+  document.getElementById("schoolHeader").innerText = data.school || "School Name";
+  document.getElementById("schoolIdHeader").innerText = "School ID: " + (data.schoolId || "______");
+
+  if(openDocId){
+    await loadLessonByDocumentId(openDocId, "open");
+  } else if(reuseDocId){
+    await loadLessonByDocumentId(reuseDocId, "reuse");
+  } else {
+    restorePageDraftFromLocal();
+  }
+
+  attachAutoDraftListeners();
+});
+</script>
+
+</body>
+</html>
