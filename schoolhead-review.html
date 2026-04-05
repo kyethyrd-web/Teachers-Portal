@@ -209,6 +209,8 @@
 
     .remark-display{
       line-height:1.3;
+      white-space:normal;
+      word-break:break-word;
     }
 
     .remark-main{
@@ -225,6 +227,11 @@
     #message{
       margin-top:16px;
       font-weight:bold;
+    }
+
+    .loading-text{
+      padding:16px;
+      color:#475569;
     }
 
     @media (max-width:900px){
@@ -270,11 +277,13 @@
         <div class="info-box"><label>Time</label><div id="timeText">—</div></div>
         <div class="info-box"><label>Submitted At</label><div id="submittedAt">—</div></div>
         <div class="info-box"><label>Checked By</label><div id="checkedBy">—</div></div>
+        <div class="info-box"><label>Checked At</label><div id="checkedAt">—</div></div>
+        <div class="info-box"><label>Status</label><div id="statusText">—</div></div>
       </div>
 
       <div class="section-title">Lesson Plan Content</div>
       <div class="lesson-table-wrap">
-        <div id="lessonTableContainer">Loading...</div>
+        <div id="lessonTableContainer" class="loading-text">Loading...</div>
       </div>
 
       <div class="section-title">Department Head Comments</div>
@@ -320,7 +329,8 @@
   }
 
   function formatReadableDateTime(dateValue){
-    if(!dateValue) return "";
+    if(!dateValue) return "—";
+
     const d = new Date(dateValue);
     if(isNaN(d.getTime())) return dateValue;
 
@@ -333,31 +343,57 @@
     });
   }
 
+  function formatRemarkTime(value){
+    if(!value) return "";
+
+    const d = new Date(value);
+    if(!isNaN(d.getTime())){
+      return d.toLocaleString("en-US", {
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    }
+
+    return value;
+  }
+
   function renderReadonlyLessonTable(tableHTML){
     const container = document.getElementById("lessonTableContainer");
 
-    if(!tableHTML){
-      container.innerHTML = "<p>No lesson content found.</p>";
+    if(!tableHTML || !String(tableHTML).trim()){
+      container.innerHTML = "<div class='loading-text'>No lesson content found.</div>";
       return;
     }
 
-    // Handle both old and new saved formats
-    if(tableHTML.trim().toLowerCase().startsWith("<table")){
-      container.innerHTML = tableHTML;
+    const trimmed = String(tableHTML).trim();
+
+    if(trimmed.toLowerCase().startsWith("<table")){
+      container.innerHTML = trimmed;
     } else {
       container.innerHTML = `
-        <table id="reviewLessonTable" style="width:100%; border-collapse:collapse; table-layout:fixed;">
-          ${tableHTML}
+        <table id="reviewLessonTable">
+          ${trimmed}
         </table>
       `;
     }
 
-    const selects = container.querySelectorAll("select");
+    const table = container.querySelector("table");
+    if(!table){
+      container.innerHTML = "<div class='loading-text'>Unable to render lesson table.</div>";
+      return;
+    }
+
+    const selects = table.querySelectorAll("select");
     selects.forEach(select => {
       const savedValue = select.getAttribute("data-selected") || select.value || "";
-      const savedTime =
+      const parentTd = select.parentElement;
+      const savedTimestamp =
         select.getAttribute("data-timestamp") ||
-        select.parentElement.getAttribute("data-time") ||
+        parentTd.getAttribute("data-time") ||
         "";
 
       const wrapper = document.createElement("div");
@@ -365,100 +401,134 @@
 
       const main = document.createElement("div");
       main.className = "remark-main";
-      main.textContent = savedValue || "Select";
+      main.textContent = savedValue || "";
       wrapper.appendChild(main);
 
-      if(savedTime){
+      if(savedTimestamp){
         const time = document.createElement("div");
         time.className = "remark-time";
-        time.textContent = formatReadableDateTime(savedTime);
+        time.textContent = `(${formatRemarkTime(savedTimestamp)})`;
         wrapper.appendChild(time);
       }
 
       select.replaceWith(wrapper);
     });
 
-    const editableCells = container.querySelectorAll("[contenteditable='true']");
+    const editableCells = table.querySelectorAll("[contenteditable='true']");
     editableCells.forEach(cell => {
       cell.setAttribute("contenteditable", "false");
       cell.style.background = "#ffffff";
+      cell.style.outline = "none";
     });
 
-    const textareas = container.querySelectorAll("textarea");
-    textareas.forEach(textarea => {
-      textarea.setAttribute("readonly", "true");
-      textarea.style.pointerEvents = "none";
-      textarea.style.background = "#f8fafc";
+    const allCells = table.querySelectorAll("td, th");
+    allCells.forEach(cell => {
+      cell.removeAttribute("onclick");
+      cell.removeAttribute("onchange");
+      cell.removeAttribute("oninput");
+    });
+
+    const remainingTextareas = table.querySelectorAll("textarea");
+    remainingTextareas.forEach(textarea => {
+      const div = document.createElement("div");
+      div.className = "readonly-comment";
+      div.textContent = textarea.value || textarea.textContent || "";
+      textarea.replaceWith(div);
+    });
+
+    const remainingInputs = table.querySelectorAll("input, select, button");
+    remainingInputs.forEach(el => {
+      el.setAttribute("disabled", "disabled");
+      el.style.pointerEvents = "none";
     });
   }
 
   async function loadLesson(){
     if(!docId){
       setMessage("No DLL document selected.");
+      document.getElementById("lessonTableContainer").innerHTML = "<div class='loading-text'>No DLL document selected.</div>";
       return;
     }
 
-    const snap = await getDoc(doc(db, "lessonPlans", docId));
+    try{
+      const snap = await getDoc(doc(db, "lessonPlans", docId));
 
-    if(!snap.exists()){
-      setMessage("DLL not found.");
-      return;
+      if(!snap.exists()){
+        setMessage("DLL not found.");
+        document.getElementById("lessonTableContainer").innerHTML = "<div class='loading-text'>DLL not found.</div>";
+        return;
+      }
+
+      currentLesson = snap.data();
+
+      document.getElementById("teacherName").innerText = currentLesson.teacherName || "—";
+      document.getElementById("schoolName").innerText = currentLesson.school || "—";
+      document.getElementById("gradeLevel").innerText = currentLesson.grade || "—";
+      document.getElementById("learningArea").innerText = currentLesson.learningArea || "—";
+      document.getElementById("quarter").innerText = currentLesson.quarter || "—";
+      document.getElementById("dateRange").innerText = currentLesson.dateRange || "—";
+      document.getElementById("timeText").innerText = currentLesson.time || "—";
+      document.getElementById("submittedAt").innerText = formatReadableDateTime(currentLesson.submittedAt);
+      document.getElementById("checkedBy").innerText = currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
+      document.getElementById("checkedAt").innerText = formatReadableDateTime(currentLesson.checkedAt);
+      document.getElementById("statusText").innerText = currentLesson.status || "—";
+
+      renderReadonlyLessonTable(currentLesson.tableHTML);
+
+      document.getElementById("checkerCommentView").innerText =
+        currentLesson.checkerComment || "No comments provided.";
+
+      document.getElementById("approverComment").value =
+        currentLesson.approverComment || "";
+
+      setMessage("");
+    }catch(error){
+      console.error("Failed to load lesson:", error);
+      setMessage("Failed to load DLL.");
+      document.getElementById("lessonTableContainer").innerHTML = "<div class='loading-text'>Failed to load DLL.</div>";
     }
-
-    currentLesson = snap.data();
-
-    document.getElementById("teacherName").innerText = currentLesson.teacherName || "—";
-    document.getElementById("schoolName").innerText = currentLesson.school || "—";
-    document.getElementById("gradeLevel").innerText = currentLesson.grade || "—";
-    document.getElementById("learningArea").innerText = currentLesson.learningArea || "—";
-    document.getElementById("quarter").innerText = currentLesson.quarter || "—";
-    document.getElementById("dateRange").innerText = currentLesson.dateRange || "—";
-    document.getElementById("timeText").innerText = currentLesson.time || "—";
-    document.getElementById("submittedAt").innerText = formatReadableDateTime(currentLesson.submittedAt) || "—";
-    document.getElementById("checkedBy").innerText =
-      currentLesson.checkedBy || currentLesson.assignedDepartmentHead || "—";
-
-    renderReadonlyLessonTable(currentLesson.tableHTML);
-
-    document.getElementById("checkerCommentView").innerText =
-      currentLesson.checkerComment || "No comments provided.";
-
-    document.getElementById("approverComment").value =
-      currentLesson.approverComment || "";
   }
 
   window.approveDLL = async function(){
-    if(!docId || !currentLesson) return;
+    if(!docId || !currentLesson){
+      setMessage("No DLL loaded.");
+      return;
+    }
 
     try{
       await updateDoc(doc(db, "lessonPlans", docId), {
         status: "approved",
         approvedAt: new Date().toISOString(),
-        approvedBy: currentProfile.name || "School Head",
+        approvedBy: currentProfile?.name || "School Head",
         approverComment: document.getElementById("approverComment").value.trim()
       });
 
       setMessage("DLL approved successfully.", "#0b8f3c");
       await loadLesson();
     }catch(error){
-      console.error(error);
+      console.error("Approve failed:", error);
       setMessage("Failed to approve DLL.");
     }
   };
 
   window.returnToDeptHead = async function(){
-    if(!docId || !currentLesson) return;
+    if(!docId || !currentLesson){
+      setMessage("No DLL loaded.");
+      return;
+    }
 
     try{
       await updateDoc(doc(db, "lessonPlans", docId), {
         status: "checked",
-        approverComment: document.getElementById("approverComment").value.trim()
+        approverComment: document.getElementById("approverComment").value.trim(),
+        approvedAt: "",
+        approvedBy: ""
       });
 
       setMessage("DLL returned to Department Head.", "#c62828");
       await loadLesson();
     }catch(error){
-      console.error(error);
+      console.error("Return failed:", error);
       setMessage("Failed to return DLL.");
     }
   };
@@ -470,6 +540,8 @@
   window.logout = function(){
     signOut(auth).then(() => {
       window.location.href = "login.html";
+    }).catch((error) => {
+      console.error("Logout failed:", error);
     });
   };
 
@@ -499,7 +571,7 @@
 
       await loadLesson();
     }catch(error){
-      console.error(error);
+      console.error("Failed to initialize review page:", error);
       setMessage("Failed to load review page.");
     }
   });
