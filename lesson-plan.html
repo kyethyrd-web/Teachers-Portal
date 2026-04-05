@@ -117,6 +117,7 @@
     select, input[type="text"]{
       width:100%;
       padding:4px;
+      box-sizing:border-box;
     }
 
     .infoTable td:nth-child(1),
@@ -240,14 +241,14 @@
       <td>
         <select id="learningArea" onchange="checkLearningArea(this)">
           <option value="">Select Learning Area</option>
-          <option>English</option>
-          <option>Math</option>
-          <option>ESP</option>
-          <option>Araling Panlipunan</option>
-          <option>MAPEH</option>
-          <option>Science</option>
-          <option>TLE</option>
-          <option>Filipino</option>
+          <option value="English">English</option>
+          <option value="Math">Math</option>
+          <option value="ESP">ESP</option>
+          <option value="Araling Panlipunan">Araling Panlipunan</option>
+          <option value="MAPEH">MAPEH</option>
+          <option value="Science">Science</option>
+          <option value="TLE">TLE</option>
+          <option value="Filipino">Filipino</option>
           <option value="other">Others...</option>
         </select>
 
@@ -612,6 +613,7 @@ function updateWeekDates(selectedDate){
 }
 
 function getDraftKey(){
+  if(!currentUser) return null;
   return `currentLessonDraft_${currentUser.uid}`;
 }
 
@@ -642,8 +644,20 @@ window.checkLearningArea = function(select){
   }
 };
 
+function getCurrentLearningAreaValue(){
+  const learningArea = document.getElementById("learningArea").value;
+  const other = document.getElementById("otherLearningArea").value.trim();
+
+  if(learningArea === "other"){
+    return other;
+  }
+
+  return learningArea;
+}
+
 function savePageDraftToLocal(){
-  if(!currentUser) return;
+  const key = getDraftKey();
+  if(!key) return;
 
   const draft = {
     lessonDate: document.getElementById("lessonDate").value,
@@ -656,13 +670,43 @@ function savePageDraftToLocal(){
     tableHTML: document.getElementById("proceduresTable").innerHTML
   };
 
-  localStorage.setItem(getDraftKey(), JSON.stringify(draft));
+  localStorage.setItem(key, JSON.stringify(draft));
+}
+
+function restoreSavedRemarkSelections(){
+  const selects = document.querySelectorAll("#proceduresTable select");
+
+  selects.forEach(select => {
+    const savedValue = select.getAttribute("data-selected");
+    const savedTimestamp = select.getAttribute("data-timestamp");
+    const parentTd = select.parentElement;
+
+    if(savedValue){
+      select.value = savedValue;
+    }
+
+    if(savedTimestamp){
+      const d = new Date(savedTimestamp);
+      if(!isNaN(d.getTime())){
+        const display = d.toLocaleString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        parentTd.setAttribute("data-time", display);
+      }
+    }
+  });
 }
 
 function restorePageDraftFromLocal(){
-  if(!currentUser) return;
+  const key = getDraftKey();
+  if(!key) return;
 
-  const saved = localStorage.getItem(getDraftKey());
+  const saved = localStorage.getItem(key);
   if(!saved) return;
 
   const draft = JSON.parse(saved);
@@ -677,29 +721,31 @@ function restorePageDraftFromLocal(){
     draft.learningArea === "other" ? (draft.otherLearningArea || "") : (draft.learningArea || "")
   );
 
+  if(draft.lessonDate){
+    updateWeekDates(draft.lessonDate);
+  }
+
   if(draft.tableHTML){
     document.getElementById("proceduresTable").innerHTML = draft.tableHTML;
     restoreSavedRemarkSelections();
   }
 }
 
-function restoreSavedRemarkSelections(){
-  const selects = document.querySelectorAll("#proceduresTable select");
-  selects.forEach(select => {
-    const savedValue = select.getAttribute("data-selected");
-    if(savedValue){
-      select.value = savedValue;
-    }
-  });
-}
-
 function clearCurrentUserDraft(){
-  if(!currentUser) return;
-  localStorage.removeItem(getDraftKey());
+  const key = getDraftKey();
+  if(!key) return;
+  localStorage.removeItem(key);
 }
 
 function attachAutoDraftListeners(){
-  document.getElementById("lessonDate").addEventListener("input", savePageDraftToLocal);
+  document.getElementById("lessonDate").addEventListener("input", () => {
+    const selected = document.getElementById("lessonDate").value;
+    if(selected){
+      updateWeekDates(selected);
+    }
+    savePageDraftToLocal();
+  });
+
   document.getElementById("gradeLevel").addEventListener("change", savePageDraftToLocal);
   document.getElementById("learningArea").addEventListener("change", savePageDraftToLocal);
   document.getElementById("otherLearningArea").addEventListener("input", savePageDraftToLocal);
@@ -741,11 +787,53 @@ function clearLesson(){
   }
 }
 
-window.handleRemark = async function(select, dayIndex) {
+function isCopyableRow(rowIndex, row){
+  if(rowIndex === 0 || rowIndex === 1) return false;
+
+  const firstCellText = (row.cells[0]?.innerText || "").trim().toUpperCase();
+
+  if(firstCellText === "V. REMARKS") return false;
+  if(firstCellText.includes("CHECKER'S COMMENTS")) return false;
+  if(firstCellText === "I. OBJECTIVES") return false;
+  if(firstCellText === "III. LEARNING RESOURCES") return false;
+  if(firstCellText === "IV. PROCEDURES") return false;
+  if(firstCellText === "VI. REFLECTIONS") return false;
+
+  return true;
+}
+
+function copyToNextDay(dayIndex){
+  if(dayIndex >= 4){
+    document.getElementById("statusBox").innerText = "Status: No next day available for copying.";
+    return;
+  }
+
+  const table = document.getElementById("proceduresTable");
+  const sourceColumn = dayIndex + 1;
+  const targetColumn = dayIndex + 2;
+
+  for(let r = 0; r < table.rows.length; r++){
+    const row = table.rows[r];
+
+    if(!isCopyableRow(r, row)) continue;
+    if(!row.cells[sourceColumn] || !row.cells[targetColumn]) continue;
+
+    const sourceCell = row.cells[sourceColumn];
+    const targetCell = row.cells[targetColumn];
+
+    if(sourceCell.getAttribute("contenteditable") === "true" && targetCell.getAttribute("contenteditable") === "true"){
+      targetCell.innerHTML = sourceCell.innerHTML;
+    }
+  }
+
+  document.getElementById("statusBox").innerText = "Status: Lesson copied to next day.";
+}
+
+window.handleRemark = async function(select, dayIndex){
   const remark = select.value;
   const remarkCell = select.parentElement;
 
-  if (!remark) {
+  if(!remark){
     select.removeAttribute("data-selected");
     select.removeAttribute("data-timestamp");
     remarkCell.removeAttribute("data-time");
@@ -764,107 +852,16 @@ window.handleRemark = async function(select, dayIndex) {
     second: "2-digit"
   });
 
-  // Save value and timestamp on the select
   select.setAttribute("data-selected", remark);
   select.setAttribute("data-timestamp", timestampIso);
-
-  // Save visible timestamp on parent TD so CSS can show it
   remarkCell.setAttribute("data-time", timestampDisplay);
 
-  // Copy lesson forward only when possible
-  if (remark === "Not carried-out" || remark === "Class suspension") {
+  if(remark === "Not carried-out" || remark === "Class suspension"){
     copyToNextDay(dayIndex);
   }
 
   await saveLesson();
 };
-
-function copyToNextDay(dayIndex) {
-  // Friday cannot copy to next day
-  if (dayIndex >= 4) {
-    document.getElementById("statusBox").innerText =
-      "Status: No next day available for copying.";
-    return;
-  }
-
-  const table = document.getElementById("proceduresTable");
-  const sourceColumn = dayIndex + 1; // Monday=1 ... Friday=5
-  const targetColumn = dayIndex + 2;
-
-  for (let r = 0; r < table.rows.length; r++) {
-    const row = table.rows[r];
-
-    if (row.cells.length < 6) continue;
-    if (!row.cells[sourceColumn] || !row.cells[targetColumn]) continue;
-
-    const sourceCell = row.cells[sourceColumn];
-    const targetCell = row.cells[targetColumn];
-
-    // Skip day header row
-    if (r === 0) continue;
-
-    // Copy date row only if needed? usually no
-    if (r === 1) continue;
-
-    // Skip remarks row because it has dropdowns
-    const firstCellText = (row.cells[0]?.innerText || "").trim().toUpperCase();
-    if (firstCellText === "V. REMARKS") continue;
-
-    // Skip checker comments row
-    if (firstCellText.includes("CHECKER'S COMMENTS")) continue;
-
-    // Copy only editable lesson cells
-    if (sourceCell.getAttribute("contenteditable") === "true") {
-      targetCell.innerHTML = sourceCell.innerHTML;
-    }
-  }
-
-  document.getElementById("statusBox").innerText =
-    "Status: Lesson copied to next day.";
-}
-
-function restoreSavedRemarkSelections() {
-  const selects = document.querySelectorAll("#proceduresTable select");
-
-  selects.forEach(select => {
-    const savedValue = select.getAttribute("data-selected");
-    const savedTimestamp = select.getAttribute("data-timestamp");
-    const parentTd = select.parentElement;
-
-    if (savedValue) {
-      select.value = savedValue;
-    }
-
-    if (savedTimestamp) {
-      const d = new Date(savedTimestamp);
-      if (!isNaN(d.getTime())) {
-        const display = d.toLocaleString("en-US", {
-          month: "numeric",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          second: "2-digit"
-        });
-        parentTd.setAttribute("data-time", display);
-      }
-    }
-  });
-}
-
-  document.getElementById("statusBox").innerText = "Status: New lesson for this selection";
-}
-
-function getCurrentLearningAreaValue(){
-  let learningArea = document.getElementById("learningArea").value;
-  const other = document.getElementById("otherLearningArea").value.trim();
-
-  if(learningArea === "other" && other){
-    return other;
-  }
-
-  return learningArea;
-}
 
 async function readLessonData(statusValue = "draft"){
   const selected = document.getElementById("lessonDate").value;
@@ -963,10 +960,6 @@ window.loadLesson = async function(){
     return;
   }
 
-  const monday = getMonday(selected);
-  updateWeekDates(selected);
-  clearLesson();
-
   const grade = document.getElementById("gradeLevel").value;
   const quarter = document.getElementById("quarter").value;
   const learningArea = getCurrentLearningAreaValue();
@@ -975,6 +968,10 @@ window.loadLesson = async function(){
     document.getElementById("statusBox").innerText = "Status: Select learning area first";
     return;
   }
+
+  const monday = getMonday(selected);
+  updateWeekDates(selected);
+  clearLesson();
 
   const lessonKey = `${currentUser.uid}_${formatDate(monday)}_${grade}_${learningArea}_${quarter}`;
   const snap = await getDoc(doc(db, "lessonPlans", lessonKey));
@@ -986,6 +983,11 @@ window.loadLesson = async function(){
     if(data.tableHTML){
       document.getElementById("proceduresTable").innerHTML = data.tableHTML;
       restoreSavedRemarkSelections();
+    }
+
+    const checkerComment = document.getElementById("checkerComment");
+    if(checkerComment){
+      checkerComment.value = data.checkerComment || "";
     }
 
     document.getElementById("statusBox").innerText = "Status: Lesson Loaded";
@@ -1024,6 +1026,11 @@ async function loadLessonByDocumentId(docId, mode = "open"){
     if(data.tableHTML){
       document.getElementById("proceduresTable").innerHTML = data.tableHTML;
       restoreSavedRemarkSelections();
+    }
+
+    const checkerComment = document.getElementById("checkerComment");
+    if(checkerComment){
+      checkerComment.value = data.checkerComment || "";
     }
 
     if(mode === "reuse"){
