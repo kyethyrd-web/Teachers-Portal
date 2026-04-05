@@ -82,6 +82,11 @@
       background:#00307a;
     }
 
+    button:disabled{
+      opacity:0.7;
+      cursor:not-allowed;
+    }
+
     h2{
       margin-bottom:10px;
     }
@@ -206,10 +211,10 @@
   </div>
 
   <div class="navbar">
-    <button onclick="location.href='teacher-dashboard.html'">Dashboard</button>
-    <button onclick="goToLessonLogHistory()">Lesson Log</button>
-    <button onclick="exportWord()">Export</button>
-    <button onclick="saveLesson()">Save</button>
+    <button type="button" onclick="location.href='teacher-dashboard.html'">Dashboard</button>
+    <button type="button" onclick="goToLessonLogHistory()">Lesson Log</button>
+    <button type="button" onclick="exportWord()">Export</button>
+    <button type="button" id="saveBtn" onclick="saveLesson()">Save</button>
   </div>
 
   <h2>Daily Lesson Log</h2>
@@ -547,7 +552,7 @@
     </tr>
   </table>
 
-  <button onclick="submitLesson()">Submit</button>
+  <button type="button" id="submitBtn" onclick="submitLesson()">Submit</button>
   <div id="statusBox">Status: Ready</div>
 </div>
 
@@ -904,53 +909,107 @@ async function readLessonData(statusValue = "draft"){
 }
 
 window.saveLesson = async function(){
-  const result = await readLessonData("draft");
-  if(!result) return;
+  const saveBtn = document.getElementById("saveBtn");
 
-  const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
-  const oldData = oldSnap.exists() ? oldSnap.data() : {};
+  try{
+    if(saveBtn){
+      saveBtn.disabled = true;
+      saveBtn.innerText = "Saving...";
+    }
 
-  const data = {
-    ...oldData,
-    ...result.payload,
-    createdAt: oldData.createdAt || new Date().toISOString(),
-    submittedAt: oldData.submittedAt || "",
-    checkedAt: oldData.checkedAt || "",
-    approvedAt: oldData.approvedAt || "",
-    checkerComment: oldData.checkerComment || "",
-    checkedBy: oldData.checkedBy || "",
-    approvedBy: oldData.approvedBy || "",
-    approverComment: oldData.approverComment || ""
-  };
+    document.getElementById("statusBox").innerText = "Status: Saving...";
 
-  await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
-  document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
-  savePageDraftToLocal();
+    const result = await readLessonData("draft");
+    if(!result){
+      document.getElementById("statusBox").innerText = "Status: Save cancelled";
+      return;
+    }
+
+    const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
+    const oldData = oldSnap.exists() ? oldSnap.data() : {};
+
+    const data = {
+      ...oldData,
+      ...result.payload,
+      createdAt: oldData.createdAt || new Date().toISOString(),
+      submittedAt: oldData.submittedAt || "",
+      checkedAt: oldData.checkedAt || "",
+      approvedAt: oldData.approvedAt || "",
+      checkerComment: oldData.checkerComment || "",
+      checkedBy: oldData.checkedBy || "",
+      approvedBy: oldData.approvedBy || "",
+      approverComment: oldData.approverComment || ""
+    };
+
+    await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
+    document.getElementById("statusBox").innerText = "Status: Lesson Saved!";
+    savePageDraftToLocal();
+  }catch(error){
+    console.error("Save failed:", error);
+    document.getElementById("statusBox").innerText = "Status: Save failed";
+    alert("Save failed. Check the browser console for the exact error.");
+  }finally{
+    if(saveBtn){
+      saveBtn.disabled = false;
+      saveBtn.innerText = "Save";
+    }
+  }
 };
 
 window.submitLesson = async function(){
-  const result = await readLessonData("submitted");
-  if(!result) return;
+  const submitBtn = document.getElementById("submitBtn");
 
-  const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
-  const oldData = oldSnap.exists() ? oldSnap.data() : {};
+  try{
+    if(submitBtn){
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+    }
 
-  const data = {
-    ...oldData,
-    ...result.payload,
-    createdAt: oldData.createdAt || new Date().toISOString(),
-    submittedAt: new Date().toISOString(),
-    checkedAt: "",
-    approvedAt: "",
-    checkerComment: oldData.checkerComment || "",
-    checkedBy: "",
-    approvedBy: "",
-    approverComment: ""
-  };
+    document.getElementById("statusBox").innerText = "Status: Submitting...";
 
-  await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
-  document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
-  clearCurrentUserDraft();
+    const result = await readLessonData("submitted");
+    if(!result){
+      document.getElementById("statusBox").innerText = "Status: Submission cancelled";
+      return;
+    }
+
+    const oldSnap = await getDoc(doc(db, "lessonPlans", result.lessonKey));
+    const oldData = oldSnap.exists() ? oldSnap.data() : {};
+
+    const data = {
+      ...oldData,
+      ...result.payload,
+      createdAt: oldData.createdAt || new Date().toISOString(),
+      submittedAt: new Date().toISOString(),
+      checkedAt: "",
+      approvedAt: "",
+      checkerComment: oldData.checkerComment || "",
+      checkedBy: "",
+      approvedBy: "",
+      approverComment: ""
+    };
+
+    await setDoc(doc(db, "lessonPlans", result.lessonKey), data);
+
+    document.getElementById("statusBox").innerText = "Status: Submitted to Department Head";
+    clearCurrentUserDraft();
+    alert("Lesson submitted successfully.");
+  }catch(error){
+    console.error("Submit failed:", error);
+
+    if(error.code === "permission-denied"){
+      document.getElementById("statusBox").innerText = "Status: Permission denied while submitting";
+      alert("Submission failed because Firestore denied permission.");
+    }else{
+      document.getElementById("statusBox").innerText = "Status: Submission failed";
+      alert("Submission failed. Check the browser console for the exact error.");
+    }
+  }finally{
+    if(submitBtn){
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Submit";
+    }
+  }
 };
 
 window.loadLesson = async function(){
